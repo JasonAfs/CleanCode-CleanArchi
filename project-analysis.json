@@ -1,0 +1,117 @@
+{
+  "metadata": {
+    "analyzedAt": "2025-01-11T15:28:09.382Z",
+    "rootPath": "/Users/jasonafonso/triumph_clean_code_project",
+    "totalFiles": 6,
+    "totalSize": 7468,
+    "fileTypes": {
+      ".json": 3,
+      ".ts": 2,
+      ".js": 1
+    }
+  },
+  "structure": {
+    "path": "/Users/jasonafonso/triumph_clean_code_project",
+    "files": [
+      {
+        "path": "/Users/jasonafonso/triumph_clean_code_project/.eslintrc.json",
+        "content": "{\n    \"parser\": \"@typescript-eslint/parser\",\n    \"plugins\": [\"@typescript-eslint\"],\n    \"extends\": [\n      \"eslint:recommended\",\n      \"plugin:@typescript-eslint/recommended\"\n    ],\n    \"rules\": {\n      \"@typescript-eslint/explicit-function-return-type\": \"warn\",\n      \"@typescript-eslint/no-explicit-any\": \"error\",\n      \"@typescript-eslint/no-unused-vars\": \"error\"\n    }\n  }",
+        "size": 376,
+        "lastModified": "2025-01-11T12:18:38.132Z",
+        "extension": ".json"
+      },
+      {
+        "path": "/Users/jasonafonso/triumph_clean_code_project/analyse.ts",
+        "content": "import * as fs from \"fs\";\nimport * as path from \"path\";\n\ninterface FileInfo {\n  path: string;\n  content: string;\n  size: number;\n  lastModified: Date;\n  extension: string;\n}\n\ninterface DirectoryInfo {\n  path: string;\n  files: FileInfo[];\n  subdirectories: DirectoryInfo[];\n}\n\ninterface ProjectAnalysis {\n  metadata: {\n    analyzedAt: Date;\n    rootPath: string;\n    totalFiles: number;\n    totalSize: number;\n    fileTypes: { [key: string]: number };\n  };\n  structure: DirectoryInfo;\n}\n\nconst ignoredDirectories = new Set([\n  \"node_modules\",\n  \".git\",\n  \"dist\",\n  \"build\",\n  \"coverage\",\n  \".next\",\n  \".cache\",\n]);\n\nconst ignoredFiles = new Set([\n  \".DS_Store\",\n  \"thumbs.db\",\n  \"package-lock.json\",\n  \"yarn.lock\",\n  \"pnpm-lock.yaml\",\n  \".gitignore\",\n  \".env\",\n  \".env.local\",\n]);\n\n// Extensions et noms de fichiers à analyser\nconst relevantExtensions = new Set([\n  \".ts\",\n  \".tsx\",\n  \".js\",\n  \".jsx\",\n  \".css\",\n  \".scss\",\n  \".html\",\n  \".json\",\n  \".prisma\",            // Ajout du support Prisma\n  \".dockerfile\",        // Certains Dockerfiles peuvent avoir cette extension\n]);\n\n// Noms de fichiers spéciaux à inclure (sans extension)\nconst specialFileNames = new Set([\n  \"dockerfile\",         // Dockerfile standard\n  \"docker-compose.yml\", // Docker Compose\n  \"docker-compose.yaml\",\n  \".dockerignore\",\n  \"schema.prisma\",      // Fichier Prisma principal\n]);\n\n// Taille maximale de fichier à inclure (5MB)\nconst MAX_FILE_SIZE = 5 * 1024 * 1024;\n\nfunction shouldAnalyzeFile(filePath: string, size: number): boolean {\n  const basename = path.basename(filePath).toLowerCase();\n  const ext = path.extname(filePath).toLowerCase();\n\n  // Vérifier si le fichier est ignoré\n  if (ignoredFiles.has(basename)) {\n    return false;\n  }\n\n  // Vérifier la taille du fichier\n  if (size > MAX_FILE_SIZE) {\n    console.log(`Fichier ignoré (trop volumineux): ${filePath}`);\n    return false;\n  }\n\n  // Vérifier si c'est un fichier spécial à inclure\n  if (specialFileNames.has(basename)) {\n    return true;\n  }\n\n  // Vérifier l'extension\n  if (relevantExtensions.has(ext)) {\n    return true;\n  }\n\n  return false;\n}\n\nfunction analyzeProject(rootPath: string): ProjectAnalysis {\n  const structure = analyzeDirectory(rootPath);\n  const metadata = {\n    analyzedAt: new Date(),\n    rootPath,\n    totalFiles: 0,\n    totalSize: 0,\n    fileTypes: {} as { [key: string]: number },\n  };\n\n  function processDirectory(dir: DirectoryInfo) {\n    dir.files.forEach((file) => {\n      metadata.totalFiles++;\n      metadata.totalSize += file.size;\n\n      // Gestion spéciale pour les fichiers sans extension\n      let fileType = file.extension;\n      if (!fileType || fileType === \"no-extension\") {\n        const basename = path.basename(file.path).toLowerCase();\n        if (basename === \"dockerfile\") {\n          fileType = \"dockerfile\";\n        } else if (basename.includes(\"docker-compose\")) {\n          fileType = \"docker-compose\";\n        } else if (basename === \".dockerignore\") {\n          fileType = \"dockerignore\";\n        }\n      }\n\n      metadata.fileTypes[fileType] = (metadata.fileTypes[fileType] || 0) + 1;\n    });\n\n    dir.subdirectories.forEach(processDirectory);\n  }\n\n  processDirectory(structure);\n\n  return {\n    metadata,\n    structure,\n  };\n}\n\nfunction analyzeDirectory(dirPath: string): DirectoryInfo {\n  const result: DirectoryInfo = {\n    path: dirPath,\n    files: [],\n    subdirectories: [],\n  };\n\n  const entries = fs.readdirSync(dirPath);\n\n  for (const entry of entries) {\n    const fullPath = path.join(dirPath, entry);\n    const stats = fs.statSync(fullPath);\n\n    if (stats.isDirectory()) {\n      if (!ignoredDirectories.has(entry)) {\n        result.subdirectories.push(analyzeDirectory(fullPath));\n      }\n    } else if (stats.isFile()) {\n      if (shouldAnalyzeFile(fullPath, stats.size)) {\n        try {\n          result.files.push({\n            path: fullPath,\n            content: fs.readFileSync(fullPath, \"utf-8\"),\n            size: stats.size,\n            lastModified: stats.mtime,\n            extension: path.extname(fullPath).toLowerCase() || \"no-extension\",\n          });\n        } catch (error) {\n          console.error(\n            `Erreur lors de la lecture du fichier ${fullPath}:`,\n            error\n          );\n        }\n      }\n    }\n  }\n\n  return result;\n}\n\nfunction saveAnalysis(analysis: ProjectAnalysis, outputPath: string): void {\n  const jsonContent = JSON.stringify(analysis, null, 2);\n  fs.writeFileSync(outputPath, jsonContent);\n}\n\nfunction main() {\n  const projectPath = process.argv[2] || process.cwd();\n  console.log(`Analyse du projet: ${projectPath}`);\n\n  try {\n    const analysis = analyzeProject(projectPath);\n    const outputPath = path.join(projectPath, \"project-analysis.json\");\n\n    saveAnalysis(analysis, outputPath);\n    console.log(`\\nAnalyse sauvegardée dans: ${outputPath}`);\n\n    console.log(\"\\nRésumé:\");\n    console.log(\n      `- Nombre total de fichiers analysés: ${analysis.metadata.totalFiles}`\n    );\n    console.log(\n      `- Taille totale des fichiers analysés: ${(\n        analysis.metadata.totalSize /\n        1024 /\n        1024\n      ).toFixed(2)} MB`\n    );\n    console.log(\"- Types de fichiers:\");\n    Object.entries(analysis.metadata.fileTypes).forEach(([ext, count]) => {\n      console.log(`  ${ext}: ${count} fichiers`);\n    });\n  } catch (error) {\n    console.error(\"Erreur lors de l'analyse:\", error);\n  }\n}\n\nmain();",
+        "size": 5394,
+        "lastModified": "2025-01-11T15:23:42.224Z",
+        "extension": ".ts"
+      },
+      {
+        "path": "/Users/jasonafonso/triumph_clean_code_project/jest.config.js",
+        "content": "module.exports = {\n    preset: 'ts-jest',\n    testEnvironment: 'node',\n    roots: ['<rootDir>/src'],\n    moduleNameMapper: {\n      '@domain/(.*)': '<rootDir>/src/domain/$1',\n      '@application/(.*)': '<rootDir>/src/application/$1'\n    }\n  };",
+        "size": 242,
+        "lastModified": "2025-01-11T12:23:57.456Z",
+        "extension": ".js"
+      },
+      {
+        "path": "/Users/jasonafonso/triumph_clean_code_project/package.json",
+        "content": "{\n  \"name\": \"triumph_clean_code_project\",\n  \"version\": \"1.0.0\",\n  \"main\": \"index.js\",\n  \"scripts\": {\n    \"dev\": \"nodemon --watch 'src/**/*.ts' --exec ts-node src/index.ts\",\n    \"lint\": \"eslint . --ext .ts\",\n    \"format\": \"prettier --write 'src/**/*.ts'\",\n    \"test\": \"jest\",\n    \"test:watch\": \"jest --watch\",\n    \"test:coverage\": \"jest --coverage\"\n  },\n  \"keywords\": [],\n  \"author\": \"\",\n  \"license\": \"ISC\",\n  \"description\": \"\",\n  \"devDependencies\": {\n    \"@types/jest\": \"^29.5.14\",\n    \"@types/node\": \"^22.10.5\",\n    \"@typescript-eslint/eslint-plugin\": \"^8.19.1\",\n    \"@typescript-eslint/parser\": \"^8.19.1\",\n    \"eslint\": \"^9.18.0\",\n    \"jest\": \"^29.7.0\",\n    \"nodemon\": \"^3.1.9\",\n    \"prettier\": \"^3.4.2\",\n    \"ts-jest\": \"^29.2.5\",\n    \"ts-node\": \"^10.9.2\",\n    \"typescript\": \"^5.7.3\"\n  }\n}\n",
+        "size": 792,
+        "lastModified": "2025-01-11T12:22:52.096Z",
+        "extension": ".json"
+      },
+      {
+        "path": "/Users/jasonafonso/triumph_clean_code_project/tsconfig.json",
+        "content": "{\n    \"compilerOptions\": {\n      \"target\": \"es2022\",\n      \"module\": \"commonjs\",\n      \"strict\": true,\n      \"esModuleInterop\": true,\n      \"skipLibCheck\": true,\n      \"rootDir\": \"./src\",\n      \"baseUrl\": \"./src\",\n      \"paths\": {\n        \"@domain/*\": [\"domain/*\"],\n        \"@application/*\": [\"application/*\"]\n      }\n    },\n    \"include\": [\"src/**/*\"]\n  }",
+        "size": 356,
+        "lastModified": "2025-01-11T14:58:16.434Z",
+        "extension": ".json"
+      }
+    ],
+    "subdirectories": [
+      {
+        "path": "/Users/jasonafonso/triumph_clean_code_project/src",
+        "files": [
+          {
+            "path": "/Users/jasonafonso/triumph_clean_code_project/src/index.ts",
+            "content": "// Code mal formaté intentionnellement\nconst userExample = {\n  name: 'John',\n  age: 30,\n  roles: ['admin', 'user'],\n};\n\n// Fonction sans type de retour (devrait déclencher ESLint)\nfunction getData(input) {\n  return input;\n}\n\n// Variable non utilisée (devrait déclencher ESLint)\nconst unusedVar = 'test';\n",
+            "size": 308,
+            "lastModified": "2025-01-11T15:11:17.973Z",
+            "extension": ".ts"
+          }
+        ],
+        "subdirectories": [
+          {
+            "path": "/Users/jasonafonso/triumph_clean_code_project/src/application",
+            "files": [],
+            "subdirectories": [
+              {
+                "path": "/Users/jasonafonso/triumph_clean_code_project/src/application/ports",
+                "files": [],
+                "subdirectories": [
+                  {
+                    "path": "/Users/jasonafonso/triumph_clean_code_project/src/application/ports/repositories",
+                    "files": [],
+                    "subdirectories": []
+                  },
+                  {
+                    "path": "/Users/jasonafonso/triumph_clean_code_project/src/application/ports/services",
+                    "files": [],
+                    "subdirectories": []
+                  }
+                ]
+              },
+              {
+                "path": "/Users/jasonafonso/triumph_clean_code_project/src/application/use-cases",
+                "files": [],
+                "subdirectories": []
+              }
+            ]
+          },
+          {
+            "path": "/Users/jasonafonso/triumph_clean_code_project/src/domain",
+            "files": [],
+            "subdirectories": [
+              {
+                "path": "/Users/jasonafonso/triumph_clean_code_project/src/domain/entities",
+                "files": [],
+                "subdirectories": []
+              },
+              {
+                "path": "/Users/jasonafonso/triumph_clean_code_project/src/domain/repositories",
+                "files": [],
+                "subdirectories": []
+              },
+              {
+                "path": "/Users/jasonafonso/triumph_clean_code_project/src/domain/value-objects",
+                "files": [],
+                "subdirectories": []
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}
