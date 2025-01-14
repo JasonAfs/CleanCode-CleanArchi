@@ -5,7 +5,7 @@ import { AddDealershipEmployeeValidator } from "@application/validation/dealersh
 import { DealershipNotFoundError } from "@domain/errors/dealership/DealershipNotFoundError";
 import { UserNotFoundError } from "@domain/errors/user/UserNotFoundError";
 
-export class AddEmployeeUseCase {
+export class AddDealershipEmployeeUseCase {
     constructor(
         private readonly dealershipRepository: IDealershipRepository,
         private readonly userRepository: IUserRepository,
