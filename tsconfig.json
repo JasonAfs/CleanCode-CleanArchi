@@ -7,6 +7,7 @@
       "skipLibCheck": true,
       "rootDir": "./src",
       "baseUrl": "./src",
+      "experimentalDecorators": true,
       "paths": {
         "@domain/*": ["domain/*"],
         "@application/*": ["application/*"]

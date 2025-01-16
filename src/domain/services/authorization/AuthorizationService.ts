@@ -1,32 +1,51 @@
 import { UserRole } from "@domain/enums/UserRole";
-import { 
-    Permission,
-    ROLE_HIERARCHY,
-    ROLE_PERMISSIONS 
-} from "./RolePermissions";
+import { AuthorizationContext } from "./AuthorizationContext";
+import { Permission } from "./Permission";
+import { ROLE_PERMISSIONS } from "./PermissionRegistry";
 
 export class AuthorizationService {
-    public hasPermission(userRole: UserRole, requiredRole: UserRole): boolean {
-        return ROLE_HIERARCHY[userRole] >= ROLE_HIERARCHY[requiredRole];
-    }
+    constructor(private readonly permissionRegistry: ReadonlyMap<UserRole, ReadonlySet<Permission>> = ROLE_PERMISSIONS) {}
 
-    public hasSpecificPermission(userRole: UserRole, permission: Permission): boolean {
-        return ROLE_PERMISSIONS[permission].includes(userRole);
-    }
+    public hasPermission(context: AuthorizationContext, requiredPermission: Permission): boolean {
 
-    public canManageStock(userRole: UserRole): boolean {
-        return this.hasSpecificPermission(userRole, Permission.MANAGE_STOCK);
-    }
+        console.log('Checking permission details:', {
+            userRole: context.userRole,
+            requiredPermission,
+            hasPermission: this.permissionRegistry.get(context.userRole)?.has(requiredPermission),
+            allUserPermissions: Array.from(this.permissionRegistry.get(context.userRole) || []),
+            dealershipId: context.dealershipId,
+            companyId: context.companyId
+        });
+        // 1. Vérifier si l'utilisateur a la permission requise
+        const userPermissions = this.permissionRegistry.get(context.userRole);
+        if (!userPermissions?.has(requiredPermission)) {
+            return false;
+        }
 
-    public canPerformMaintenance(userRole: UserRole): boolean {
-        return this.hasSpecificPermission(userRole, Permission.PERFORM_MAINTENANCE);
-    }
+        // 2. Les admins ont toujours accès à tout
+        if (context.userRole === UserRole.TRIUMPH_ADMIN) {
+            return true;
+        }
 
-    public canManageFleet(userRole: UserRole): boolean {
-        return this.hasSpecificPermission(userRole, Permission.MANAGE_FLEET);
-    }
+        // 3. Vérifier le contexte selon le type d'utilisateur
+        switch (context.userRole) {
+            case UserRole.DEALERSHIP_MANAGER:
+            case UserRole.DEALERSHIP_EMPLOYEE:
+            case UserRole.DEALERSHIP_TECHNICIAN:
+                // Vérifier que l'utilisateur accède à sa propre concession
+                return context.dealershipId ? true : false;
 
-    public isAdmin(userRole: UserRole): boolean {
-        return this.hasSpecificPermission(userRole, Permission.ADMIN_ACCESS);
+            case UserRole.COMPANY_MANAGER:
+            case UserRole.COMPANY_DRIVER:
+                // Vérifier que l'utilisateur accède à sa propre entreprise
+                return context.companyId ? true : false;
+
+            case UserRole.CLIENT:
+                // Les clients ne peuvent accéder qu'à leurs propres ressources
+                return context.userId === context.resourceId;
+
+            default:
+                return false;
+        }
     }
 }

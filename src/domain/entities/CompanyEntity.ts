@@ -122,13 +122,13 @@ export class Company {
         return this.props.employees.getDrivers();
     }
 
-    public getPartnerEmployees(): User[] {
-        return this.props.employees.getPartnerEmployees();
+    public getCompanyEmployees(): User[] {
+        return this.props.employees.getCompanyEmployees();
     }
 
     // Méthodes de validation supplémentaires
     public isValidForRegistration(): boolean {
-        // Une entreprise valide doit avoir au moins un employé partenaire
-        return this.getPartnerEmployees().length > 0;
+        // Une entreprise valide doit avoir au moins un employé company manager
+        return this.getCompanyEmployees().length > 0;
     }
 }
