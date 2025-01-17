@@ -84,4 +84,8 @@ export class User {
     this.props.lastName = lastName;
     this.props.updatedAt = new Date();
   }
+
+  public getHashedPassword(): string {
+    return this.props.hashedPassword;
+}
 }

@@ -10,7 +10,8 @@
       "experimentalDecorators": true,
       "paths": {
         "@domain/*": ["domain/*"],
-        "@application/*": ["application/*"]
+        "@application/*": ["application/*"],
+        "@infrastructure/*": ["infrastructure/*"],
       }
     },
     "include": ["src/**/*", "tests"]
