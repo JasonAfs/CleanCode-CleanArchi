@@ -1,0 +1,133 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id             String    @id @default(uuid())
+  email          String    @unique
+  firstName      String
+  lastName       String
+  hashedPassword String
+  role           UserRole
+  companyId      String?
+  isActive       Boolean   @default(true)
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+  company        Company?  @relation(fields: [companyId], references: [id])
+  dealership     Dealership? @relation(fields: [dealershipId], references: [id])
+  dealershipId   String?
+  refreshTokens  RefreshToken[] 
+
+  @@map("users")
+}
+
+model Company {
+  id                String    @id @default(uuid())
+  name              String
+  registrationNumber String   @unique
+  street            String
+  city              String
+  postalCode        String
+  country           String
+  phone             String
+  email             String
+  isActive          Boolean   @default(true)
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+  employees         User[]
+  motorcycles       CompanyMotorcycle[]
+
+  @@map("companies")
+}
+
+model Dealership {
+  id        String    @id @default(uuid())
+  name      String    @unique
+  street    String
+  city      String
+  postalCode String
+  country   String
+  phone     String
+  email     String
+  isActive  Boolean   @default(true)
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  employees User[]
+  motorcycles Motorcycle[]
+
+  @@map("dealerships")
+}
+
+model Motorcycle {
+  id                 String    @id @default(uuid())
+  vin                String    @unique
+  model              String
+  year               Int
+  registrationNumber String
+  mileage            Int
+  status             MotorcycleStatus
+  lastMaintenanceDate DateTime?
+  nextMaintenanceDate DateTime?
+  isActive           Boolean   @default(true)
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime  @updatedAt
+  dealershipId       String
+  dealership         Dealership @relation(fields: [dealershipId], references: [id])
+  companyAssignments CompanyMotorcycle[]
+
+  @@map("motorcycles")
+}
+
+model CompanyMotorcycle {
+  id           String    @id @default(uuid())
+  companyId    String
+  motorcycleId String
+  assignedAt   DateTime  @default(now())
+  isActive     Boolean   @default(true)
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  company      Company   @relation(fields: [companyId], references: [id])
+  motorcycle   Motorcycle @relation(fields: [motorcycleId], references: [id])
+
+  @@map("company_motorcycles")
+}
+
+model RefreshToken {
+  id        String   @id @default(uuid())
+  token     String   @unique
+  userId    String
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id])
+
+  @@map("refresh_tokens")
+}
+
+
+enum UserRole {
+  TRIUMPH_ADMIN
+  DEALERSHIP_MANAGER
+  DEALERSHIP_EMPLOYEE
+  DEALERSHIP_TECHNICIAN
+  COMPANY_MANAGER
+  COMPANY_DRIVER
+  CLIENT
+}
+
+enum MotorcycleStatus {
+  AVAILABLE
+  IN_USE
+  MAINTENANCE
+  OUT_OF_SERVICE
+}

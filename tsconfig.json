@@ -1,18 +1,19 @@
 {
-    "compilerOptions": {
-      "target": "es2022",
-      "module": "commonjs",
-      "strict": true,
-      "esModuleInterop": true,
-      "skipLibCheck": true,
-      "rootDir": "./src",
-      "baseUrl": "./src",
-      "experimentalDecorators": true,
-      "paths": {
-        "@domain/*": ["domain/*"],
-        "@application/*": ["application/*"],
-        "@infrastructure/*": ["infrastructure/*"],
-      }
-    },
-    "include": ["src/**/*", "tests"]
-  }
+  "compilerOptions": {
+    "target": "es2022",
+    "module": "commonjs",
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "baseUrl": ".",  // Changé de "./src" à "."
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,  // Ajouté pour NestJS
+    "outDir": "./dist",  // Ajouté pour spécifier le dossier de sortie
+    "paths": {
+      "@domain/*": ["src/domain/*"],       // Mis à jour
+      "@application/*": ["src/application/*"],  // Mis à jour
+      "@infrastructure/*": ["src/infrastructure/*"],  // Mis à jour
+    }
+  },
+  "include": ["src/**/*", "tests/**/*"]  // Modifié pour inclure tous les fichiers de tests
+}

@@ -11,9 +11,9 @@ export class DealershipEmployees {
 
     private isValidEmployeeRole(role: UserRole): boolean {
         return [
-            UserRole.DEALER_EMPLOYEE,
-            UserRole.TECHNICIAN,
-            UserRole.STOCK_MANAGER
+            UserRole.DEALERSHIP_EMPLOYEE,
+            UserRole.DEALERSHIP_TECHNICIAN,
+            UserRole.DEALERSHIP_MANAGER
         ].includes(role);
     }
 
