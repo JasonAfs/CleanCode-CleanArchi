@@ -131,4 +131,15 @@ export class Company {
         // Une entreprise valide doit avoir au moins un employé company manager
         return this.getCompanyEmployees().length > 0;
     }
+    
+    get createdByDealershipId(): string | undefined {
+        return this.props.createdByDealershipId;
+    }
+
+    public belongsToDealership(dealershipId: string | undefined): boolean {
+        if (!dealershipId || !this.props.createdByDealershipId) {
+            return false;
+        }
+        return this.props.createdByDealershipId === dealershipId;
+    }
 }

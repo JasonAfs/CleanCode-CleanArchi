@@ -9,19 +9,16 @@ import { ContactInfo } from "@domain/value-objects/ContactInfo";
 import { Email } from "@domain/value-objects/Email";
 import { RegistrationNumber } from "@domain/value-objects/RegistrationNumber";
 import { Permission } from "@domain/services/authorization/Permission";
+import { CompanyValidationError } from "@domain/aggregates/company/CompanyEmployees";
 
 export class CreateCompanyUseCase implements IAuthorizationAware {
     constructor(
         private readonly companyRepository: ICompanyRepository,
-        private readonly validator: CreateCompanyValidator
     ) {}
+    
+    private readonly validator = new CreateCompanyValidator();
 
     public getAuthorizationContext(dto: CreateCompanyDTO): AuthorizationContext {
-        console.log('Authorization Context:', {
-            userId: dto.userId,
-            userRole: dto.userRole,
-            dealershipId: dto.dealershipId
-        });
         return {
             userId: dto.userId,
             userRole: dto.userRole,
@@ -31,18 +28,17 @@ export class CreateCompanyUseCase implements IAuthorizationAware {
     
     @Authorize(Permission.CREATE_PARTNER_COMPANY)
     public async execute(dto: CreateCompanyDTO): Promise<Company> {
-        // Validate input
+        // Validation des données
         this.validator.validate(dto);
 
+        // Vérification si l'entreprise existe déjà
         const registrationNumber = RegistrationNumber.create(dto.registrationNumber);
-
-        // Check if company already exists
         const exists = await this.companyRepository.exists(registrationNumber);
         if (exists) {
-            throw new Error(`Company with registration number ${dto.registrationNumber} already exists`);
+            throw new CompanyValidationError(`Company with registration number ${dto.registrationNumber} already exists`);
         }
 
-        // Create value objects
+        // Création des value objects
         const address = Address.create(
             dto.street,
             dto.city,
@@ -55,15 +51,16 @@ export class CreateCompanyUseCase implements IAuthorizationAware {
             new Email(dto.email)
         );
 
-        // Create company entity
+        // Création de l'entité Company
         const company = Company.create({
             name: dto.name.trim(),
             registrationNumber,
             address,
-            contactInfo
+            contactInfo,
+            createdByDealershipId: dto.dealershipId
         });
 
-        // Save to repository
+        // Sauvegarde
         await this.companyRepository.create(company);
 
         return company;

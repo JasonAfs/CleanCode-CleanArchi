@@ -14,90 +14,93 @@ generator client {
 }
 
 model User {
-  id             String    @id @default(uuid())
-  email          String    @unique
+  id             String         @id @default(uuid())
+  email          String         @unique
   firstName      String
   lastName       String
   hashedPassword String
   role           UserRole
   companyId      String?
-  isActive       Boolean   @default(true)
-  createdAt      DateTime  @default(now())
-  updatedAt      DateTime  @updatedAt
-  company        Company?  @relation(fields: [companyId], references: [id])
-  dealership     Dealership? @relation(fields: [dealershipId], references: [id])
+  isActive       Boolean        @default(true)
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+  company        Company?       @relation(fields: [companyId], references: [id])
+  dealership     Dealership?    @relation(fields: [dealershipId], references: [id])
   dealershipId   String?
-  refreshTokens  RefreshToken[] 
+  refreshTokens  RefreshToken[]
 
   @@map("users")
 }
 
 model Company {
-  id                String    @id @default(uuid())
-  name              String
-  registrationNumber String   @unique
-  street            String
-  city              String
-  postalCode        String
-  country           String
-  phone             String
-  email             String
-  isActive          Boolean   @default(true)
-  createdAt         DateTime  @default(now())
-  updatedAt         DateTime  @updatedAt
-  employees         User[]
-  motorcycles       CompanyMotorcycle[]
+  id                    String              @id @default(uuid())
+  name                  String
+  registrationNumber    String              @unique
+  street                String
+  city                  String
+  postalCode            String
+  country               String
+  phone                 String
+  email                 String
+  isActive              Boolean             @default(true)
+  createdAt             DateTime            @default(now())
+  updatedAt             DateTime            @updatedAt
+  employees             User[]
+  motorcycles           CompanyMotorcycle[]
+  createdByDealershipId String?
+  createdByDealership   Dealership?         @relation(fields: [createdByDealershipId], references: [id])
 
   @@map("companies")
 }
 
 model Dealership {
-  id        String    @id @default(uuid())
-  name      String    @unique
-  street    String
-  city      String
-  postalCode String
-  country   String
-  phone     String
-  email     String
-  isActive  Boolean   @default(true)
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
-  employees User[]
+  id          String       @id @default(uuid())
+  name        String       @unique
+  street      String
+  city        String
+  postalCode  String
+  country     String
+  phone       String
+  email       String
+  isActive    Boolean      @default(true)
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  employees   User[]
   motorcycles Motorcycle[]
+  Company     Company[]
 
   @@map("dealerships")
 }
 
 model Motorcycle {
-  id                 String    @id @default(uuid())
-  vin                String    @unique
-  model              String
-  year               Int
-  registrationNumber String
-  mileage            Int
-  status             MotorcycleStatus
+  id                  String              @id @default(uuid())
+  vin                 String              @unique
+  model               String
+  year                Int
+  registrationNumber  String
+  mileage             Int
+  status              MotorcycleStatus
   lastMaintenanceDate DateTime?
   nextMaintenanceDate DateTime?
-  isActive           Boolean   @default(true)
-  createdAt          DateTime  @default(now())
-  updatedAt          DateTime  @updatedAt
-  dealershipId       String
-  dealership         Dealership @relation(fields: [dealershipId], references: [id])
-  companyAssignments CompanyMotorcycle[]
+  isActive            Boolean             @default(true)
+  createdAt           DateTime            @default(now())
+  updatedAt           DateTime            @updatedAt
+  dealershipId        String
+  dealership          Dealership          @relation(fields: [dealershipId], references: [id])
+  companyAssignments  CompanyMotorcycle[]
 
   @@map("motorcycles")
 }
 
 model CompanyMotorcycle {
-  id           String    @id @default(uuid())
+  id           String     @id @default(uuid())
   companyId    String
   motorcycleId String
-  assignedAt   DateTime  @default(now())
-  isActive     Boolean   @default(true)
-  createdAt    DateTime  @default(now())
-  updatedAt    DateTime  @updatedAt
-  company      Company   @relation(fields: [companyId], references: [id])
+  assignedAt   DateTime   @default(now())
+  isActive     Boolean    @default(true)
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+  company      Company    @relation(fields: [companyId], references: [id])
   motorcycle   Motorcycle @relation(fields: [motorcycleId], references: [id])
 
   @@map("company_motorcycles")
@@ -113,7 +116,6 @@ model RefreshToken {
 
   @@map("refresh_tokens")
 }
-
 
 enum UserRole {
   TRIUMPH_ADMIN

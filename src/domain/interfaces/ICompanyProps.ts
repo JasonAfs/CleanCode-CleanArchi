@@ -10,6 +10,7 @@ export interface ICompanyProps {
     address: Address;
     contactInfo: ContactInfo;
     employees: CompanyEmployees;
+    createdByDealershipId?: string;
     isActive: boolean;
     createdAt: Date;
     updatedAt: Date;

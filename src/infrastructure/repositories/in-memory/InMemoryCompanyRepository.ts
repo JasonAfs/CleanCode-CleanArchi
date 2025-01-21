@@ -54,6 +54,9 @@ export class InMemoryCompanyRepository implements ICompanyRepository {
         return (await this.findByRegistrationNumber(registrationNumber)) !== null;
     }
 
+    async findByDealershipId(dealershipId: string): Promise<Company[]> {
+        return Array.from(this.companies.values());
+        }
     // Méthode utilitaire pour les tests
     clear(): void {
         this.companies.clear();

@@ -10,4 +10,5 @@ export interface ICompanyRepository {
     findAll(): Promise<Company[]>;
     findActive(): Promise<Company[]>;
     exists(registrationNumber: RegistrationNumber): Promise<boolean>;
+    findByDealershipId(dealershipId: string): Promise<Company[]>;
 }
