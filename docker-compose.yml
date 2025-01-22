@@ -32,6 +32,25 @@ services:
       networks:
         - triumph_network
 
+  frontend:
+    container_name: triumph_frontend
+    build: 
+      context: .
+      dockerfile: src/infrastructure/react/triumph-fleet-ui/Dockerfile
+    volumes:
+      - ./src:/usr/src/app/src
+      - /usr/src/app/node_modules
+      - /usr/src/app/src/infrastructure/react/triumph-fleet-ui/node_modules
+    ports:
+      - "5173:5173"
+    environment:
+      - NODE_ENV=development
+      - VITE_API_URL=http://localhost:3000
+    depends_on:
+      - api
+    networks:
+      - triumph_network
+
 networks:
   triumph_network:
     driver: bridge
