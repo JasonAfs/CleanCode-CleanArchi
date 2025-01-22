@@ -1,4 +1,3 @@
-// src/application/use-cases/auth/LoginUseCase.ts
 import { LoginDTO } from "@application/dtos/auth/LoginDTO";
 import { AuthTokensDTO } from "@application/dtos/auth/AuthTokensDTO";
 import { IUserRepository } from "@application/ports/repositories/IUserRepository";
@@ -7,31 +6,32 @@ import { IAuthenticationService } from "@application/ports/services/IAuthenticat
 import { LoginValidator } from "@application/validation/auth/LoginValidator";
 import { Email } from "@domain/value-objects/Email";
 import { InvalidCredentialsError } from "@domain/errors/auth/InvalidCredentialsError";
+import { Result } from "@domain/shared/Result";
 
 export class LoginUseCase {
     constructor(
         private readonly userRepository: IUserRepository,
         private readonly passwordService: IPasswordService,
         private readonly authService: IAuthenticationService,
-        private readonly validator: LoginValidator
     ) {}
 
-    public async execute(dto: LoginDTO): Promise<AuthTokensDTO> {
+    private readonly validator = new LoginValidator();
+
+    public async execute(dto: LoginDTO): Promise<Result<AuthTokensDTO, Error>> {
         this.validator.validate(dto);
 
         const user = await this.userRepository.findByEmail(new Email(dto.email));
         if (!user) {
-            throw new InvalidCredentialsError();
+            return new InvalidCredentialsError(); // Return au lieu de throw
         }
 
-        // Accéder au hashedPassword via la méthode getHashedPassword()
         const isValid = await this.passwordService.verifyPassword(
             dto.password, 
-            user.getHashedPassword() // Nous devrons ajouter cette méthode à l'entité User
+            user.getHashedPassword()
         );
         
         if (!isValid) {
-            throw new InvalidCredentialsError();
+            return new InvalidCredentialsError(); // Return au lieu de throw
         }
 
         return this.authService.generateTokens(user.id, user.role);
