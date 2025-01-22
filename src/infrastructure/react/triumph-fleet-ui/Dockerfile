@@ -1,4 +1,7 @@
-FROM node:18-alpine
+FROM node:20-alpine
+
+# Install Python and build dependencies
+RUN apk add --update --no-cache python3 make g++ gcc
 
 WORKDIR /usr/src/app
 
