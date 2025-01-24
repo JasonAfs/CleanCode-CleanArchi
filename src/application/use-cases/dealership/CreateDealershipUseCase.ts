@@ -1,48 +1,64 @@
 import { IDealershipRepository } from '@application/ports/repositories/IDealershipRepository';
 import { CreateDealershipDTO } from '@application/dtos/dealership/CreateDealershipDTO';
 import { CreateDealershipValidator } from '@application/validation/dealership/CreateDealershipValidator';
+import { Authorize, IAuthorizationAware } from '@application/decorators/Authorize';
+import { AuthorizationContext } from '@domain/services/authorization/AuthorizationContext';
 import { Dealership } from '@domain/entities/DealershipEntity';
 import { Address } from '@domain/value-objects/Address';
 import { ContactInfo } from '@domain/value-objects/ContactInfo';
 import { Email } from '@domain/value-objects/Email';
+import { Permission } from '@domain/services/authorization/Permission';
 import { DealershipAlreadyExistsError } from '@domain/errors/dealership/DealershipAlreadyExistsError';
+import { Result } from '@domain/shared/Result';
 
-export class CreateDealershipUseCase {
-  constructor(
-    private readonly dealershipRepository: IDealershipRepository,
-    private readonly validator: CreateDealershipValidator,
-  ) {}
+export class CreateDealershipUseCase implements IAuthorizationAware {
+    constructor(
+        private readonly dealershipRepository: IDealershipRepository,
+    ) {}
+    
+    private readonly validator = new CreateDealershipValidator();
 
-  public async execute(dto: CreateDealershipDTO): Promise<Dealership> {
-    // Validate input
-    this.validator.validate(dto);
-
-    // Check if dealership already exists
-    const exists = await this.dealershipRepository.exists(dto.name);
-    if (exists) {
-      throw new DealershipAlreadyExistsError(dto.name);
+    public getAuthorizationContext(dto: CreateDealershipDTO): AuthorizationContext {
+        return {
+            userId: dto.userId,
+            userRole: dto.userRole
+        };
     }
+    
+    @Authorize(Permission.MANAGE_ALL_DEALERSHIPS)
+    public async execute(dto: CreateDealershipDTO): Promise<Result<Dealership, Error>> {
+        // Validation des données
+        this.validator.validate(dto);
 
-    // Create value objects
-    const address = Address.create(
-      dto.street,
-      dto.city,
-      dto.postalCode,
-      dto.country,
-    );
+        // Vérification si la concession existe déjà
+        const exists = await this.dealershipRepository.exists(dto.name);
+        if (exists) {
+            return new DealershipAlreadyExistsError(dto.name);
+        }
 
-    const contactInfo = ContactInfo.create(dto.phone, new Email(dto.email));
+        // Création des value objects
+        const address = Address.create(
+            dto.street,
+            dto.city,
+            dto.postalCode,
+            dto.country
+        );
 
-    // Create dealership entity
-    const dealership = Dealership.create({
-      name: dto.name,
-      address,
-      contactInfo,
-    });
+        const contactInfo = ContactInfo.create(
+            dto.phone,
+            new Email(dto.email)
+        );
 
-    // Save to repository
-    await this.dealershipRepository.create(dealership);
+        // Création de l'entité Dealership
+        const dealership = Dealership.create({
+            name: dto.name.trim(),
+            address,
+            contactInfo
+        });
 
-    return dealership;
-  }
+        // Sauvegarde
+        await this.dealershipRepository.create(dealership);
+
+        return dealership;
+    }
 }

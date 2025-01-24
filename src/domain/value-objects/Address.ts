@@ -2,10 +2,10 @@ import { InvalidAddressError } from "@domain/errors/value-objects/address/Invali
 
 export class Address {
     private constructor(
-        private readonly street: string,
-        private readonly city: string,
-        private readonly postalCode: string,
-        private readonly country: string
+        private readonly _street: string,
+        private readonly _city: string,
+        private readonly _postalCode: string,
+        private readonly _country: string
     ) {}
 
     public static create(street: string, city: string, postalCode: string, country: string): Address {
@@ -30,7 +30,24 @@ export class Address {
         );
     }
 
+    // Ajout des getters
+    get street(): string {
+        return this._street;
+    }
+
+    get city(): string {
+        return this._city;
+    }
+
+    get postalCode(): string {
+        return this._postalCode;
+    }
+
+    get country(): string {
+        return this._country;
+    }
+
     public toString(): string {
-        return `${this.street}, ${this.postalCode} ${this.city}, ${this.country}`;
+        return `${this._street}, ${this._city}, ${this._postalCode}, ${this._country}`;
     }
 }

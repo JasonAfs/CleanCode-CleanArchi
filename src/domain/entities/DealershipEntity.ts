@@ -6,6 +6,7 @@ import { DealershipEmployees } from '@domain/aggregates/dealership/DealershipEmp
 import { User } from '@domain/entities/UserEntity';
 import { UserRole } from '@domain/enums/UserRole';
 import { randomUUID } from 'crypto';
+import { Motorcycle } from './MotorcycleEntity';
 
 export class Dealership {
   private readonly props: IDealershipProps;
@@ -17,7 +18,7 @@ export class Dealership {
   public static create(
     props: Omit<
       IDealershipProps,
-      'id' | 'createdAt' | 'updatedAt' | 'isActive' | 'employees'
+      'id' | 'createdAt' | 'updatedAt' | 'isActive' | 'employees' | 'motorcycles'
     >,
   ): Dealership {
     if (!props.name.trim()) {
@@ -28,6 +29,7 @@ export class Dealership {
       ...props,
       id: randomUUID(),
       employees: DealershipEmployees.create(),
+      motorcycles: [],
       isActive: true,
       createdAt: new Date(),
       updatedAt: new Date(),
@@ -66,6 +68,10 @@ export class Dealership {
   get updatedAt(): Date {
     return this.props.updatedAt;
   }
+
+  get motorcycles(): Motorcycle[] {
+    return this.props.motorcycles;
+}
 
   private updateLastModified(): void {
     this.props.updatedAt = new Date();
@@ -127,4 +133,20 @@ export class Dealership {
   public getStockManagers(): User[] {
     return this.props.employees.getByRole(UserRole.DEALERSHIP_STOCK_MANAGER);
   }
+
+  public addMotorcycle(motorcycle: Motorcycle): void {
+    this.props.motorcycles.push(motorcycle);
+    this.updateLastModified();
+}
+
+public removeMotorcycle(motorcycleId: string): void {
+    this.props.motorcycles = this.props.motorcycles.filter(
+        moto => moto.id !== motorcycleId
+    );
+    this.updateLastModified();
+}
+
+public hasMotorcycle(motorcycleId: string): boolean {
+    return this.props.motorcycles.some(moto => moto.id === motorcycleId);
+}
 }

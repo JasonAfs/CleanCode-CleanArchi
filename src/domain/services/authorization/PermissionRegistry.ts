@@ -11,11 +11,12 @@ export const ROLE_PERMISSIONS: ReadonlyMap<UserRole, ReadonlySet<Permission>> = 
         Permission.MANAGE_PARTS_CATALOG,
         Permission.VIEW_ALL_STATISTICS,
         Permission.CREATE_PARTNER_COMPANY,
-        Permission.UPDATE_PARTNER_COMPANY,    // Ajout
-        Permission.DEACTIVATE_PARTNER_COMPANY,    // Ajout
+        Permission.UPDATE_PARTNER_COMPANY,    
+        Permission.DEACTIVATE_PARTNER_COMPANY,    
         Permission.VIEW_PARTNER_COMPANY,
         Permission.VIEW_COMPANY_EMPLOYEES,
-        Permission.VIEW_COMPANY_ASSIGNED_MOTORCYCLES
+        Permission.VIEW_COMPANY_ASSIGNED_MOTORCYCLES,
+        Permission.VIEW_ALL_DEALERSHIPS,
     ]) as ReadonlySet<Permission>],
     [UserRole.DEALERSHIP_MANAGER, new Set([
         Permission.MANAGE_DEALERSHIP_USERS,
