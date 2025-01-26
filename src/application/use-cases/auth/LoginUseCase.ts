@@ -22,7 +22,7 @@ export class LoginUseCase {
 
         const user = await this.userRepository.findByEmail(new Email(dto.email));
         if (!user) {
-            return new InvalidCredentialsError(); // Return au lieu de throw
+            return new InvalidCredentialsError(); 
         }
 
         const isValid = await this.passwordService.verifyPassword(
@@ -31,7 +31,7 @@ export class LoginUseCase {
         );
         
         if (!isValid) {
-            return new InvalidCredentialsError(); // Return au lieu de throw
+            return new InvalidCredentialsError(); 
         }
 
         return this.authService.generateTokens(user.id, user.role);

@@ -1,62 +1,25 @@
+// src/infrastructure/react/triumph-fleet-ui/providers/AuthProvider.tsx
 import { useState, useEffect, ReactNode, useMemo } from 'react';
 import { AuthContext } from '../contexts/AuthContext';
 import { HttpAuthenticationGateway } from '../services/auth/HttpAuthenticationGateway';
 import type { User } from '@domain/entities/UserEntity';
 import type { LoginDTO } from '@application/dtos/auth/LoginDTO';
 import type { RegisterDTO } from '@application/dtos/auth/RegisterDTO';
-import { jwtDecode } from 'jwt-decode';
 
 interface AuthProviderProps {
     readonly children: ReactNode;
 }
 
-interface JwtPayload {
-    userId: string;
-    role: string;
-    email: string;
-    exp: number;
-}
-
 export function AuthProvider({ children }: AuthProviderProps) {
     const [user, setUser] = useState<User | null>(null);
+    const [isInitializing, setIsInitializing] = useState(true);
     const authGateway = useMemo(() => new HttpAuthenticationGateway(), []);
-
-    // Fonction pour extraire les informations utilisateur du token
-    const getUserFromToken = (token: string) => {
-        try {
-            const decoded = jwtDecode<JwtPayload>(token);
-            return {
-                id: decoded.userId,
-                role: decoded.role,
-                email: decoded.email
-            };
-        } catch (error) {
-            console.error('Error decoding token:', error);
-            return null;
-        }
-    };
-
-    // Vérifie l'authentification au chargement
-    useEffect(() => {
-        const accessToken = localStorage.getItem('accessToken');
-        if (accessToken) {
-            const userData = getUserFromToken(accessToken);
-            if (userData) {
-                setUser(userData as User); //todo : à corriger
-            }
-        }
-    }, []);
 
     const value = useMemo(() => ({
         user,
         login: async (credentials: LoginDTO) => {
             const tokens = await authGateway.login(credentials);
-            if (tokens.accessToken) {
-                const userData = getUserFromToken(tokens.accessToken);
-                if (userData) {
-                    setUser(userData as User);
-                }
-            }
+            setUser(authGateway.getCurrentUser());
             return tokens;
         },
         register: async (data: RegisterDTO) => {
@@ -67,6 +30,32 @@ export function AuthProvider({ children }: AuthProviderProps) {
             setUser(null);
         }
     }), [user, authGateway]);
+
+    useEffect(() => {
+        const checkAuth = async () => {
+            try {
+                await authGateway.checkAuthStatus();
+                const currentUser = authGateway.getCurrentUser();
+                setUser(currentUser);
+            } catch (error) {
+                console.error('Auth check failed:', error);
+                setUser(null);
+            } finally {
+                setIsInitializing(false);
+            }
+        };
+
+        // Vérification initiale
+        checkAuth();
+
+        // Vérification périodique uniquement après l'initialisation
+        const interval = setInterval(checkAuth, 60000);
+        return () => clearInterval(interval);
+    }, [authGateway]);
+
+    if (isInitializing) {
+        return null; // Ou un spinner/loader
+    }
 
     return (
         <AuthContext.Provider value={value}>
