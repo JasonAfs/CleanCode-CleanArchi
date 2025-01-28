@@ -10,3 +10,5 @@ export interface IDealershipRepository {
     findActive(): Promise<Dealership[]>;
     exists(name: string): Promise<boolean>;
 }
+
+

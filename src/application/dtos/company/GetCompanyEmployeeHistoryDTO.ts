@@ -1,8 +1,6 @@
-import { UserRole } from "@domain/enums/UserRole";
+import { BaseAuthenticatedDTO } from "../shared/BaseAuthenticatedDTO";
 
-export interface GetCompanyEmployeeHistoryDTO {
-    userId: string;
-    userRole: UserRole;
+export interface GetCompanyEmployeeHistoryDTO extends BaseAuthenticatedDTO{
     dealershipId?: string;
     companyId: string;
     includeInactive?: boolean;

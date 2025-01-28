@@ -1,8 +1,5 @@
-import { UserRole } from "@domain/enums/UserRole";
-
-export interface DeactivateCompanyDTO {
-    userId: string;
-    userRole: UserRole;
+import { BaseAuthenticatedDTO } from "../shared/BaseAuthenticatedDTO";
+export interface DeactivateCompanyDTO extends BaseAuthenticatedDTO{
     dealershipId?: string;
     companyId: string;
 }

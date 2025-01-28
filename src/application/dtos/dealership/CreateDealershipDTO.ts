@@ -1,8 +1,6 @@
-import { UserRole } from "@domain/enums/UserRole";
+import { BaseAuthenticatedDTO } from "../shared/BaseAuthenticatedDTO";
 
-export interface CreateDealershipDTO {
-    userId: string;
-    userRole: UserRole;      
+export interface CreateDealershipDTO extends BaseAuthenticatedDTO {     
     name: string;
     street: string;
     city: string;
