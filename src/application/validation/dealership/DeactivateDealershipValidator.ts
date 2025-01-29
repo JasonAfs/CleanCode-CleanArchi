@@ -1,4 +1,4 @@
-import { DeactivateDealershipDTO } from "@application/dtos/dealership/DeactivateDealershipDTO";
+import { DeactivateDealershipDTO } from "@application/dtos/dealership/request/DeactivateDealershipDTO";
 import { DealershipValidationError } from "@domain/errors/dealership/DealershipValidationError";
 
 export class DeactivateDealershipValidator {

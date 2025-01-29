@@ -1,8 +1,8 @@
-import { GetDealershipByIdUseCaseDTO } from '@application/use-cases/dealership/GetDealershipByIdUseCase';
+import { GetDealershipByIdDTO } from '@application/dtos/dealership/request/GetDealershipByIdDTO';
 import { DealershipValidationError } from '@domain/errors/dealership/DealershipValidationError';
 
 export class GetDealershipByIdValidator {
-    public validate(dto: GetDealershipByIdUseCaseDTO): void {
+    public validate(dto: GetDealershipByIdDTO): void {
         if (!dto.dealershipId?.trim()) {
             throw new DealershipValidationError('Dealership ID is required');
         }

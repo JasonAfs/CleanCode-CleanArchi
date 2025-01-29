@@ -16,7 +16,7 @@ export class JwtAuthenticationService implements IAuthenticationService {
     private readonly refreshTokenRepository: IRefreshTokenRepository,
     private readonly jwtSecret: string = process.env.JWT_SECRET ||
       'your-secret-key',
-    private readonly accessTokenExpiration: string = '30m',
+    private readonly accessTokenExpiration: string = '1d',
     private readonly refreshTokenExpiration: string = '7d',
   ) {}
 

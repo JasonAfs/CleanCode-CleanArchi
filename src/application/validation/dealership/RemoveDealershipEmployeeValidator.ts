@@ -1,4 +1,4 @@
-import { RemoveDealershipEmployeeDTO } from "@application/dtos/dealership/RemoveDealershipEmployeeDTO";
+import { RemoveDealershipEmployeeDTO } from "@application/dtos/dealership/request/RemoveDealershipEmployeeDTO";
 import { DealershipValidationError } from "@domain/errors/dealership/DealershipValidationError";
 
 export class RemoveDealershipEmployeeValidator {

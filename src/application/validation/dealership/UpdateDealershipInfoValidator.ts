@@ -1,4 +1,4 @@
-import { UpdateDealershipInfoDTO } from '@application/dtos/dealership/UpdateDealershipInfoDTO';
+import { UpdateDealershipInfoDTO } from '@application/dtos/dealership/request/UpdateDealershipInfoDTO';
 import { DealershipValidationError } from '@domain/errors/dealership/DealershipValidationError';
 
 export class UpdateDealershipInfoValidator {

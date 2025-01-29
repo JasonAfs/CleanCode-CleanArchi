@@ -12,4 +12,5 @@ export interface IUserProps {
     hashedPassword: string;
     createdAt: Date;
     updatedAt: Date;
+    dealershipId?: string | null;
 }

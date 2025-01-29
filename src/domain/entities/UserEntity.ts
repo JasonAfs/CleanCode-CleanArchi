@@ -87,5 +87,9 @@ export class User {
 
   public getHashedPassword(): string {
     return this.props.hashedPassword;
-}
+  }
+  
+  get dealershipId(): string | null {
+    return this.props.dealershipId || null;
+  }
 }

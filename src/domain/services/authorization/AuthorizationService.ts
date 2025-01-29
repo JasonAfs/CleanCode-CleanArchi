@@ -8,14 +8,6 @@ export class AuthorizationService {
 
     public hasPermission(context: AuthorizationContext, requiredPermission: Permission): boolean {
 
-        console.log('Checking permission details:', {
-            userRole: context.userRole,
-            requiredPermission,
-            hasPermission: this.permissionRegistry.get(context.userRole)?.has(requiredPermission),
-            allUserPermissions: Array.from(this.permissionRegistry.get(context.userRole) || []),
-            dealershipId: context.dealershipId,
-            companyId: context.companyId
-        });
         // 1. Vérifier si l'utilisateur a la permission requise
         const userPermissions = this.permissionRegistry.get(context.userRole);
         if (!userPermissions?.has(requiredPermission)) {

@@ -30,7 +30,7 @@ export class UserMapper {
             lastName: user.lastName,
             role: user.role as PrismaUserRole,
             companyId: user.companyId || null,
-            dealershipId: null,
+            dealershipId: user.dealershipId,
             hashedPassword: user.getHashedPassword(),
             isActive: user.isActive
         };

@@ -15,6 +15,12 @@ export const routes: RouteConfig[] = [
         allowedRoles: Object.values(UserRole), // Accessible à tous les rôles
     },
     {
+        path: "/dealership",
+        title: "Concessions",
+        icon: "Store",
+        allowedRoles: [UserRole.TRIUMPH_ADMIN, UserRole.DEALERSHIP_MANAGER],
+    },
+    {
         title: "Users",
         path: "/user",
         icon: "Users",

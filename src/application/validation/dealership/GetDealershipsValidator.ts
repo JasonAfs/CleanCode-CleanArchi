@@ -1,4 +1,4 @@
-import { GetDealershipsDTO } from '@application/dtos/dealership/GetDealershipsDTO';
+import { GetDealershipsDTO } from '@application/dtos/dealership/request/GetDealershipsDTO';
 import { DealershipValidationError } from '@domain/errors/dealership/DealershipValidationError';
 
 export class GetDealershipsValidator {

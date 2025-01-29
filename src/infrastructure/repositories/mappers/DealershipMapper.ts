@@ -8,11 +8,28 @@ import { UserMapper } from './UserMapper';
 import { MotorcycleMapper } from './MotorcycleMapper';
 
 export class DealershipMapper {
+    /**
+     * Convertit une entité Prisma en entité de domaine
+     */
     public static toDomain(prismaDealership: PrismaDealership & { 
         employees?: PrismaUser[],
         motorcycles?: PrismaMotorcycle[]
     }): Dealership {
-        const dealership = Dealership.create({
+        // Reconstituer l'agrégat des employés
+        let employees = DealershipEmployees.create();
+        if (prismaDealership.employees?.length) {
+            for (const employee of prismaDealership.employees) {
+                const userEntity = UserMapper.toDomain(employee);
+                employees = employees.addEmployee(userEntity);
+            }
+        }
+
+        // Mapper les motos
+        const motorcycles = prismaDealership.motorcycles?.map(MotorcycleMapper.toDomain) || [];
+
+        // Utiliser la méthode reconstitute pour créer l'entité
+        return Dealership.reconstitute({
+            id: prismaDealership.id,
             name: prismaDealership.name,
             address: Address.create(
                 prismaDealership.street,
@@ -23,34 +40,17 @@ export class DealershipMapper {
             contactInfo: ContactInfo.create(
                 prismaDealership.phone,
                 new Email(prismaDealership.email)
-            )
-        });
-
-        // Initialiser l'agrégat des employés
-        let employeesAggregate = DealershipEmployees.create();
-        if (prismaDealership.employees?.length) {
-            for (const employee of prismaDealership.employees) {
-                const userEntity = UserMapper.toDomain(employee);
-                employeesAggregate = employeesAggregate.addEmployee(userEntity);
-            }
-        }
-
-        // Mapper les motos
-        const motorcycles = prismaDealership.motorcycles?.map(MotorcycleMapper.toDomain) || [];
-
-        Object.defineProperties(dealership, {
-            'id': { value: prismaDealership.id },
-            'isActive': { value: prismaDealership.isActive },
-            'createdAt': { value: prismaDealership.createdAt },
-            'updatedAt': { value: prismaDealership.updatedAt },
-            'employees': { value: employeesAggregate },
-            'motorcycles': { value: motorcycles }
-        });
-
-        return dealership;
+            ),
+            isActive: prismaDealership.isActive,
+            createdAt: prismaDealership.createdAt,
+            updatedAt: prismaDealership.updatedAt
+        }, employees, motorcycles);
     }
 
-    public static toPrisma(dealership: Dealership): Omit<PrismaDealership, 'createdAt' | 'updatedAt'> {
+    /**
+     * Convertit une entité de domaine en objet Prisma pour la création
+     */
+    public static toPrismaCreate(dealership: Dealership): any {
         return {
             id: dealership.id,
             name: dealership.name,
@@ -60,7 +60,30 @@ export class DealershipMapper {
             country: dealership.address.country,
             phone: dealership.contactInfo.phoneNumber,
             email: dealership.contactInfo.emailAddress.toString(),
-            isActive: dealership.isActive
+            isActive: dealership.isActive,
+            // Pas de relations lors de la création initiale
+        };
+    }
+
+    /**
+     * Convertit une entité de domaine en objet Prisma pour la mise à jour
+     */
+    public static toPrismaUpdate(dealership: Dealership): any {
+        return {
+            name: dealership.name,
+            street: dealership.address.street,
+            city: dealership.address.city,
+            postalCode: dealership.address.postalCode,
+            country: dealership.address.country,
+            phone: dealership.contactInfo.phoneNumber,
+            email: dealership.contactInfo.emailAddress.toString(),
+            isActive: dealership.isActive,
+            // Gestion des relations pour la mise à jour
+            employees: {
+                connect: dealership.employees.getAll().map(employee => ({
+                    id: employee.id
+                }))
+            }
         };
     }
 }

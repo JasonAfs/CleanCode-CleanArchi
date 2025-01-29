@@ -1,23 +1,29 @@
 import { IDealershipRepository } from '@application/ports/repositories/IDealershipRepository';
-import { UpdateDealershipInfoDTO } from '@application/dtos/dealership/UpdateDealershipInfoDTO';
+import { UpdateDealershipInfoDTO } from '@application/dtos/dealership/request/UpdateDealershipInfoDTO';
 import { UpdateDealershipInfoValidator } from '@application/validation/dealership/UpdateDealershipInfoValidator';
 import { Authorize, IAuthorizationAware } from '@application/decorators/Authorize';
 import { AuthorizationContext } from '@domain/services/authorization/AuthorizationContext';
 import { Permission } from '@domain/services/authorization/Permission';
-import { UserRole } from '@domain/enums/UserRole';
 import { Result } from '@domain/shared/Result';
 import { DealershipNotFoundError } from '@domain/errors/dealership/DealershipNotFoundError';
 import { UnauthorizedError } from '@domain/errors/authorization/UnauthorizedError';
 import { Address } from '@domain/value-objects/Address';
 import { ContactInfo } from '@domain/value-objects/ContactInfo';
 import { Email } from '@domain/value-objects/Email';
+import { UpdateDealershipInfoResponseDTO } from '@application/dtos/dealership/response/UpdateDealershipInfoResponseDTO';
+import { DealershipValidationError } from '@domain/errors/dealership/DealershipValidationError';
+import { DealershipAuthorizationService } from '@domain/services/authorization/DealershipAuthorizationService';
 
 export class UpdateDealershipInfoUseCase implements IAuthorizationAware {
     private readonly validator = new UpdateDealershipInfoValidator();
+    private readonly authService: DealershipAuthorizationService;
 
     constructor(
-        private readonly dealershipRepository: IDealershipRepository
-    ) {}
+        private readonly dealershipRepository: IDealershipRepository,
+        authService?: DealershipAuthorizationService
+    ) {
+        this.authService = authService ?? new DealershipAuthorizationService();
+    }
 
     public getAuthorizationContext(dto: UpdateDealershipInfoDTO): AuthorizationContext {
         return {
@@ -28,40 +34,47 @@ export class UpdateDealershipInfoUseCase implements IAuthorizationAware {
     }
 
     @Authorize(Permission.UPDATE_DEALERSHIP_INFO)
-    public async execute(dto: UpdateDealershipInfoDTO): Promise<Result<void, Error>> {
+    public async execute(dto: UpdateDealershipInfoDTO): Promise<Result<UpdateDealershipInfoResponseDTO, Error>> {
         try {
-            // Validation des données d'entrée
-            this.validator.validate(dto);
+            // Étape 1: Validation des données d'entrée
+            try {
+                this.validator.validate(dto);
+            } catch (error) {
+                if (error instanceof DealershipValidationError) {
+                    return error;
+                }
+                throw error;
+            }
 
-            // Récupérer la concession
+            // Étape 2: Récupérer la concession
             const dealership = await this.dealershipRepository.findById(dto.dealershipId);
             if (!dealership) {
                 return new DealershipNotFoundError(dto.dealershipId);
             }
 
-            // Vérifier les droits d'accès pour les managers de concession
-            if (dto.userRole === UserRole.DEALERSHIP_MANAGER && !dealership.hasEmployee(dto.userId)) {
+            // Étape 3: Vérifier les droits d'accès
+            if (!this.authService.canAccessDealership(dto.userId, dto.userRole, dealership)) {
                 return new UnauthorizedError("You don't have access to this dealership");
             }
 
-            // Mettre à jour les informations
+            // Étape 4: Mise à jour des informations
             if (dto.name) {
                 dealership.updateName(dto.name.trim());
             }
 
-            // Mise à jour de l'adresse si tous les champs sont fournis
-            if (dto.street && dto.city && dto.postalCode && dto.country) {
+            // Étape 5: Mise à jour de l'adresse si tous les champs sont fournis
+            if (this.hasAllAddressFields(dto)) {
                 const newAddress = Address.create(
-                    dto.street.trim(),
-                    dto.city.trim(),
-                    dto.postalCode.trim(),
-                    dto.country.trim()
+                    dto.street!.trim(),
+                    dto.city!.trim(),
+                    dto.postalCode!.trim(),
+                    dto.country!.trim()
                 );
                 dealership.updateAddress(newAddress);
             }
 
-            // Mise à jour des informations de contact
-            if (dto.phone || dto.email) {
+            // Étape 6: Mise à jour des informations de contact
+            if (this.hasContactInfoChanges(dto)) {
                 const newContactInfo = ContactInfo.create(
                     dto.phone?.trim() ?? dealership.contactInfo.phoneNumber,
                     dto.email ? new Email(dto.email.trim()) : dealership.contactInfo.emailAddress
@@ -69,15 +82,35 @@ export class UpdateDealershipInfoUseCase implements IAuthorizationAware {
                 dealership.updateContactInfo(newContactInfo);
             }
 
-            // Sauvegarder les modifications
+            const updatedFields = {
+                name: !!dto.name,
+                address: this.hasAllAddressFields(dto),
+                contactInfo: this.hasContactInfoChanges(dto)
+            };
+
+            // Étape 7: Sauvegarder les modifications
             await this.dealershipRepository.update(dealership);
 
-            return;
+            return {
+                success: true,
+                message: `Dealership ${dealership.name} has been successfully updated`,
+                dealershipId: dealership.id,
+                updatedFields
+            };
+            
         } catch (error) {
             if (error instanceof Error) {
                 return error;
             }
             return new Error('An unexpected error occurred while updating dealership information');
         }
+    }
+
+    private hasAllAddressFields(dto: UpdateDealershipInfoDTO): boolean {
+        return !!(dto.street && dto.city && dto.postalCode && dto.country);
+    }
+
+    private hasContactInfoChanges(dto: UpdateDealershipInfoDTO): boolean {
+        return !!(dto.phone || dto.email);
     }
 }

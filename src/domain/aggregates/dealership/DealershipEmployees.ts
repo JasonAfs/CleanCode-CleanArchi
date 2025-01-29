@@ -13,7 +13,8 @@ export class DealershipEmployees {
         return [
             UserRole.DEALERSHIP_EMPLOYEE,
             UserRole.DEALERSHIP_TECHNICIAN,
-            UserRole.DEALERSHIP_MANAGER
+            UserRole.DEALERSHIP_MANAGER,
+            UserRole.DEALERSHIP_STOCK_MANAGER
         ].includes(role);
     }
 

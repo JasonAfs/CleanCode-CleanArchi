@@ -1,29 +1,29 @@
 import { IDealershipRepository } from '@application/ports/repositories/IDealershipRepository';
+import { GetDealershipByIdDTO } from '@application/dtos/dealership/request/GetDealershipByIdDTO';
 import { GetDealershipByIdValidator } from '@application/validation/dealership/GetDealershipByIdValidator';
 import { Authorize, IAuthorizationAware } from '@application/decorators/Authorize';
 import { AuthorizationContext } from '@domain/services/authorization/AuthorizationContext';
 import { Permission } from '@domain/services/authorization/Permission';
-import { UserRole } from '@domain/enums/UserRole';
-import { Dealership } from '@domain/entities/DealershipEntity';
 import { Result } from '@domain/shared/Result';
 import { DealershipNotFoundError } from '@domain/errors/dealership/DealershipNotFoundError';
 import { UnauthorizedError } from '@domain/errors/authorization/UnauthorizedError';
-import { GetDealershipByIdDTO } from '@application/dtos/dealership/etDealershipByIdDTO';
-
-
-export interface GetDealershipByIdUseCaseDTO extends GetDealershipByIdDTO {
-    userId: string;
-    userRole: UserRole;
-}
+import { DealershipAuthorizationService } from '@domain/services/authorization/DealershipAuthorizationService';
+import { DealershipValidationError } from '@domain/errors/dealership/DealershipValidationError';
+import { DealershipMapper } from '@application/mappers/DealershipMapper';
+import { DealershipWithEmployeesDTO } from '@application/dtos/dealership/response/DealershipWithEmployeesDTO';
 
 export class GetDealershipByIdUseCase implements IAuthorizationAware {
     private readonly validator = new GetDealershipByIdValidator();
+    private readonly authService: DealershipAuthorizationService;
 
     constructor(
-        private readonly dealershipRepository: IDealershipRepository
-    ) {}
+        private readonly dealershipRepository: IDealershipRepository,
+        authService?: DealershipAuthorizationService
+    ) {
+        this.authService = authService ?? new DealershipAuthorizationService();
+    }
 
-    public getAuthorizationContext(dto: GetDealershipByIdUseCaseDTO): AuthorizationContext {
+    public getAuthorizationContext(dto: GetDealershipByIdDTO): AuthorizationContext {
         return {
             userId: dto.userId,
             userRole: dto.userRole,
@@ -32,39 +32,30 @@ export class GetDealershipByIdUseCase implements IAuthorizationAware {
     }
 
     @Authorize([Permission.VIEW_ALL_DEALERSHIPS, Permission.VIEW_DEALERSHIP_DETAILS])
-    public async execute(dto: GetDealershipByIdUseCaseDTO): Promise<Result<Dealership, Error>> {
+    public async execute(dto: GetDealershipByIdDTO): Promise<Result<DealershipWithEmployeesDTO, Error>> {
         try {
-            // Validation des données d'entrée
-            this.validator.validate(dto);
+            // Étape 1: Validation des données d'entrée
+            try {
+                this.validator.validate(dto);
+            } catch (error) {
+                if (error instanceof DealershipValidationError) {
+                    return error;
+                }
+                throw error;
+            }
 
-            // Récupérer la concession
+            // Étape 2: Récupération de la concession
             const dealership = await this.dealershipRepository.findById(dto.dealershipId);
             if (!dealership) {
                 return new DealershipNotFoundError(dto.dealershipId);
             }
 
-            // Les admins ont accès à toutes les concessions
-            if (dto.userRole === UserRole.TRIUMPH_ADMIN) {
-                return dealership;
+            // Étape 3: Vérification des droits d'accès
+            if (!this.authService.canAccessDealership(dto.userId, dto.userRole, dealership)) {
+                return new UnauthorizedError("You don't have access to this dealership");
             }
 
-            // Pour les managers/employés de concession, vérifier qu'ils appartiennent à cette concession
-            const dealershipRoles = [
-                UserRole.DEALERSHIP_MANAGER, 
-                UserRole.DEALERSHIP_EMPLOYEE, 
-                UserRole.DEALERSHIP_TECHNICIAN,
-                UserRole.DEALERSHIP_STOCK_MANAGER
-            ];
-
-            if (dealershipRoles.includes(dto.userRole)) {
-                if (!dealership.hasEmployee(dto.userId)) {
-                    return new UnauthorizedError("You don't have access to this dealership");
-                }
-                return dealership;
-            }
-
-            // Les autres rôles n'ont pas accès aux détails des concessions
-            return new UnauthorizedError("Unauthorized to view dealership details");
+            return DealershipMapper.toDTOWithEmployees(dealership);
 
         } catch (error) {
             if (error instanceof Error) {

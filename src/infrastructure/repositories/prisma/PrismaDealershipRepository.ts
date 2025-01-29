@@ -7,28 +7,53 @@ export class PrismaDealershipRepository implements IDealershipRepository {
     constructor(private readonly prisma: PrismaClient) {}
 
     async create(dealership: Dealership): Promise<void> {
-        const prismaDealership = DealershipMapper.toPrisma(dealership);
+        const prismaData = DealershipMapper.toPrismaCreate(dealership);
         await this.prisma.dealership.create({
-            data: prismaDealership
+            data: prismaData
         });
     }
-
+    
     async update(dealership: Dealership): Promise<void> {
-        const prismaDealership = DealershipMapper.toPrisma(dealership);
-        await this.prisma.dealership.update({
-            where: { id: dealership.id },
-            data: prismaDealership
-        });
+        const prismaData = DealershipMapper.toPrismaUpdate(dealership);
+        const employeeIds = dealership.employees.getAll().map(emp => emp.id);
+        
+        await this.prisma.$transaction([
+            // Déconnecter les anciens employés
+            this.prisma.user.updateMany({
+                where: { 
+                    dealershipId: dealership.id,
+                    id: { notIn: employeeIds }
+                },
+                data: { dealershipId: null }
+            }),
+    
+            // Mettre à jour la concession
+            this.prisma.dealership.update({
+                where: { id: dealership.id },
+                data: prismaData
+            }),
+            
+            // Mettre à jour les nouveaux employés
+            this.prisma.user.updateMany({
+                where: { id: { in: employeeIds } },
+                data: { dealershipId: dealership.id }
+            })
+        ]);
     }
 
     async findById(id: string): Promise<Dealership | null> {
         const dealership = await this.prisma.dealership.findUnique({
             where: { id },
             include: {
-                employees: true // Pour charger les employés associés
+                employees: {
+                    where: {
+                        isActive: true
+                    }
+                },
+                motorcycles: true,
             }
         });
-
+    
         if (!dealership) return null;
         return DealershipMapper.toDomain(dealership);
     }
