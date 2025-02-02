@@ -1,9 +1,7 @@
 import { IDealershipRepository } from '@application/ports/repositories/IDealershipRepository';
 import { CreateDealershipDTO } from '@application/dtos/dealership/request/CreateDealershipDTO';
-import {
-  Authorize,
-  IAuthorizationAware,
-} from '@application/decorators/Authorize';
+import { Authorize } from '@application/decorators/Authorize';
+import { IAuthorizationAware } from '@domain/services/authorization/IAuthorizationAware';
 import { AuthorizationContext } from '@domain/services/authorization/AuthorizationContext';
 import { Dealership } from '@domain/entities/DealershipEntity';
 import { Address } from '@domain/value-objects/Address';
@@ -28,6 +26,7 @@ export class CreateDealershipUseCase implements IAuthorizationAware {
     return {
       userId: dto.userId,
       userRole: dto.userRole,
+      resourceType: 'dealership',
     };
   }
 
@@ -47,27 +46,29 @@ export class CreateDealershipUseCase implements IAuthorizationAware {
       }
 
       // Étape 2: Vérification de l'existence
-      const exists = await this.dealershipRepository.exists(dto.name);
-      if (exists) {
+      const existingDealership = await this.dealershipRepository.exists(
+        dto.name,
+      );
+      if (existingDealership) {
         return new DealershipAlreadyExistsError(dto.name);
       }
 
       // Étape 3: Création des value objects
       const address = Address.create(
-        dto.street.trim(),
-        dto.city.trim(),
-        dto.postalCode.trim(),
-        dto.country.trim(),
+        this.sanitizeInput(dto.street),
+        this.sanitizeInput(dto.city),
+        this.sanitizeInput(dto.postalCode),
+        this.sanitizeInput(dto.country),
       );
 
       const contactInfo = ContactInfo.create(
-        dto.phone.trim(),
-        new Email(dto.email.trim()),
+        this.sanitizeInput(dto.phone),
+        new Email(this.sanitizeInput(dto.email)),
       );
 
       // Étape 4: Création de l'entité Dealership
       const dealership = Dealership.create({
-        name: dto.name.trim(),
+        name: this.sanitizeInput(dto.name),
         address,
         contactInfo,
       });
@@ -75,6 +76,7 @@ export class CreateDealershipUseCase implements IAuthorizationAware {
       // Étape 5: Persistence
       await this.dealershipRepository.create(dealership);
 
+      // Étape 6: Retour de la réponse
       return DealershipMapper.toDTO(dealership);
     } catch (error) {
       if (error instanceof Error) {
@@ -84,5 +86,14 @@ export class CreateDealershipUseCase implements IAuthorizationAware {
         'An unexpected error occurred while creating the dealership',
       );
     }
+  }
+
+  /**
+   * Nettoie les entrées utilisateur
+   * @param input Chaîne de caractères à nettoyer
+   * @returns Chaîne de caractères nettoyée
+   */
+  private sanitizeInput(input: string): string {
+    return input.trim().replace(/\s+/g, ' ');
   }
 }

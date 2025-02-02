@@ -1,7 +1,8 @@
 import { IDealershipRepository } from '@application/ports/repositories/IDealershipRepository';
 import { UpdateDealershipInfoDTO } from '@application/dtos/dealership/request/UpdateDealershipInfoDTO';
 import { UpdateDealershipInfoValidator } from '@application/validation/dealership/UpdateDealershipInfoValidator';
-import { Authorize, IAuthorizationAware } from '@application/decorators/Authorize';
+import { Authorize} from '@application/decorators/Authorize';
+import { IAuthorizationAware } from '@domain/services/authorization/IAuthorizationAware';
 import { AuthorizationContext } from '@domain/services/authorization/AuthorizationContext';
 import { Permission } from '@domain/services/authorization/Permission';
 import { Result } from '@domain/shared/Result';
@@ -12,17 +13,13 @@ import { ContactInfo } from '@domain/value-objects/ContactInfo';
 import { Email } from '@domain/value-objects/Email';
 import { UpdateDealershipInfoResponseDTO } from '@application/dtos/dealership/response/UpdateDealershipInfoResponseDTO';
 import { DealershipValidationError } from '@domain/errors/dealership/DealershipValidationError';
-import { DealershipAuthorizationService } from '@domain/services/authorization/DealershipAuthorizationService';
 
 export class UpdateDealershipInfoUseCase implements IAuthorizationAware {
     private readonly validator = new UpdateDealershipInfoValidator();
-    private readonly authService: DealershipAuthorizationService;
 
     constructor(
         private readonly dealershipRepository: IDealershipRepository,
-        authService?: DealershipAuthorizationService
     ) {
-        this.authService = authService ?? new DealershipAuthorizationService();
     }
 
     public getAuthorizationContext(dto: UpdateDealershipInfoDTO): AuthorizationContext {
@@ -33,7 +30,7 @@ export class UpdateDealershipInfoUseCase implements IAuthorizationAware {
         };
     }
 
-    @Authorize(Permission.UPDATE_DEALERSHIP_INFO)
+    @Authorize(Permission.MANAGE_DEALERSHIP)
     public async execute(dto: UpdateDealershipInfoDTO): Promise<Result<UpdateDealershipInfoResponseDTO, Error>> {
         try {
             // Étape 1: Validation des données d'entrée
@@ -52,10 +49,6 @@ export class UpdateDealershipInfoUseCase implements IAuthorizationAware {
                 return new DealershipNotFoundError(dto.dealershipId);
             }
 
-            // Étape 3: Vérifier les droits d'accès
-            if (!this.authService.canAccessDealership(dto.userId, dto.userRole, dealership)) {
-                return new UnauthorizedError("You don't have access to this dealership");
-            }
 
             // Étape 4: Mise à jour des informations
             if (dto.name) {

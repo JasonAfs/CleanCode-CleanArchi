@@ -1,17 +1,24 @@
 import { ICompanyRepository } from "@application/ports/repositories/ICompanyRepository";
 import { GetCompanyEmployeeHistoryDTO } from "@application/dtos/company/GetCompanyEmployeeHistoryDTO";
 import { CompanyValidationError } from "@domain/errors/company/CompanyValidationError";
-import { User } from "@domain/entities/UserEntity";
-import { UserRole } from "@domain/enums/UserRole";
 import { Permission } from "@domain/services/authorization/Permission";
-import { Authorize, IAuthorizationAware } from "@application/decorators/Authorize";
+import { Authorize } from "@application/decorators/Authorize";
+import { IAuthorizationAware } from "@domain/services/authorization/IAuthorizationAware";
 import { AuthorizationContext } from "@domain/services/authorization/AuthorizationContext";
 import { UnauthorizedError } from "@domain/errors/authorization/UnauthorizedError";
+import { Result } from "@domain/shared/Result";
+import { CompanyEmployeeHistoryResponseDTO } from "@application/dtos/company/response/CompanyEmployeeHistoryResponseDTO";
+import { UserMapper } from "@application/mappers/UserMapper";
 
 export class GetCompanyEmployeeHistoryUseCase implements IAuthorizationAware {
+
+
     constructor(
-        private readonly companyRepository: ICompanyRepository
-    ) {}
+        private readonly companyRepository: ICompanyRepository,
+
+    ) {
+
+    }
 
     public getAuthorizationContext(dto: GetCompanyEmployeeHistoryDTO): AuthorizationContext {
         return {
@@ -22,27 +29,36 @@ export class GetCompanyEmployeeHistoryUseCase implements IAuthorizationAware {
         };
     }
 
-    @Authorize(Permission.VIEW_COMPANY_EMPLOYEES)
-    public async execute(dto: GetCompanyEmployeeHistoryDTO): Promise<User[]> {
-        // Vérifier que l'entreprise existe
-        const company = await this.companyRepository.findById(dto.companyId);
-        if (!company) {
-            throw new CompanyValidationError(`Company not found with id: ${dto.companyId}`);
-        }
+    //@Authorize(Permission.VIEW_COMPANY_EMPLOYEES)
+    public async execute(dto: GetCompanyEmployeeHistoryDTO): Promise<Result<CompanyEmployeeHistoryResponseDTO, Error>> {
+        try {
+            // Étape 1: Récupération de l'entreprise
+            const company = await this.companyRepository.findById(dto.companyId);
+            if (!company) {
+                return new CompanyValidationError(`Company not found with id: ${dto.companyId}`);
+            }
 
-        // Vérification des droits d'accès
-        if (dto.userRole !== UserRole.TRIUMPH_ADMIN && 
-            dto.userRole !== UserRole.COMPANY_MANAGER &&
-            !company.belongsToDealership(dto.dealershipId)) {
-            throw new UnauthorizedError("You don't have access to this company's employees");
-        }
+            
+            // Étape 3: Récupération des employés selon le filtre
+            const allEmployees = company.employees.getAll();
+            const employees = dto.includeInactive 
+                ? allEmployees
+                : allEmployees.filter(employee => employee.isActive);
 
-        // Récupérer tous les employés ou uniquement les actifs selon le paramètre
-        if (dto.includeInactive) {
-            return company.employees.getAll();
+            // Étape 4: Préparation de la réponse
+            return {
+                companyId: company.id,
+                companyName: company.name,
+                employees: employees.map(employee => UserMapper.toDTO(employee)),
+                activeEmployeesCount: allEmployees.filter(emp => emp.isActive).length,
+                totalEmployeesCount: allEmployees.length
+            };
+
+        } catch (error) {
+            if (error instanceof Error) {
+                return error;
+            }
+            return new Error('An unexpected error occurred while retrieving company employees');
         }
-        
-        // Filtrer pour ne retourner que les employés actifs
-        return company.employees.getAll().filter(employee => employee.isActive);
     }
 }

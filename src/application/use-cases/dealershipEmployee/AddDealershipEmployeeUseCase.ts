@@ -1,7 +1,5 @@
-import {
-  Authorize,
-  IAuthorizationAware,
-} from '@application/decorators/Authorize';
+import { Authorize } from '@application/decorators/Authorize';
+import { IAuthorizationAware } from '@domain/services/authorization/IAuthorizationAware';
 import { AddDealershipEmployeeValidator } from '@application/validation/dealership/AddDealershipEmployeeValidator';
 import { IDealershipRepository } from '@application/ports/repositories/IDealershipRepository';
 import { IUserRepository } from '@application/ports/repositories/IUserRepository';
@@ -12,13 +10,10 @@ import { DealershipValidationError } from '@domain/errors/dealership/DealershipV
 import { DealershipNotFoundError } from '@domain/errors/dealership/DealershipNotFoundError';
 import { UserNotFoundError } from '@domain/errors/user/UserNotFoundError';
 import { Permission } from '@domain/services/authorization/Permission';
-import { DealershipAuthorizationService } from '@domain/services/authorization/DealershipAuthorizationService';
-import { UnauthorizedError } from '@domain/errors/authorization/UnauthorizedError';
 import { AddDealershipEmployeeResponseDTO } from '@application/dtos/dealership/response/AddDealershipEmployeeResponseDTO';
 
 export class AddDealershipEmployeeUseCase implements IAuthorizationAware {
   private readonly validator = new AddDealershipEmployeeValidator();
-  private readonly authService = new DealershipAuthorizationService();
 
   constructor(
     private readonly dealershipRepository: IDealershipRepository,
@@ -28,10 +23,13 @@ export class AddDealershipEmployeeUseCase implements IAuthorizationAware {
   public getAuthorizationContext(
     dto: AddDealershipEmployeeDTO,
   ): AuthorizationContext {
+    console.log("dto == " +JSON.stringify(dto))
     return {
       userId: dto.userId,
       userRole: dto.userRole,
-      dealershipId: dto.dealershipId,
+      resourceId: dto.dealershipId, 
+      dealershipId: dto.userDealershipId,
+      resourceType: 'dealership'
     };
   }
 
@@ -50,39 +48,19 @@ export class AddDealershipEmployeeUseCase implements IAuthorizationAware {
         throw error;
       }
 
-      // Étape 2: Vérifier que le rôle à assigner est valide
-      if (!this.authService.isDealershipRole(dto.role)) {
-        return new DealershipValidationError('Invalid dealership role');
-      }
-
-      // Étape 3: Récupérer la concession
-      const dealership = await this.dealershipRepository.findById(
-        dto.dealershipId,
-      );
+      // Étape 2: Récupérer la concession
+      const dealership = await this.dealershipRepository.findById(dto.dealershipId);
       if (!dealership) {
         return new DealershipNotFoundError(dto.dealershipId);
       }
 
-      // Étape 4: Vérifier les droits d'accès
-      if (
-        !this.authService.canAccessDealership(
-          dto.userId,
-          dto.userRole,
-          dealership,
-        )
-      ) {
-        return new UnauthorizedError(
-          "You don't have access to this dealership",
-        );
-      }
-
-      // Étape 5: Vérifier que l'employé existe
+      // Étape 3: Vérifier que l'employé existe
       const employee = await this.userRepository.findById(dto.employeeId);
       if (!employee) {
         return new UserNotFoundError(dto.employeeId);
       }
 
-      // Étape 6: Vérifier si l'employé n'est pas déjà associé à une autre concession
+      // Étape 4: Vérifier si l'employé n'est pas déjà associé à une autre concession
       const existingDealership = await this.dealershipRepository.findByEmployee(
         dto.employeeId,
       );
@@ -92,11 +70,11 @@ export class AddDealershipEmployeeUseCase implements IAuthorizationAware {
         );
       }
 
-      // Étape 7: Mettre à jour le rôle de l'employé
+      // Étape 5: Mettre à jour le rôle de l'employé
       employee.updateRole(dto.role);
       await this.userRepository.update(employee);
 
-      // Étape 8: Ajouter l'employé à la concession
+      // Étape 6: Ajouter l'employé à la concession
       dealership.addEmployee(employee);
       await this.dealershipRepository.update(dealership);
 

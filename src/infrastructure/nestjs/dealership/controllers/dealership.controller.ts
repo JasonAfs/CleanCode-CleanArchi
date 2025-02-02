@@ -295,6 +295,7 @@ export class DealershipController {
         role: dto.role,
         userId: req.user.userId,
         userRole: req.user.role,
+        userDealershipId: req.user.dealershipId
       });
 
       if (result instanceof Error) {
@@ -344,6 +345,7 @@ export class DealershipController {
         employeeId: employeeId,
         userId: req.user.userId,
         userRole: req.user.role,
+        userDealershipId: req.user.dealershipId
       });
 
       if (result instanceof Error) {

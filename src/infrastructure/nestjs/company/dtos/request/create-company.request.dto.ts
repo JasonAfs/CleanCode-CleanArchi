@@ -1,50 +1,37 @@
-import { IsString, IsEmail, IsOptional } from 'class-validator';
+import { IsString, IsEmail } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 import { CreateCompanyDTO } from '@application/dtos/company/CreateCompanyDTO';
-import { UserRole } from '@domain/enums/UserRole';
 
-export class CreateCompanyRequestDTO implements CreateCompanyDTO {
-  @ApiProperty()
-  @IsString()
-  userId!: string;
+export class CreateCompanyRequestDTO implements Omit<CreateCompanyDTO, 'userId' | 'userRole' | 'dealershipId'> {
+    @ApiProperty()
+    @IsString()
+    name!: string;
 
-  @ApiProperty({ enum: UserRole })
-  userRole!: UserRole;
+    @ApiProperty()
+    @IsString()
+    registrationNumber!: string;
 
-  @ApiProperty({ required: false })
-  @IsOptional()
-  @IsString()
-  dealershipId?: string;
+    @ApiProperty()
+    @IsString()
+    street!: string;
 
-  @ApiProperty()
-  @IsString()
-  name!: string;
+    @ApiProperty()
+    @IsString()
+    city!: string;
 
-  @ApiProperty()
-  @IsString()
-  registrationNumber!: string;
+    @ApiProperty()
+    @IsString()
+    postalCode!: string;
 
-  @ApiProperty()
-  @IsString()
-  street!: string;
+    @ApiProperty()
+    @IsString()
+    country!: string;
 
-  @ApiProperty()
-  @IsString()
-  city!: string;
+    @ApiProperty()
+    @IsString()
+    phone!: string;
 
-  @ApiProperty()
-  @IsString()
-  postalCode!: string;
-
-  @ApiProperty()
-  @IsString()
-  country!: string;
-
-  @ApiProperty()
-  @IsString()
-  phone!: string;
-
-  @ApiProperty()
-  @IsEmail()
-  email!: string;
+    @ApiProperty()
+    @IsEmail()
+    email!: string;
 }

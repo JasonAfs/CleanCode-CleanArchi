@@ -1,24 +1,22 @@
-import { ICompanyProps } from "@domain/interfaces/ICompanyProps";
-import { Address } from "@domain/value-objects/Address";
-import { ContactInfo } from "@domain/value-objects/ContactInfo";
-import { RegistrationNumber } from "@domain/value-objects/RegistrationNumber";
-import { CompanyEmployees } from "@domain/aggregates/company/CompanyEmployees";
-import { User } from "@domain/entities/UserEntity";
-import { CompanyValidationError } from "@domain/errors/company/CompanyValidationError";
-import { randomUUID } from "crypto";
+import { CompanyProps, CreateCompanyProps, ReconstitueCompanyProps } from '@domain/interfaces/company/ICompanyProps';
+import { Address } from '@domain/value-objects/Address';
+import { ContactInfo } from '@domain/value-objects/ContactInfo';
+import { RegistrationNumber } from '@domain/value-objects/RegistrationNumber';
+import { CompanyEmployees } from '@domain/aggregates/company/CompanyEmployees';
+import { User } from '@domain/entities/UserEntity';
+import { CompanyValidationError } from '@domain/errors/company/CompanyValidationError';
+import { randomUUID } from 'crypto';
 
 export class Company {
-    private readonly props: ICompanyProps;
+    private readonly props: CompanyProps;
 
-    private constructor(props: ICompanyProps) {
+    private constructor(props: CompanyProps) {
         this.props = props;
     }
 
-    public static create(
-        props: Omit<ICompanyProps, 'id' | 'createdAt' | 'updatedAt' | 'isActive' | 'employees'>
-    ): Company {
+    public static create(props: CreateCompanyProps): Company {
         if (!props.name.trim()) {
-            throw new CompanyValidationError("Company name cannot be empty");
+            throw new CompanyValidationError('Company name cannot be empty');
         }
 
         return new Company({
@@ -28,6 +26,16 @@ export class Company {
             isActive: true,
             createdAt: new Date(),
             updatedAt: new Date()
+        });
+    }
+
+    public static reconstitute(
+        props: ReconstitueCompanyProps, 
+        employees: CompanyEmployees = CompanyEmployees.create()
+    ): Company {
+        return new Company({
+            ...props,
+            employees
         });
     }
 
@@ -68,35 +76,54 @@ export class Company {
         return this.props.updatedAt;
     }
 
+    get createdByDealershipId(): string | undefined {
+        return this.props.createdByDealershipId;
+    }
+
     private updateLastModified(): void {
         this.props.updatedAt = new Date();
     }
 
     // Méthodes d'état
     public deactivate(): void {
+        if (!this.props.isActive) {
+            throw new CompanyValidationError('Company is already inactive');
+        }
         this.props.isActive = false;
         this.updateLastModified();
     }
 
     public activate(): void {
+        if (this.props.isActive) {
+            throw new CompanyValidationError('Company is already active');
+        }
         this.props.isActive = true;
         this.updateLastModified();
     }
 
     // Méthodes de mise à jour
     public updateContactInfo(contactInfo: ContactInfo): void {
+        if (!this.props.isActive) {
+            throw new CompanyValidationError('Cannot update contact info of an inactive company');
+        }
         this.props.contactInfo = contactInfo;
         this.updateLastModified();
     }
 
     public updateAddress(address: Address): void {
+        if (!this.props.isActive) {
+            throw new CompanyValidationError('Cannot update address of an inactive company');
+        }
         this.props.address = address;
         this.updateLastModified();
     }
 
     public updateName(name: string): void {
+        if (!this.props.isActive) {
+            throw new CompanyValidationError('Cannot update name of an inactive company');
+        }
         if (!name.trim()) {
-            throw new CompanyValidationError("Company name cannot be empty");
+            throw new CompanyValidationError('Company name cannot be empty');
         }
         this.props.name = name.trim();
         this.updateLastModified();
@@ -104,11 +131,17 @@ export class Company {
 
     // Méthodes de gestion des employés
     public addEmployee(user: User): void {
+        if (!this.props.isActive) {
+            throw new CompanyValidationError('Cannot add employee to an inactive company');
+        }
         this.props.employees = this.props.employees.addEmployee(user);
         this.updateLastModified();
     }
 
     public removeEmployee(userId: string): void {
+        if (!this.props.isActive) {
+            throw new CompanyValidationError('Cannot remove employee from an inactive company');
+        }
         this.props.employees = this.props.employees.removeEmployee(userId);
         this.updateLastModified();
     }
@@ -117,23 +150,12 @@ export class Company {
         return this.props.employees.hasEmployee(userId);
     }
 
-    // Méthodes de filtrage des employés
     public getDrivers(): User[] {
         return this.props.employees.getDrivers();
     }
 
     public getCompanyEmployees(): User[] {
         return this.props.employees.getCompanyEmployees();
-    }
-
-    // Méthodes de validation supplémentaires
-    public isValidForRegistration(): boolean {
-        // Une entreprise valide doit avoir au moins un employé company manager
-        return this.getCompanyEmployees().length > 0;
-    }
-    
-    get createdByDealershipId(): string | undefined {
-        return this.props.createdByDealershipId;
     }
 
     public belongsToDealership(dealershipId: string | undefined): boolean {

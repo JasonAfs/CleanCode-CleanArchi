@@ -1,37 +1,33 @@
 import { IDealershipRepository } from '@application/ports/repositories/IDealershipRepository';
 import { GetDealershipByIdDTO } from '@application/dtos/dealership/request/GetDealershipByIdDTO';
 import { GetDealershipByIdValidator } from '@application/validation/dealership/GetDealershipByIdValidator';
-import { Authorize, IAuthorizationAware } from '@application/decorators/Authorize';
+import { Authorize} from '@application/decorators/Authorize';
+import { IAuthorizationAware } from '@domain/services/authorization/IAuthorizationAware';
 import { AuthorizationContext } from '@domain/services/authorization/AuthorizationContext';
 import { Permission } from '@domain/services/authorization/Permission';
 import { Result } from '@domain/shared/Result';
 import { DealershipNotFoundError } from '@domain/errors/dealership/DealershipNotFoundError';
-import { UnauthorizedError } from '@domain/errors/authorization/UnauthorizedError';
-import { DealershipAuthorizationService } from '@domain/services/authorization/DealershipAuthorizationService';
 import { DealershipValidationError } from '@domain/errors/dealership/DealershipValidationError';
 import { DealershipMapper } from '@application/mappers/DealershipMapper';
 import { DealershipWithEmployeesDTO } from '@application/dtos/dealership/response/DealershipWithEmployeesDTO';
 
 export class GetDealershipByIdUseCase implements IAuthorizationAware {
     private readonly validator = new GetDealershipByIdValidator();
-    private readonly authService: DealershipAuthorizationService;
 
     constructor(
-        private readonly dealershipRepository: IDealershipRepository,
-        authService?: DealershipAuthorizationService
-    ) {
-        this.authService = authService ?? new DealershipAuthorizationService();
-    }
+        private readonly dealershipRepository: IDealershipRepository
+    ) {}
 
     public getAuthorizationContext(dto: GetDealershipByIdDTO): AuthorizationContext {
         return {
             userId: dto.userId,
             userRole: dto.userRole,
-            dealershipId: dto.dealershipId
+            resourceId: dto.dealershipId,  // Important: resourceId au lieu de dealershipId
+            resourceType: 'dealership'
         };
     }
 
-    @Authorize([Permission.VIEW_ALL_DEALERSHIPS, Permission.VIEW_DEALERSHIP_DETAILS])
+    @Authorize(Permission.VIEW_DEALERSHIP_DETAILS)
     public async execute(dto: GetDealershipByIdDTO): Promise<Result<DealershipWithEmployeesDTO, Error>> {
         try {
             // Étape 1: Validation des données d'entrée
@@ -50,11 +46,7 @@ export class GetDealershipByIdUseCase implements IAuthorizationAware {
                 return new DealershipNotFoundError(dto.dealershipId);
             }
 
-            // Étape 3: Vérification des droits d'accès
-            if (!this.authService.canAccessDealership(dto.userId, dto.userRole, dealership)) {
-                return new UnauthorizedError("You don't have access to this dealership");
-            }
-
+            // Étape 3: Retourner les données
             return DealershipMapper.toDTOWithEmployees(dealership);
 
         } catch (error) {

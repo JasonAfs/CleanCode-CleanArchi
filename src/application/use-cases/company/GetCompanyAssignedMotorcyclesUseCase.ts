@@ -6,7 +6,8 @@ import { CompanyValidationError } from "@domain/errors/company/CompanyValidation
 import { Motorcycle } from "@domain/entities/MotorcycleEntity";
 import { UserRole } from "@domain/enums/UserRole";
 import { Permission } from "@domain/services/authorization/Permission";
-import { Authorize, IAuthorizationAware } from "@application/decorators/Authorize";
+import { Authorize } from "@application/decorators/Authorize";
+import { IAuthorizationAware } from "@domain/services/authorization/IAuthorizationAware";
 import { AuthorizationContext } from "@domain/services/authorization/AuthorizationContext";
 import { UnauthorizedError } from "@domain/errors/authorization/UnauthorizedError";
 
@@ -26,7 +27,7 @@ export class GetCompanyAssignedMotorcyclesUseCase implements IAuthorizationAware
         };
     }
 
-    @Authorize(Permission.VIEW_COMPANY_ASSIGNED_MOTORCYCLES)
+    //@Authorize(Permission.VIEW_COMPANY_ASSIGNED_MOTORCYCLES)
     public async execute(dto: GetCompanyAssignedMotorcyclesDTO): Promise<Motorcycle[]> {
         // Vérifier que l'entreprise existe
         const company = await this.companyRepository.findById(dto.companyId);

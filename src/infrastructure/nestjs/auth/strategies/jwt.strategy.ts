@@ -1,6 +1,14 @@
 import { Injectable } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 import { ExtractJwt, Strategy } from 'passport-jwt';
+import { UserRole } from '@domain/enums/UserRole';
+
+interface JwtPayload {
+  userId: string;
+  role: UserRole;
+  dealershipId?: string;
+  companyId?: string;
+}
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
@@ -9,7 +17,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     if (!secretKey) {
       throw new Error('JWT_SECRET is not defined in environment variables');
     }
-    
+
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
       ignoreExpiration: false,
@@ -17,7 +25,12 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     });
   }
 
-  async validate(payload: any) {
-    return { userId: payload.userId, role: payload.role };
+  async validate(payload: JwtPayload) {
+    return { 
+      userId: payload.userId, 
+      role: payload.role,
+      dealershipId: payload.dealershipId,
+      companyId: payload.companyId // Ajout de companyId
+    };
   }
 }

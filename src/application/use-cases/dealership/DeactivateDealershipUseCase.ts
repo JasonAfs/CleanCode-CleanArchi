@@ -1,14 +1,13 @@
 import { IDealershipRepository } from '@application/ports/repositories/IDealershipRepository';
 import { DeactivateDealershipDTO } from '@application/dtos/dealership/request/DeactivateDealershipDTO';
 import { DeactivateDealershipValidator } from '@application/validation/dealership/DeactivateDealershipValidator';
-import { Authorize, IAuthorizationAware } from '@application/decorators/Authorize';
+import { Authorize } from '@application/decorators/Authorize';
+import { IAuthorizationAware } from '@domain/services/authorization/IAuthorizationAware';
 import { AuthorizationContext } from '@domain/services/authorization/AuthorizationContext';
 import { Permission } from '@domain/services/authorization/Permission';
 import { Result } from '@domain/shared/Result';
 import { DealershipNotFoundError } from '@domain/errors/dealership/DealershipNotFoundError';
-import { UnauthorizedError } from '@domain/errors/authorization/UnauthorizedError';
 import { DealershipValidationError } from '@domain/errors/dealership/DealershipValidationError';
-import { UserRole } from '@domain/enums/UserRole';
 import { DeactivateDealershipResponseDTO } from '@application/dtos/dealership/response/DeactivateDealershipResponseDTO';
 
 export class DeactivateDealershipUseCase implements IAuthorizationAware {
@@ -22,7 +21,8 @@ export class DeactivateDealershipUseCase implements IAuthorizationAware {
         return {
             userId: dto.userId,
             userRole: dto.userRole,
-            dealershipId: dto.dealershipId
+            resourceId: dto.dealershipId,
+            resourceType: 'dealership'
         };
     }
 
@@ -50,13 +50,7 @@ export class DeactivateDealershipUseCase implements IAuthorizationAware {
                 return new DealershipValidationError('Dealership is already deactivated');
             }
 
-            // Étape 4: Vérification des droits d'accès pour les managers
-            if (dto.userRole === UserRole.DEALERSHIP_MANAGER && 
-                !dealership.hasEmployee(dto.userId)) {
-                return new UnauthorizedError("You don't have access to this dealership");
-            }
-
-            // Étape 5: Désactivation et sauvegarde
+            // Étape 4: Désactivation et sauvegarde
             dealership.deactivate();
             await this.dealershipRepository.update(dealership);
 

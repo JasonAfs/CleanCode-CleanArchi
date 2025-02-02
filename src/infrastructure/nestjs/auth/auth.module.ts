@@ -9,7 +9,11 @@ import { PrismaUserRepository } from '@infrastructure/repositories/prisma/Prisma
 import { IUserRepository } from '@application/ports/repositories/IUserRepository';
 import { PrismaRefreshTokenRepository } from '@infrastructure/repositories/prisma/PrismaRefreshTokenRepository';
 import { IRefreshTokenRepository } from '@application/ports/repositories/IRefreshTokenRepository';
+import { IDealershipRepository } from '@application/ports/repositories/IDealershipRepository';
+import { ICompanyRepository } from '@application/ports/repositories/ICompanyRepository';
 import { JwtAuthenticationService } from '@infrastructure/services/auth/JwtAuthenticationService';
+import { PrismaDealershipRepository } from '@infrastructure/repositories/prisma/PrismaDealershipRepository';
+import { PrismaCompanyRepository } from '@infrastructure/repositories/prisma/PrismaCompanyRepository';
 import { IAuthenticationService } from '@application/ports/services/IAuthenticationService';
 import { BcryptPasswordService } from '@infrastructure/services/auth/BcryptPasswordService';
 import { IPasswordService } from '@application/ports/services/IPasswordService';
@@ -45,11 +49,34 @@ import { PrismaService } from '../prisma/prisma.service';
       inject: [PrismaService],
     },
     {
-      provide: 'IAuthenticationService',
-      useFactory: (refreshTokenRepo: IRefreshTokenRepository) => {
-        return new JwtAuthenticationService(refreshTokenRepo);
+      provide: 'IDealershipRepository',
+      useFactory: (prismaService: PrismaService) => {
+        return new PrismaDealershipRepository(prismaService);
       },
-      inject: ['IRefreshTokenRepository'],
+      inject: [PrismaService],
+    },
+    {
+      provide: 'ICompanyRepository',
+      useFactory: (prismaService: PrismaService) => {
+        return new PrismaCompanyRepository(prismaService);
+      },
+      inject: [PrismaService],
+    },
+    {
+      provide: 'IAuthenticationService',
+      useFactory: (
+        refreshTokenRepo: IRefreshTokenRepository,
+        dealershipRepo: IDealershipRepository,
+        companyRepo: ICompanyRepository,
+      ) => {
+        return new JwtAuthenticationService(
+          refreshTokenRepo,
+          dealershipRepo,
+          companyRepo,
+          process.env.JWT_SECRET
+        );
+      },
+      inject: ['IRefreshTokenRepository', 'IDealershipRepository', 'ICompanyRepository'],
     },
     {
       provide: 'IPasswordService',

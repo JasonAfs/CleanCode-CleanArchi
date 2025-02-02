@@ -2,54 +2,101 @@ import { ICompanyRepository } from '@application/ports/repositories/ICompanyRepo
 import { ICompanyMotorcycleRepository } from '@application/ports/repositories/ICompanyMotorcycleRepository';
 import { DeactivateCompanyDTO } from '@application/dtos/company/DeactivateCompanyDTO';
 import { DeactivateCompanyValidator } from '@application/validation/company/DeactivateCompanyValidator';
-import { Authorize, IAuthorizationAware } from '@application/decorators/Authorize';
+import { Authorize } from '@application/decorators/Authorize';
+import { IAuthorizationAware } from '@domain/services/authorization/IAuthorizationAware';
 import { AuthorizationContext } from '@domain/services/authorization/AuthorizationContext';
 import { Permission } from '@domain/services/authorization/Permission';
-import { UserRole } from '@domain/enums/UserRole';
+import { Result } from '@domain/shared/Result';
 import { UnauthorizedError } from '@domain/errors/authorization/UnauthorizedError';
 import { CompanyValidationError } from '@domain/errors/company/CompanyValidationError';
+import { DeactivateCompanyResponseDTO } from '@application/dtos/company/response/DeactivateCompanyResponseDTO';
+import { UserRole } from '@domain/enums/UserRole';
 
 export class DeactivateCompanyUseCase implements IAuthorizationAware {
-    constructor(
-        private readonly companyRepository: ICompanyRepository,
-        private readonly companyMotorcycleRepository: ICompanyMotorcycleRepository,
-    ) {}
+  private readonly validator = new DeactivateCompanyValidator();
 
-    private readonly validator = new DeactivateCompanyValidator();
+  constructor(
+    private readonly companyRepository: ICompanyRepository,
+    private readonly companyMotorcycleRepository: ICompanyMotorcycleRepository,
+  ) {}
 
-    public getAuthorizationContext(dto: DeactivateCompanyDTO): AuthorizationContext {
-        return {
-            userId: dto.userId,
-            userRole: dto.userRole,
-            dealershipId: dto.dealershipId
-        };
-    }
+  public getAuthorizationContext(
+    dto: DeactivateCompanyDTO,
+  ): AuthorizationContext {
+    return {
+      userId: dto.userId,
+      userRole: dto.userRole,
+      dealershipId: dto.dealershipId,
+      resourceType: 'company',
+      resourceId: dto.companyId,
+    };
+  }
 
-    @Authorize(Permission.DEACTIVATE_PARTNER_COMPANY)
-    public async execute(dto: DeactivateCompanyDTO): Promise<void> {
+  @Authorize(Permission.MANAGE_COMPANY)
+  public async execute(
+    dto: DeactivateCompanyDTO,
+  ): Promise<Result<DeactivateCompanyResponseDTO, Error>> {
+    try {
+      // Étape 1: Validation des données d'entrée
+      try {
         this.validator.validate(dto);
-
-        const company = await this.companyRepository.findById(dto.companyId);
-        if (!company) {
-            throw new CompanyValidationError(`Company not found with id: ${dto.companyId}`);
+      } catch (error) {
+        if (error instanceof CompanyValidationError) {
+          return error;
         }
+        throw error;
+      }
 
-        if (dto.userRole !== UserRole.TRIUMPH_ADMIN && 
-            !company.belongsToDealership(dto.dealershipId)) {
-            throw new UnauthorizedError("You don't have access to this company");
-        }
+      // Étape 2: Récupération de l'entreprise
+      const company = await this.companyRepository.findById(dto.companyId);
+      if (!company) {
+        return new CompanyValidationError(
+          `Company not found with id: ${dto.companyId}`,
+        );
+      }
 
-        if (!company.isActive) {
-            throw new CompanyValidationError("Company is already inactive");
-        }
+      // Ajouter la vérification de la concession
+      if (
+        dto.userRole !== UserRole.TRIUMPH_ADMIN &&
+        !company.belongsToDealership(dto.dealershipId)
+      ) {
+        return new UnauthorizedError(
+          "You don't have access to deactivate this company",
+        );
+      }
 
-        const activeAssignments = await this.companyMotorcycleRepository.findActiveByCompanyId(dto.companyId);
-        if (activeAssignments.length > 0) {
-            throw new CompanyValidationError("Cannot deactivate company with active motorcycle assignments");
-        }
+      // Étape 3: Vérification de l'état actuel
+      if (!company.isActive) {
+        return new CompanyValidationError('Company is already deactivated');
+      }
 
-        company.deactivate();
+      // Étape 5: Vérification des motos assignées
+      const activeAssignments =
+        await this.companyMotorcycleRepository.findActiveByCompanyId(
+          dto.companyId,
+        );
+      if (activeAssignments.length > 0) {
+        return new CompanyValidationError(
+          'Cannot deactivate company with active motorcycle assignments',
+        );
+      }
 
-        await this.companyRepository.update(company);
+      // Étape 6: Désactivation et sauvegarde
+      company.deactivate();
+      await this.companyRepository.update(company);
+
+      return {
+        success: true,
+        message: `Company ${company.name} has been successfully deactivated`,
+        companyId: company.id,
+      };
+    } catch (error) {
+      if (error instanceof Error) {
+        return error;
+      }
+      return new Error(
+        'An unexpected error occurred while deactivating the company',
+      );
     }
+  }
 }

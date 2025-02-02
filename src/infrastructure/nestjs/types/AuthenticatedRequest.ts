@@ -6,5 +6,6 @@ export interface AuthenticatedRequest extends Request {
         userId: string;
         role: UserRole;
         dealershipId?: string;
+        companyId?: string;
     };
 }

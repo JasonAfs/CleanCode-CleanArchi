@@ -1,4 +1,5 @@
-import { Authorize, IAuthorizationAware } from "@application/decorators/Authorize";
+import { Authorize } from "@application/decorators/Authorize";
+import { IAuthorizationAware } from "@domain/services/authorization/IAuthorizationAware";
 import { RemoveDealershipEmployeeValidator } from "@application/validation/dealership/RemoveDealershipEmployeeValidator";
 import { IDealershipRepository } from "@application/ports/repositories/IDealershipRepository";
 import { IUserRepository } from "@application/ports/repositories/IUserRepository";
@@ -8,15 +9,12 @@ import { Result } from "@domain/shared/Result";
 import { Permission } from "@domain/services/authorization/Permission";
 import { DealershipNotFoundError } from "@domain/errors/dealership/DealershipNotFoundError";
 import { UserRole } from "@domain/enums/UserRole";
-import { UnauthorizedError } from "@domain/errors/authorization/UnauthorizedError";
 import { UserNotFoundError } from "@domain/errors/user/UserNotFoundError";
 import { DealershipValidationError } from "@domain/errors/dealership/DealershipValidationError";
-import { DealershipAuthorizationService } from "@domain/services/authorization/DealershipAuthorizationService";
 import { RemoveDealershipEmployeeResponseDTO } from "@application/dtos/dealership/response/RemoveDealershipEmployeeResponseDTO";
 
 export class RemoveDealershipEmployeeUseCase implements IAuthorizationAware {
     private readonly validator = new RemoveDealershipEmployeeValidator();
-    private readonly authService = new DealershipAuthorizationService();
 
     constructor(
         private readonly dealershipRepository: IDealershipRepository,
@@ -28,7 +26,9 @@ export class RemoveDealershipEmployeeUseCase implements IAuthorizationAware {
         return {
             userId: dto.userId,
             userRole: dto.userRole,
-            dealershipId: dto.dealershipId
+            resourceId: dto.dealershipId,
+            dealershipId: dto.userDealershipId,
+            resourceType: 'dealership'
         };
     }
 
@@ -49,11 +49,6 @@ export class RemoveDealershipEmployeeUseCase implements IAuthorizationAware {
             const dealership = await this.dealershipRepository.findById(dto.dealershipId);
             if (!dealership) {
                 return new DealershipNotFoundError(dto.dealershipId);
-            }
-
-            // Étape 3: Vérifier les droits d'accès
-            if (!this.authService.canAccessDealership(dto.userId, dto.userRole, dealership)) {
-                return new UnauthorizedError("You don't have access to this dealership");
             }
 
             // Étape 4: Vérifier que l'employé existe
