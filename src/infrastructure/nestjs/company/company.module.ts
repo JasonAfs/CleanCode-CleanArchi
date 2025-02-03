@@ -20,6 +20,7 @@ import { GetCompanyAssignedMotorcyclesUseCase } from '@application/use-cases/com
 import { GetCompanyEmployeeHistoryUseCase } from '@application/use-cases/company/GetCompanyEmployeeHistoryUseCase';
 import { AddCompanyEmployeeUseCase } from '@application/use-cases/companyEmployee/AddCompanyEmployeeUseCase';
 import { RemoveCompanyEmployeeUseCase } from '@application/use-cases/companyEmployee/RemoveCompanyEmployeeUseCase';
+import { GetCompaniesUseCase } from '@application/use-cases/company/GetCompaniesUseCase';
 
 @Module({
   imports: [PrismaModule],
@@ -56,6 +57,13 @@ import { RemoveCompanyEmployeeUseCase } from '@application/use-cases/companyEmpl
     },
 
     // Use Case Providers
+    {
+      provide: GetCompaniesUseCase,
+      useFactory: (companyRepo: ICompanyRepository) => {
+        return new GetCompaniesUseCase(companyRepo);
+      },
+      inject: ['ICompanyRepository'],
+    },
     {
       provide: CreateCompanyUseCase,
       useFactory: (companyRepo: ICompanyRepository) => {

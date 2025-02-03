@@ -9,11 +9,11 @@ import {
   UseGuards,
   Request,
   BadRequestException,
-  ConflictException,
   UnauthorizedException,
   NotFoundException,
+  Query,
 } from '@nestjs/common';
-import { ApiTags, ApiResponse, ApiBearerAuth, ApiParam } from '@nestjs/swagger';
+import { ApiTags, ApiResponse, ApiBearerAuth, ApiParam,ApiQuery } from '@nestjs/swagger';
 import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
 
 // Use Cases
@@ -39,6 +39,9 @@ import { UserNotFoundError } from '@domain/errors/user/UserNotFoundError';
 import { AuthenticatedRequest } from '../../types/AuthenticatedRequest';
 import { UserRole } from '@domain/enums/UserRole';
 
+import { GetCompaniesUseCase } from '@application/use-cases/company/GetCompaniesUseCase';
+import { GetCompaniesRequestDTO } from '../dtos/request/get-companies.request.dto';
+
 @ApiTags('companies')
 @ApiBearerAuth()
 @UseGuards(JwtAuthGuard)
@@ -52,6 +55,7 @@ export class CompanyController {
     private readonly getEmployeeHistoryUseCase: GetCompanyEmployeeHistoryUseCase,
     private readonly addEmployeeUseCase: AddCompanyEmployeeUseCase,
     private readonly removeEmployeeUseCase: RemoveCompanyEmployeeUseCase,
+    private readonly getCompaniesUseCase: GetCompaniesUseCase,
   ) {}
 
   @Post()
@@ -142,6 +146,47 @@ export class CompanyController {
       }
       throw new BadRequestException(
         `Failed to update company: ${error.message}`,
+      );
+    }
+  }
+
+  @Get()
+  @ApiResponse({ status: 200, description: 'Retrieved all companies' })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  @ApiQuery({ name: 'includeInactive', required: false, type: Boolean })
+  async getCompanies(
+    @Request() req: AuthenticatedRequest,
+    @Query() query: GetCompaniesRequestDTO
+  ) {
+    try {
+      const result = await this.getCompaniesUseCase.execute({
+        userId: req.user.userId,
+        userRole: req.user.role,
+        userDealershipId: req.user.dealershipId,
+        includeInactive: query.includeInactive
+      });
+
+      if (result instanceof Error) {
+        if (result instanceof UnauthorizedError) {
+          throw new UnauthorizedException(result.message);
+        }
+        if (result instanceof CompanyValidationError) {
+          throw new BadRequestException(result.message);
+        }
+        throw new BadRequestException('Failed to retrieve companies');
+      }
+
+      return result;
+    } catch (err) {
+      const error = err as Error;
+      if (
+        error instanceof UnauthorizedException ||
+        error instanceof BadRequestException
+      ) {
+        throw error;
+      }
+      throw new BadRequestException(
+        `Failed to retrieve companies: ${error.message}`,
       );
     }
   }

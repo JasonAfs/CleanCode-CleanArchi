@@ -1,8 +1,26 @@
+// src/types/company.ts
 export interface Company {
   id: string;
   name: string;
-  email: string;
-  status: 'active' | 'inactive';
+  registrationNumber: string;
+  address: {
+      street: string;
+      city: string;
+      postalCode: string;
+      country: string;
+  };
+  contactInfo: {
+      phone: string;
+      email: string;
+  };
+  isActive: boolean;
+  employees: Array<{
+      id: string;
+      firstName: string;
+      lastName: string;
+      email: string;
+      role: string;
+  }>;
 }
 
 export type CompanyDialogState = {
@@ -11,25 +29,3 @@ export type CompanyDialogState = {
   data: Company | null;
   setData: (company: Company) => void;
 };
-
-// Mock data
-export const mockCompanies: Company[] = [
-  {
-    id: '1',
-    name: 'Auto École Paris',
-    email: 'contact@autoecole-paris.fr',
-    status: 'active',
-  },
-  {
-    id: '2',
-    name: 'Moto Location Lyon',
-    email: 'info@motolocation-lyon.fr',
-    status: 'active',
-  },
-  {
-    id: '3',
-    name: 'Coursiers Express',
-    email: 'contact@coursiers-express.fr',
-    status: 'inactive',
-  },
-];

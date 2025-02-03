@@ -12,13 +12,13 @@ export const routes: RouteConfig[] = [
         title: "Dashboard",
         path: "/dashboard",
         icon: "LayoutDashboard",
-        allowedRoles: Object.values(UserRole), // Accessible à tous les rôles
+        allowedRoles: Object.values(UserRole),
     },
     {
         path: "/dealership",
         title: "Concessions",
         icon: "Store",
-        allowedRoles: [UserRole.TRIUMPH_ADMIN, UserRole.DEALERSHIP_MANAGER],
+        allowedRoles: [UserRole.TRIUMPH_ADMIN],
     },
     {
         title: "Users",

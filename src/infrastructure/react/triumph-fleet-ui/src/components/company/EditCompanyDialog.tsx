@@ -1,4 +1,3 @@
-// src/components/company/EditCompanyDialog.tsx
 import { useState, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import {
@@ -22,50 +21,102 @@ export const useCompanyDialogStore = create<CompanyDialogState>((set) => ({
   setData: (data: Company) => set(() => ({ data, isOpen: true })),
 }));
 
-type EditCompanyDialogProps = Pick<CompanyDialogState, "isOpen" | "data" | "toggleModal">;
+type EditCompanyDialogProps = Readonly<Pick<CompanyDialogState, "isOpen" | "data" | "toggleModal">>;
+
+interface Employee {
+  id: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  role: string;
+}
+
+interface FormData {
+  name: string;
+  registrationNumber: string;
+  address: {
+    street: string;
+    city: string;
+    postalCode: string;
+    country: string;
+  };
+  contactInfo: {
+    phone: string;
+    email: string;
+  };
+  isActive: boolean;
+  employees: Employee[];
+}
+
+const initialFormData: FormData = {
+  name: '',
+  registrationNumber: '',
+  address: {
+    street: '',
+    city: '',
+    postalCode: '',
+    country: ''
+  },
+  contactInfo: {
+    phone: '',
+    email: ''
+  },
+  isActive: true,
+  employees: []
+};
 
 export function EditCompanyDialog({ isOpen, data, toggleModal }: EditCompanyDialogProps) {
   const { addCompany, updateCompany } = useCompanyStore();
-  const [formData, setFormData] = useState<Partial<Company>>({
-    name: '',
-    email: '',
-    status: 'active'
-  });
+  const [formData, setFormData] = useState<FormData>(initialFormData);
 
   useEffect(() => {
     if (data) {
-      setFormData(data);
-    } else {
       setFormData({
-        name: '',
-        email: '',
-        status: 'active'
+        name: data.name,
+        registrationNumber: data.registrationNumber,
+        address: { ...data.address },
+        contactInfo: { ...data.contactInfo },
+        isActive: data.isActive,
+        employees: [...data.employees]
       });
+    } else {
+      setFormData(initialFormData);
     }
   }, [data]);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
     if (data?.id) {
-      // Mise à jour
-      updateCompany({
+      await updateCompany({
         ...formData,
         id: data.id
       } as Company);
     } else {
-      // Création
-      addCompany(formData as Omit<Company, 'id'>);
+      await addCompany(formData);
     }
     
     toggleModal();
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value
-    });
+    const { name, value } = e.target;
+    
+    if (name.includes('.')) {
+      const [section, field] = name.split('.');
+      setFormData(prev => ({
+        ...prev,
+        [section]: {
+          ...(prev[section as keyof typeof prev] as Record<string, unknown>),
+          [field]: value
+        }
+      }));
+    } else {
+      setFormData(prev => ({
+        ...prev,
+        [name]: value
+      }));
+    }
   };
 
   return (
@@ -94,15 +145,100 @@ export function EditCompanyDialog({ isOpen, data, toggleModal }: EditCompanyDial
                 required
               />
             </div>
+
             <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="email" className="text-right">
+              <Label htmlFor="registrationNumber" className="text-right">
+                N° SIRET
+              </Label>
+              <Input
+                id="registrationNumber"
+                name="registrationNumber"
+                value={formData.registrationNumber}
+                onChange={handleChange}
+                className="col-span-3"
+                required
+              />
+            </div>
+
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="address.street" className="text-right">
+                Rue
+              </Label>
+              <Input
+                id="address.street"
+                name="address.street"
+                value={formData.address.street}
+                onChange={handleChange}
+                className="col-span-3"
+                required
+              />
+            </div>
+
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="address.city" className="text-right">
+                Ville
+              </Label>
+              <Input
+                id="address.city"
+                name="address.city"
+                value={formData.address.city}
+                onChange={handleChange}
+                className="col-span-3"
+                required
+              />
+            </div>
+
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="address.postalCode" className="text-right">
+                Code Postal
+              </Label>
+              <Input
+                id="address.postalCode"
+                name="address.postalCode"
+                value={formData.address.postalCode}
+                onChange={handleChange}
+                className="col-span-3"
+                required
+              />
+            </div>
+
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="address.country" className="text-right">
+                Pays
+              </Label>
+              <Input
+                id="address.country"
+                name="address.country"
+                value={formData.address.country}
+                onChange={handleChange}
+                className="col-span-3"
+                required
+              />
+            </div>
+
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="contactInfo.phone" className="text-right">
+                Téléphone
+              </Label>
+              <Input
+                id="contactInfo.phone"
+                name="contactInfo.phone"
+                value={formData.contactInfo.phone}
+                onChange={handleChange}
+                className="col-span-3"
+                required
+              />
+            </div>
+
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="contactInfo.email" className="text-right">
                 Email
               </Label>
               <Input
-                id="email"
-                name="email"
+                id="contactInfo.email"
+                name="contactInfo.email"
                 type="email"
-                value={formData.email}
+                value={formData.contactInfo.email}
                 onChange={handleChange}
                 className="col-span-3"
                 required
