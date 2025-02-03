@@ -3,9 +3,12 @@ import { Address } from '@domain/value-objects/Address';
 import { ContactInfo } from '@domain/value-objects/ContactInfo';
 import { RegistrationNumber } from '@domain/value-objects/RegistrationNumber';
 import { CompanyEmployees } from '@domain/aggregates/company/CompanyEmployees';
+import { CompanyMotorcycles } from '@domain/aggregates/company/CompanyMotorcycles';
 import { User } from '@domain/entities/UserEntity';
+import { Motorcycle } from '@domain/entities/MotorcycleEntity';
 import { CompanyValidationError } from '@domain/errors/company/CompanyValidationError';
 import { randomUUID } from 'crypto';
+import { MotorcycleAssignment } from '@domain/interfaces/motorcycle/IMotorcycleAssignment';
 
 export class Company {
     private readonly props: CompanyProps;
@@ -19,10 +22,12 @@ export class Company {
             throw new CompanyValidationError('Company name cannot be empty');
         }
 
+        const id = randomUUID();
         return new Company({
             ...props,
-            id: randomUUID(),
+            id,
             employees: CompanyEmployees.create(),
+            motorcycles: CompanyMotorcycles.create(id),
             isActive: true,
             createdAt: new Date(),
             updatedAt: new Date()
@@ -31,11 +36,13 @@ export class Company {
 
     public static reconstitute(
         props: ReconstitueCompanyProps, 
-        employees: CompanyEmployees = CompanyEmployees.create()
+        employees: CompanyEmployees = CompanyEmployees.create(),
+        motorcycles: CompanyMotorcycles = CompanyMotorcycles.create(props.id)
     ): Company {
         return new Company({
             ...props,
-            employees
+            employees,
+            motorcycles
         });
     }
 
@@ -62,6 +69,10 @@ export class Company {
 
     get employees(): CompanyEmployees {
         return this.props.employees;
+    }
+
+    get motorcycles(): CompanyMotorcycles {
+        return this.props.motorcycles;
     }
 
     get isActive(): boolean {
@@ -156,6 +167,39 @@ export class Company {
 
     public getCompanyEmployees(): User[] {
         return this.props.employees.getCompanyEmployees();
+    }
+
+    // Méthodes de gestion des motos
+    public assignMotorcycle(motorcycle: Motorcycle): void {
+        if (!this.props.isActive) {
+            throw new CompanyValidationError('Cannot assign motorcycle to an inactive company');
+        }
+        this.props.motorcycles = this.props.motorcycles.assignMotorcycle(motorcycle);
+        this.updateLastModified();
+    }
+
+    public endMotorcycleAssignment(motorcycleId: string, motorcycle: Motorcycle): void {
+        if (!this.props.isActive) {
+            throw new CompanyValidationError('Cannot end motorcycle assignment in an inactive company');
+        }
+        this.props.motorcycles = this.props.motorcycles.endAssignment(motorcycleId, motorcycle);
+        this.updateLastModified();
+    }
+
+    public getActiveMotorcycleAssignments(): MotorcycleAssignment[] {
+        return this.props.motorcycles.getActiveAssignments();
+    }
+
+    public getMotorcycleAssignmentHistory(): MotorcycleAssignment[] {
+        return this.props.motorcycles.getAssignmentHistory();
+    }
+
+    public hasActiveMotorcycleAssignment(motorcycleId: string): boolean {
+        return this.props.motorcycles.hasActiveAssignment(motorcycleId);
+    }
+
+    public getMotorcycleStatistics() {
+        return this.props.motorcycles.getAssignmentStatistics();
     }
 
     public belongsToDealership(dealershipId: string | undefined): boolean {

@@ -1,32 +1,26 @@
-// src/domain/entities/MotorcycleEntity.ts
-import { IMotorcycleProps } from "@domain/interfaces/IMotorcycleProps";
-import { MotorcycleStatus } from "@domain/enums/MotorcycleStatus";
-import { MotorcycleValidationError } from "@domain/errors/motorcycle/MotorcycleValidationError";
-import { randomUUID } from "crypto";
+import { MotorcycleStatus } from '@domain/enums/MotorcycleStatus';
+import { MotorcycleModel } from '@domain/enums/MotorcycleModel';
+import { MotorcycleValidationError } from '@domain/errors/motorcycle/MotorcycleValidationError';
+import { MaintenanceSchedule } from '@domain/value-objects/MaintenanceSchedule';
+import { VIN } from '@domain/value-objects/VIN';
+import { MotorcycleMaintenance } from '@domain/aggregates/maintenance/MotorcycleMaintenance';
+import { MaintenanceType, SparePart } from '@domain/interfaces/maintenance/IMaintenanceProps';
+import { randomUUID } from 'crypto';
+import { MotorcycleProps, CreateMotorcycleProps, ReconstituteMotorcycleProps } from '@domain/interfaces/motorcycle/IMotorcycleProps';
 
 export class Motorcycle {
-    private readonly props: IMotorcycleProps;
+    private readonly props: MotorcycleProps;
 
-    private constructor(props: IMotorcycleProps) {
+    private constructor(props: MotorcycleProps) {
         this.props = props;
     }
 
-    public static create(
-        props: Omit<IMotorcycleProps, 'id' | 'createdAt' | 'updatedAt' | 'isActive' | 'status' | 'lastMaintenanceDate' | 'nextMaintenanceDate'>
-    ): Motorcycle {
-        if (!props.vin?.trim()) {
-            throw new MotorcycleValidationError("VIN is required");
-        }
-
+    public static create(props: CreateMotorcycleProps): Motorcycle {
         if (!props.dealershipId?.trim()) {
             throw new MotorcycleValidationError("Dealership ID is required");
         }
 
-        if (!props.model?.trim()) {
-            throw new MotorcycleValidationError("Model is required");
-        }
-
-        if (!props.year || props.year < 1900) {
+        if (props.year < 1900) {
             throw new MotorcycleValidationError("Invalid year");
         }
 
@@ -34,15 +28,29 @@ export class Motorcycle {
             throw new MotorcycleValidationError("Mileage cannot be negative");
         }
 
+        const vin = VIN.create(props.vin);
+        const maintenanceSchedule = MaintenanceSchedule.forModel(props.model);
+        const id = randomUUID();
+        const maintenanceHistory = MotorcycleMaintenance.create(id, maintenanceSchedule);
+
         return new Motorcycle({
             ...props,
-            id: randomUUID(),
+            id,
+            vin,
             status: MotorcycleStatus.AVAILABLE,
-            lastMaintenanceDate: null,
-            nextMaintenanceDate: null,
+            maintenanceSchedule,
+            maintenanceHistory,
             isActive: true,
             createdAt: new Date(),
             updatedAt: new Date()
+        });
+    }
+
+    public static reconstitute(props: ReconstituteMotorcycleProps): Motorcycle {
+        const maintenanceSchedule = MaintenanceSchedule.forModel(props.model);
+        return new Motorcycle({
+            ...props,
+            maintenanceSchedule
         });
     }
 
@@ -52,14 +60,14 @@ export class Motorcycle {
     }
 
     get vin(): string {
-        return this.props.vin;
+        return this.props.vin.toString();
     }
 
     get dealershipId(): string {
         return this.props.dealershipId;
     }
 
-    get model(): string {
+    get model(): MotorcycleModel {
         return this.props.model;
     }
 
@@ -79,14 +87,6 @@ export class Motorcycle {
         return this.props.status;
     }
 
-    get lastMaintenanceDate(): Date | null {
-        return this.props.lastMaintenanceDate;
-    }
-
-    get nextMaintenanceDate(): Date | null {
-        return this.props.nextMaintenanceDate;
-    }
-
     get isActive(): boolean {
         return this.props.isActive;
     }
@@ -99,13 +99,17 @@ export class Motorcycle {
         return this.props.updatedAt;
     }
 
-    private updateLastModified(): void {
-        this.props.updatedAt = new Date();
-    }
-
     // État et statut
     public isAvailable(): boolean {
         return this.props.status === MotorcycleStatus.AVAILABLE && this.props.isActive;
+    }
+
+    public needsMaintenance(): boolean {
+        const lastMaintenance = this.props.maintenanceHistory.getLastMaintenance();
+        return this.props.maintenanceHistory.isMaintenanceRequired(
+            this.props.mileage,
+            lastMaintenance?.date || null
+        );
     }
 
     public deactivate(): void {
@@ -137,7 +141,6 @@ export class Motorcycle {
 
     public markAsInMaintenance(): void {
         this.props.status = MotorcycleStatus.MAINTENANCE;
-        this.props.lastMaintenanceDate = new Date();
         this.updateLastModified();
     }
 
@@ -146,21 +149,69 @@ export class Motorcycle {
         this.updateLastModified();
     }
 
-    // Mise à jour des informations
-    public updateMileage(newMileage: number): void {
-        if (newMileage < this.props.mileage) {
-            throw new MotorcycleValidationError("New mileage cannot be less than current mileage");
+    // Méthodes de maintenance
+    public getNextMaintenanceInfo(): { dueDate: Date; dueMileage: number } {
+        return this.props.maintenanceHistory.getNextScheduledMaintenance(this.props.mileage);
+    }
+
+    public performMaintenance(params: {
+        type: MaintenanceType,
+        description: string,
+        spareParts: Omit<SparePart, 'id'>[],
+        technicianId: string,
+        technicianRecommendations?: string,
+        warrantyWork: boolean
+    }): void {
+        if (this.props.status !== MotorcycleStatus.MAINTENANCE) {
+            throw new MotorcycleValidationError("Motorcycle must be in maintenance status");
         }
-        this.props.mileage = newMileage;
+    
+        this.props.maintenanceHistory = this.props.maintenanceHistory.addMaintenanceRecord({
+            ...params,
+            date: new Date(),
+            mileage: this.props.mileage
+        });
+    
+        if (params.type === MaintenanceType.PREVENTIVE) {
+            const nextMaintenanceInfo = this.getNextMaintenanceInfo();
+            
+            // Vérification que le prochain kilométrage de maintenance est cohérent
+            if (nextMaintenanceInfo.dueMileage <= this.props.mileage) {
+                throw new MotorcycleValidationError("Next maintenance mileage must be greater than current mileage");
+            }
+    
+            // On peut marquer la moto comme disponible après une maintenance préventive
+            this.props.status = MotorcycleStatus.AVAILABLE;
+        }
+        
         this.updateLastModified();
     }
 
-    public scheduleNextMaintenance(date: Date): void {
-        if (date <= new Date()) {
-            throw new MotorcycleValidationError("Next maintenance date must be in the future");
+    public getMaintenanceHistory() {
+        return this.props.maintenanceHistory.getMaintenanceHistory();
+    }
+
+    public getMaintenanceCosts(): number {
+        return this.props.maintenanceHistory.getTotalMaintenanceCost();
+    }
+
+    // Mise à jour des informations
+    public updateMileage(newMileage: number): { requiresMaintenance: boolean; nextMaintenanceIn: number } {
+        if (newMileage < this.props.mileage) {
+            throw new MotorcycleValidationError("New mileage cannot be less than current mileage");
         }
-        this.props.nextMaintenanceDate = date;
+        
+        this.props.mileage = newMileage;
         this.updateLastModified();
+    
+        const requiresMaintenance = this.needsMaintenance();
+        const nextMaintenanceInfo = this.getNextMaintenanceInfo();
+        const nextMaintenanceIn = nextMaintenanceInfo.dueMileage - newMileage;
+    
+        return {
+            requiresMaintenance,
+            nextMaintenanceIn
+        };
     }
 
     public transferToDealership(newDealershipId: string): void {
@@ -174,5 +225,9 @@ export class Motorcycle {
 
         this.props.dealershipId = newDealershipId.trim();
         this.updateLastModified();
+    }
+
+    private updateLastModified(): void {
+        this.props.updatedAt = new Date();
     }
 }

@@ -3,10 +3,11 @@ import { Address } from '@domain/value-objects/Address';
 import { ContactInfo } from '@domain/value-objects/ContactInfo';
 import { DealershipValidationError } from '@domain/errors/dealership/DealershipValidationError';
 import { DealershipEmployees } from '@domain/aggregates/dealership/DealershipEmployees';
+import { DealershipMotorcycles } from '@domain/aggregates/dealership/DealershipMotorcycles';
 import { User } from '@domain/entities/UserEntity';
 import { UserRole } from '@domain/enums/UserRole';
-import { randomUUID } from 'crypto';
 import { Motorcycle } from './MotorcycleEntity';
+import { randomUUID } from 'crypto';
 
 export class Dealership {
     private readonly props: DealershipProps;
@@ -24,16 +25,18 @@ export class Dealership {
             ...props,
             id: randomUUID(),
             employees: DealershipEmployees.create(),
-            motorcycles: [],
+            motorcycles: DealershipMotorcycles.create(),
             isActive: true,
             createdAt: new Date(),
             updatedAt: new Date(),
         });
     }
 
-    public static reconstitute(props: ReconstituteDealershipProps, 
-                             employees: DealershipEmployees = DealershipEmployees.create(),
-                             motorcycles: Motorcycle[] = []): Dealership {
+    public static reconstitute(
+        props: ReconstituteDealershipProps, 
+        employees: DealershipEmployees = DealershipEmployees.create(),
+        motorcycles: DealershipMotorcycles = DealershipMotorcycles.create()
+    ): Dealership {
         return new Dealership({
             ...props,
             employees,
@@ -62,6 +65,10 @@ export class Dealership {
         return this.props.employees;
     }
 
+    get motorcycles(): DealershipMotorcycles {
+        return this.props.motorcycles;
+    }
+
     get isActive(): boolean {
         return this.props.isActive;
     }
@@ -72,10 +79,6 @@ export class Dealership {
 
     get updatedAt(): Date {
         return this.props.updatedAt;
-    }
-
-    get motorcycles(): Motorcycle[] {
-        return this.props.motorcycles;
     }
 
     private updateLastModified(): void {
@@ -141,18 +144,35 @@ export class Dealership {
 
     // Méthodes de gestion des motos
     public addMotorcycle(motorcycle: Motorcycle): void {
-        this.props.motorcycles.push(motorcycle);
+        if (!this.isActive) {
+            throw new DealershipValidationError('Cannot add motorcycle to an inactive dealership');
+        }
+        this.props.motorcycles = this.props.motorcycles.addMotorcycle(motorcycle);
         this.updateLastModified();
     }
 
     public removeMotorcycle(motorcycleId: string): void {
-        this.props.motorcycles = this.props.motorcycles.filter(
-            moto => moto.id !== motorcycleId
-        );
+        if (!this.isActive) {
+            throw new DealershipValidationError('Cannot remove motorcycle from an inactive dealership');
+        }
+        this.props.motorcycles = this.props.motorcycles.removeMotorcycle(motorcycleId);
         this.updateLastModified();
     }
 
     public hasMotorcycle(motorcycleId: string): boolean {
-        return this.props.motorcycles.some(moto => moto.id === motorcycleId);
+        return this.props.motorcycles.hasMotorcycle(motorcycleId);
+    }
+
+    // Nouvelles méthodes utilisant les fonctionnalités de l'agrégat
+    public getAvailableMotorcycles(): Motorcycle[] {
+        return this.props.motorcycles.getAvailableMotorcycles();
+    }
+
+    public getMotorcyclesRequiringMaintenance(): Motorcycle[] {
+        return this.props.motorcycles.getMotorcyclesRequiringMaintenance();
+    }
+
+    public getMotorcycleStatistics() {
+        return this.props.motorcycles.getMaintenanceStatistics();
     }
 }
