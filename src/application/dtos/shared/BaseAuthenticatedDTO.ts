@@ -4,4 +4,5 @@ export interface BaseAuthenticatedDTO {
     userId: string;
     userRole: UserRole;
     userDealershipId?: string;
+    userCompanyId?: string;
 }

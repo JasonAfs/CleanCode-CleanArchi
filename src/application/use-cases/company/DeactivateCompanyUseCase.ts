@@ -3,8 +3,8 @@ import { ICompanyMotorcycleRepository } from '@application/ports/repositories/IC
 import { DeactivateCompanyDTO } from '@application/dtos/company/DeactivateCompanyDTO';
 import { DeactivateCompanyValidator } from '@application/validation/company/DeactivateCompanyValidator';
 import { Authorize } from '@application/decorators/Authorize';
-import { IAuthorizationAware } from '@domain/services/authorization/IAuthorizationAware';
-import { AuthorizationContext } from '@domain/services/authorization/AuthorizationContext';
+import { IAuthorizationAware } from '@domain/services/authorization/ports/IAuthorizationAware';
+import { AuthorizationContext } from '@domain/services/authorization/types/AuthorizationContext';
 import { Permission } from '@domain/services/authorization/Permission';
 import { Result } from '@domain/shared/Result';
 import { UnauthorizedError } from '@domain/errors/authorization/UnauthorizedError';

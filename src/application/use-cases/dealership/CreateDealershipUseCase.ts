@@ -1,8 +1,8 @@
 import { IDealershipRepository } from '@application/ports/repositories/IDealershipRepository';
 import { CreateDealershipDTO } from '@application/dtos/dealership/request/CreateDealershipDTO';
 import { Authorize } from '@application/decorators/Authorize';
-import { IAuthorizationAware } from '@domain/services/authorization/IAuthorizationAware';
-import { AuthorizationContext } from '@domain/services/authorization/AuthorizationContext';
+import { IAuthorizationAware } from '@domain/services/authorization/ports/IAuthorizationAware';
+import { AuthorizationContext } from '@domain/services/authorization/types/AuthorizationContext';
 import { Dealership } from '@domain/entities/DealershipEntity';
 import { Address } from '@domain/value-objects/Address';
 import { ContactInfo } from '@domain/value-objects/ContactInfo';

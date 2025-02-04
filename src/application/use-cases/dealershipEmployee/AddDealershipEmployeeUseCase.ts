@@ -1,10 +1,10 @@
 import { Authorize } from '@application/decorators/Authorize';
-import { IAuthorizationAware } from '@domain/services/authorization/IAuthorizationAware';
+import { IAuthorizationAware } from '@domain/services/authorization/ports/IAuthorizationAware';
 import { AddDealershipEmployeeValidator } from '@application/validation/dealership/AddDealershipEmployeeValidator';
 import { IDealershipRepository } from '@application/ports/repositories/IDealershipRepository';
 import { IUserRepository } from '@application/ports/repositories/IUserRepository';
 import { AddDealershipEmployeeDTO } from '@application/dtos/dealership/request/AddDealershipEmployeeDTO';
-import { AuthorizationContext } from '@domain/services/authorization/AuthorizationContext';
+import { AuthorizationContext } from '@domain/services/authorization/types/AuthorizationContext';
 import { Result } from '@domain/shared/Result';
 import { DealershipValidationError } from '@domain/errors/dealership/DealershipValidationError';
 import { DealershipNotFoundError } from '@domain/errors/dealership/DealershipNotFoundError';
@@ -23,13 +23,13 @@ export class AddDealershipEmployeeUseCase implements IAuthorizationAware {
   public getAuthorizationContext(
     dto: AddDealershipEmployeeDTO,
   ): AuthorizationContext {
-    console.log("dto == " +JSON.stringify(dto))
+    console.log('dto == ' + JSON.stringify(dto));
     return {
       userId: dto.userId,
       userRole: dto.userRole,
-      resourceId: dto.dealershipId, 
+      resourceId: dto.dealershipId,
       dealershipId: dto.userDealershipId,
-      resourceType: 'dealership'
+      resourceType: 'dealership',
     };
   }
 
@@ -49,7 +49,9 @@ export class AddDealershipEmployeeUseCase implements IAuthorizationAware {
       }
 
       // Étape 2: Récupérer la concession
-      const dealership = await this.dealershipRepository.findById(dto.dealershipId);
+      const dealership = await this.dealershipRepository.findById(
+        dto.dealershipId,
+      );
       if (!dealership) {
         return new DealershipNotFoundError(dto.dealershipId);
       }

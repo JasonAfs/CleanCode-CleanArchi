@@ -1,20 +1,21 @@
 import { UserRole } from '@domain/enums/UserRole';
-import { Permission } from './Permission';
-import { AuthorizationContext } from './AuthorizationContext';
-import { ROLE_PERMISSIONS } from './PermissionRegistry';
-import { DealershipOperationChecker } from './operations/DealershipOperationChecker';
-import { CompanyOperationChecker } from './operations/CompanyOperationChecker';
-import { PermissionRuleMapper } from './mapping/PermissionRuleMapper';
+import { Permission } from '../../../domain/services/authorization/Permission';
+import { AuthorizationContext } from '../../../domain/services/authorization/types/AuthorizationContext';
+import { ROLE_PERMISSIONS } from '../../../domain/services/authorization/PermissionRegistry';
+import { DealershipOperationChecker } from '../../../domain/services/authorization/operations/DealershipOperationChecker';
+import { CompanyOperationChecker } from '../../../domain/services/authorization/operations/CompanyOperationChecker';
+import { PermissionRuleMapper } from '../../../domain/services/authorization/mapping/PermissionRuleMapper';
+import { IAuthorizationService } from '@domain/services/authorization/ports/IAuthorizationService';
 
 interface OperationCheckers {
   dealership: DealershipOperationChecker;
   company: CompanyOperationChecker;
 }
 
-export class AuthorizationService {
+export class AuthorizationService implements IAuthorizationService {
   private readonly operationCheckers: OperationCheckers = {
     dealership: new DealershipOperationChecker(),
-    company: new CompanyOperationChecker()
+    company: new CompanyOperationChecker(),
   };
 
   constructor(
