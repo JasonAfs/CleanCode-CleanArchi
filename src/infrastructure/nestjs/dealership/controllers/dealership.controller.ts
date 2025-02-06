@@ -79,6 +79,7 @@ export class DealershipController {
         userRole: req.user.role,
       });
 
+
       if (result instanceof Error) {
         if (result instanceof DealershipAlreadyExistsError) {
           throw new ConflictException(result.message);

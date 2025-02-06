@@ -54,6 +54,7 @@ export class CreateMotorcycleUseCase {
 
             // 5. Création des value objects
             const model = Model.create(dto.modelType, dto.year);
+            console.log("model = " + model)
 
             // 6. Création de l'entité Motorcycle
             const motorcycle = Motorcycle.create({

@@ -1,12 +1,23 @@
 export enum MotorcycleModel {
-    STREET_TRIPLE_765_RS = 'Street Triple 765 RS',
-    TIGER_900_RALLY_PRO = 'Tiger 900 Rally Pro',
-    SPEED_TRIPLE_1200_RS = 'Speed Triple 1200 RS',
-    TRIDENT_660 = 'Trident 660',
-    ROCKET_3_GT = 'Rocket 3 GT',
-    BONNEVILLE_T120 = 'Bonneville T120',
-    TIGER_1200_GT_EXPLORER = 'Tiger 1200 GT Explorer',
-    SCRAMBLER_1200_XE = 'Scrambler 1200 XE'
+    STREET_TRIPLE_765_RS = 'STREET_TRIPLE_765_RS',
+    TIGER_900_RALLY_PRO = 'TIGER_900_RALLY_PRO',
+    SPEED_TRIPLE_1200_RS = 'SPEED_TRIPLE_1200_RS',
+    TRIDENT_660 = 'TRIDENT_660',
+    ROCKET_3_GT = 'ROCKET_3_GT',
+    BONNEVILLE_T120 = 'BONNEVILLE_T120',
+    TIGER_1200_GT_EXPLORER = 'TIGER_1200_GT_EXPLORER',
+    SCRAMBLER_1200_XE = 'SCRAMBLER_1200_XE'
+}
+
+export const MotorcycleModelDisplayNames: Record<MotorcycleModel, string> = {
+    [MotorcycleModel.STREET_TRIPLE_765_RS]: 'Street Triple 765 RS',
+    [MotorcycleModel.TIGER_900_RALLY_PRO]: 'Tiger 900 Rally Pro',
+    [MotorcycleModel.SPEED_TRIPLE_1200_RS]: 'Speed Triple 1200 RS',
+    [MotorcycleModel.TRIDENT_660]: 'Trident 660',
+    [MotorcycleModel.ROCKET_3_GT]: 'Rocket 3 GT',
+    [MotorcycleModel.BONNEVILLE_T120]: 'Bonneville T120',
+    [MotorcycleModel.TIGER_1200_GT_EXPLORER]: 'Tiger 1200 GT Explorer',
+    [MotorcycleModel.SCRAMBLER_1200_XE]: 'Scrambler 1200 XE'
 }
 
 export enum MotorcycleStatus {

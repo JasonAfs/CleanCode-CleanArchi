@@ -46,6 +46,7 @@ model Company {
   createdAt             DateTime            @default(now())
   updatedAt             DateTime            @updatedAt
   employees             User[]
+  motorcycles Motorcycle[]
   
   createdByDealershipId String?
   createdByDealership   Dealership?         @relation(fields: [createdByDealershipId], references: [id])
@@ -67,8 +68,33 @@ model Dealership {
   updatedAt   DateTime     @updatedAt
   employees   User[]
   Company     Company[]
+  motorcycles Motorcycle[]
 
   @@map("dealerships")
+}
+
+model Motorcycle {
+  id        String   @id
+  vin       String   @unique
+  modelType MotorcycleModel
+  year      Int
+  color     String
+  mileage   Int
+  status    MotorcycleStatus @default(AVAILABLE)
+  isActive  Boolean  @default(true)
+  
+  // Holder
+  dealershipId String?
+  dealership   Dealership? @relation(fields: [dealershipId], references: [id])
+  companyId    String?
+  company      Company?    @relation(fields: [companyId], references: [id])
+  assignedAt   DateTime    @default(now())
+
+  // Timestamps
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("motorcycles")
 }
 
 model RefreshToken {
@@ -92,3 +118,21 @@ enum UserRole {
   CLIENT
 }
 
+enum MotorcycleModel {
+  STREET_TRIPLE_765_RS
+  TIGER_900_RALLY_PRO
+  SPEED_TRIPLE_1200_RS
+  TRIDENT_660
+  ROCKET_3_GT
+  BONNEVILLE_T120
+  TIGER_1200_GT_EXPLORER
+  SCRAMBLER_1200_XE
+}
+
+enum MotorcycleStatus {
+  AVAILABLE
+  IN_USE
+  IN_MAINTENANCE
+  IN_TRANSIT
+  OUT_OF_SERVICE
+}

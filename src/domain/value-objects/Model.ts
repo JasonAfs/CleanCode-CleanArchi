@@ -1,4 +1,4 @@
-import { MotorcycleModel, MODEL_CHARACTERISTICS } from "@domain/enums/MotorcycleEnums";
+import { MotorcycleModel, MODEL_CHARACTERISTICS, MotorcycleModelDisplayNames } from "@domain/enums/MotorcycleEnums";
 import { InvalidModelError } from "@domain/errors/motorcycle/InvalidModelError";
 
 
@@ -45,6 +45,6 @@ export class Model {
     }
 
     public toString(): string {
-        return `${this._year} ${this._modelType}`;
+        return `${this._year} ${MotorcycleModelDisplayNames[this._modelType]}`;
     }
 }
