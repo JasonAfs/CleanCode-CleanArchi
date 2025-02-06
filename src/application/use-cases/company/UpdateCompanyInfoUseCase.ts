@@ -1,5 +1,5 @@
 import { ICompanyRepository } from '@application/ports/repositories/ICompanyRepository';
-import { UpdateCompanyInfoDTO } from '@application/dtos/company/UpdateCompanyInfoDTO';
+import { UpdateCompanyInfoDTO } from '@application/dtos/company/request/UpdateCompanyInfoDTO';
 import { UpdateCompanyInfoValidator } from '@application/validation/company/UpdateCompanyInfoValidator';
 import { Authorize } from '@application/decorators/Authorize';
 import { IAuthorizationAware } from '@domain/services/authorization/ports/IAuthorizationAware';

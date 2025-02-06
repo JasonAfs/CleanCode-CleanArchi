@@ -1,4 +1,4 @@
-import { DeactivateCompanyDTO } from "@application/dtos/company/DeactivateCompanyDTO";
+import { DeactivateCompanyDTO } from "@application/dtos/company/request/DeactivateCompanyDTO";
 import { CompanyValidationError } from "@domain/errors/company/CompanyValidationError";
 
 export class DeactivateCompanyValidator {

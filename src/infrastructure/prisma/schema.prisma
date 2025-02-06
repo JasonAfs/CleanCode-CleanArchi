@@ -46,7 +46,7 @@ model Company {
   createdAt             DateTime            @default(now())
   updatedAt             DateTime            @updatedAt
   employees             User[]
-  motorcycles           CompanyMotorcycle[]
+  
   createdByDealershipId String?
   createdByDealership   Dealership?         @relation(fields: [createdByDealershipId], references: [id])
 
@@ -66,44 +66,9 @@ model Dealership {
   createdAt   DateTime     @default(now())
   updatedAt   DateTime     @updatedAt
   employees   User[]
-  motorcycles Motorcycle[]
   Company     Company[]
 
   @@map("dealerships")
-}
-
-model Motorcycle {
-  id                  String              @id @default(uuid())
-  vin                 String              @unique
-  model               String
-  year                Int
-  registrationNumber  String
-  mileage             Int
-  status              MotorcycleStatus
-  lastMaintenanceDate DateTime?
-  nextMaintenanceDate DateTime?
-  isActive            Boolean             @default(true)
-  createdAt           DateTime            @default(now())
-  updatedAt           DateTime            @updatedAt
-  dealershipId        String
-  dealership          Dealership          @relation(fields: [dealershipId], references: [id])
-  companyAssignments  CompanyMotorcycle[]
-
-  @@map("motorcycles")
-}
-
-model CompanyMotorcycle {
-  id           String     @id @default(uuid())
-  companyId    String
-  motorcycleId String
-  assignedAt   DateTime   @default(now())
-  isActive     Boolean    @default(true)
-  createdAt    DateTime   @default(now())
-  updatedAt    DateTime   @updatedAt
-  company      Company    @relation(fields: [companyId], references: [id])
-  motorcycle   Motorcycle @relation(fields: [motorcycleId], references: [id])
-
-  @@map("company_motorcycles")
 }
 
 model RefreshToken {
@@ -127,9 +92,3 @@ enum UserRole {
   CLIENT
 }
 
-enum MotorcycleStatus {
-  AVAILABLE
-  IN_USE
-  MAINTENANCE
-  OUT_OF_SERVICE
-}

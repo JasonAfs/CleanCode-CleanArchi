@@ -49,8 +49,7 @@ export class PrismaDealershipRepository implements IDealershipRepository {
                     where: {
                         isActive: true
                     }
-                },
-                motorcycles: true,
+                }
             }
         });
     
@@ -92,7 +91,6 @@ export class PrismaDealershipRepository implements IDealershipRepository {
         const dealerships = await this.prisma.dealership.findMany({
             include: {
                 employees: true,
-                motorcycles: true 
             }
         });
         return dealerships.map(DealershipMapper.toDomain);
@@ -103,7 +101,6 @@ export class PrismaDealershipRepository implements IDealershipRepository {
             where: { isActive: true },
             include: {
                 employees: true,
-                motorcycles: true  
             }
         });
         return dealerships.map(DealershipMapper.toDomain);

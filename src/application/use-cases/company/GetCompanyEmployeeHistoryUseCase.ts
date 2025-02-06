@@ -1,5 +1,5 @@
 import { ICompanyRepository } from '@application/ports/repositories/ICompanyRepository';
-import { GetCompanyEmployeeHistoryDTO } from '@application/dtos/company/GetCompanyEmployeeHistoryDTO';
+import { GetCompanyEmployeeHistoryDTO } from '@application/dtos/company/request/GetCompanyEmployeeHistoryDTO';
 import { CompanyValidationError } from '@domain/errors/company/CompanyValidationError';
 import { Permission } from '@domain/services/authorization/Permission';
 import { Authorize } from '@application/decorators/Authorize';

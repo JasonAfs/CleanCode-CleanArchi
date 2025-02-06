@@ -29,22 +29,22 @@ export class JwtAuthenticationService implements IAuthenticationService {
     role: UserRole,
   ): Promise<AuthTokensDTO> {
     // Récupérer les appartenances
-    let dealershipId: string | undefined;
-    let companyId: string | undefined;
+    let userDealershipId: string | undefined;
+    let userCompanyId: string | undefined;
 
     if (this.isDealershipRole(role)) {
       const dealership = await this.dealershipRepository.findByEmployee(userId); 
-      dealershipId = dealership?.id;
+      userDealershipId = dealership?.id;
     } else if (this.isCompanyRole(role)) {
       const company = await this.companyRepository.findByEmployeeId(userId);
-      companyId = company?.id;
+      userCompanyId = company?.id;
     }
 
     const tokenPayload = {
       userId,
       role,
-      ...(dealershipId && { dealershipId }),
-      ...(companyId && { companyId })
+      ...(userDealershipId && { userDealershipId }),
+      ...(userCompanyId && { userCompanyId })
     };
 
     const accessToken = jwt.sign(tokenPayload, this.jwtSecret, {

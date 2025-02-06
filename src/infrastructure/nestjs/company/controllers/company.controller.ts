@@ -20,7 +20,6 @@ import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
 import { CreateCompanyUseCase } from '@application/use-cases/company/CreateCompanyUseCase';
 import { UpdateCompanyInfoUseCase } from '@application/use-cases/company/UpdateCompanyInfoUseCase';
 import { DeactivateCompanyUseCase } from '@application/use-cases/company/DeactivateCompanyUseCase';
-import { GetCompanyAssignedMotorcyclesUseCase } from '@application/use-cases/company/GetCompanyAssignedMotorcyclesUseCase';
 import { GetCompanyEmployeeHistoryUseCase } from '@application/use-cases/company/GetCompanyEmployeeHistoryUseCase';
 import { AddCompanyEmployeeUseCase } from '@application/use-cases/companyEmployee/AddCompanyEmployeeUseCase';
 import { RemoveCompanyEmployeeUseCase } from '@application/use-cases/companyEmployee/RemoveCompanyEmployeeUseCase';
@@ -51,7 +50,6 @@ export class CompanyController {
     private readonly createCompanyUseCase: CreateCompanyUseCase,
     private readonly updateCompanyUseCase: UpdateCompanyInfoUseCase,
     private readonly deactivateCompanyUseCase: DeactivateCompanyUseCase,
-    private readonly getAssignedMotorcyclesUseCase: GetCompanyAssignedMotorcyclesUseCase,
     private readonly getEmployeeHistoryUseCase: GetCompanyEmployeeHistoryUseCase,
     private readonly addEmployeeUseCase: AddCompanyEmployeeUseCase,
     private readonly removeEmployeeUseCase: RemoveCompanyEmployeeUseCase,
@@ -72,7 +70,7 @@ export class CompanyController {
         ...dto,
         userId: req.user.userId,
         userRole: req.user.role,
-        dealershipId: req.user.dealershipId,
+        dealershipId: req.user.userDealershipId,
       });
       
       if (result instanceof Error) {
@@ -112,8 +110,8 @@ export class CompanyController {
     @Body() dto: UpdateCompanyInfoRequestDTO,
   ) {
     try {
-      console.log("cacacacac"+req.user.companyId)
-      if (req.user.role === UserRole.COMPANY_MANAGER && req.user.companyId !== companyId) {
+      console.log("cacacacac"+req.user.userCompanyId)
+      if (req.user.role === UserRole.COMPANY_MANAGER && req.user.userCompanyId !== companyId) {
         throw new UnauthorizedException('You can only update your own company');
       }
 
@@ -122,7 +120,7 @@ export class CompanyController {
         companyId,
         userId: req.user.userId,
         userRole: req.user.role,
-        dealershipId: req.user.dealershipId,
+        dealershipId: req.user.userDealershipId,
       });
 
       if (result instanceof Error) {
@@ -162,7 +160,7 @@ export class CompanyController {
       const result = await this.getCompaniesUseCase.execute({
         userId: req.user.userId,
         userRole: req.user.role,
-        userDealershipId: req.user.dealershipId,
+        userDealershipId: req.user.userDealershipId,
         includeInactive: query.includeInactive
       });
 
@@ -208,7 +206,7 @@ export class CompanyController {
         companyId,
         userId: req.user.userId,
         userRole: req.user.role,
-        dealershipId: req.user.dealershipId,
+        dealershipId: req.user.userDealershipId,
       });
 
       if (result instanceof Error) {
@@ -236,57 +234,6 @@ export class CompanyController {
     }
   }
 
-  @Get(':id/motorcycles')
-  @ApiResponse({
-    status: 200,
-    description: 'Company motorcycles retrieved successfully',
-  })
-  @ApiResponse({ status: 401, description: 'Unauthorized' })
-  @ApiResponse({ status: 404, description: 'Company not found' })
-  @ApiParam({ name: 'id', type: String })
-  async getCompanyMotorcycles(
-    @Request() req: AuthenticatedRequest,
-    @Param('id') companyId: string,
-  ) {
-    try {
-
-      if (req.user.role === UserRole.COMPANY_MANAGER && req.user.companyId !== companyId) {
-        throw new UnauthorizedException('You can only view your own company motorcycles');
-      }
-
-      const result = await this.getAssignedMotorcyclesUseCase.execute({
-        companyId,
-        userId: req.user.userId,
-        userRole: req.user.role,
-        dealershipId: req.user.dealershipId,
-        includeInactive: false,
-      });
-
-      if (result instanceof Error) {
-        if (result instanceof UnauthorizedError) {
-          throw new UnauthorizedException(result.message);
-        }
-        if (result instanceof CompanyValidationError) {
-          throw new BadRequestException(result.message);
-        }
-        throw new BadRequestException('Failed to retrieve company motorcycles');
-      }
-
-      return result;
-    } catch (err) {
-      const error = err as Error;
-      if (
-        error instanceof UnauthorizedException ||
-        error instanceof BadRequestException
-      ) {
-        throw error;
-      }
-      throw new BadRequestException(
-        `Failed to retrieve company motorcycles: ${error.message}`,
-      );
-    }
-  }
-
   @Get(':id/employees')
   @ApiResponse({
     status: 200,
@@ -299,7 +246,7 @@ export class CompanyController {
     @Request() req: AuthenticatedRequest,
     @Param('id') companyId: string,
   ) {
-    if (req.user.role === UserRole.COMPANY_MANAGER && req.user.companyId !== companyId) {
+    if (req.user.role === UserRole.COMPANY_MANAGER && req.user.userCompanyId !== companyId) {
       throw new UnauthorizedException('You can only view your own company employees');
     }
     try {
@@ -307,7 +254,7 @@ export class CompanyController {
         companyId,
         userId: req.user.userId,
         userRole: req.user.role,
-        dealershipId: req.user.dealershipId,
+        dealershipId: req.user.userDealershipId,
         includeInactive: false,
       });
 
@@ -347,7 +294,7 @@ export class CompanyController {
     @Param('id') companyId: string,
     @Body() dto: AddCompanyEmployeeRequestDTO,
   ) {
-    if (req.user.role === UserRole.COMPANY_MANAGER && req.user.companyId !== companyId) {
+    if (req.user.role === UserRole.COMPANY_MANAGER && req.user.userCompanyId !== companyId) {
       throw new UnauthorizedException('You can only add employees to your own company');
     }
 
@@ -357,7 +304,7 @@ export class CompanyController {
         companyId,
         userId: req.user.userId,
         userRole: req.user.role,
-        dealershipId: req.user.dealershipId,
+        dealershipId: req.user.userDealershipId,
       });
 
       if (result instanceof Error) {
@@ -400,7 +347,7 @@ export class CompanyController {
     @Param('id') companyId: string,
     @Param('employeeId') employeeId: string,
   ) {
-    if (req.user.role === UserRole.COMPANY_MANAGER && req.user.companyId !== companyId) {
+    if (req.user.role === UserRole.COMPANY_MANAGER && req.user.userCompanyId !== companyId) {
       throw new UnauthorizedException('You can only remove employees from your own company');
     }
 
@@ -410,7 +357,7 @@ export class CompanyController {
         employeeId,
         userId: req.user.userId,
         userRole: req.user.role,
-        dealershipId: req.user.dealershipId,
+        dealershipId: req.user.userDealershipId,
       });
 
       if (result instanceof Error) {

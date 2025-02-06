@@ -7,7 +7,6 @@ export class CompanyOperationChecker {
     Permission.MANAGE_COMPANY,
     Permission.MANAGE_COMPANY_USERS,
     Permission.VIEW_COMPANY_DETAILS,
-    Permission.VIEW_COMPANY_ASSIGNED_MOTORCYCLES,
   ]);
 
   public isCompanyOperation(permission: Permission): boolean {

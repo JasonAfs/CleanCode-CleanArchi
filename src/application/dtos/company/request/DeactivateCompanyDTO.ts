@@ -1,4 +1,4 @@
-import { BaseAuthenticatedDTO } from "../shared/BaseAuthenticatedDTO";
+import { BaseAuthenticatedDTO } from "../../shared/BaseAuthenticatedDTO";
 export interface DeactivateCompanyDTO extends BaseAuthenticatedDTO{
     dealershipId?: string;
     companyId: string;

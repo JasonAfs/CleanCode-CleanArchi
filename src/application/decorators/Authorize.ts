@@ -25,7 +25,6 @@ export function Authorize(requiredPermissions: PermissionRequirement) {
       const context: AuthorizationContext = instance.getAuthorizationContext(
         ...args,
       );
-      console.log('le context = ' + JSON.stringify(context));
 
       // Instance unique du service d'autorisation
       const authService = new AuthorizationService();
@@ -41,10 +40,9 @@ export function Authorize(requiredPermissions: PermissionRequirement) {
           );
         }
       } else {
-        console.log('contextttt +' + JSON.stringify(context));
         if (!authService.hasPermission(context, requiredPermissions)) {
           throw new UnauthorizedError(
-            `Missing requiredoo permission: ${JSON.stringify(context)}`,
+            `Missing required permission: ${requiredPermissions}`,
           );
         }
       }

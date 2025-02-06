@@ -12,15 +12,7 @@ export enum Permission {
     MANAGE_COMPANY = 'MANAGE_COMPANY',         // Inclut create, update, deactivate
     MANAGE_COMPANY_USERS = 'MANAGE_COMPANY_USERS',  // Pour la gestion des employés
     VIEW_COMPANY_DETAILS = 'VIEW_COMPANY_DETAILS',
-    VIEW_COMPANY_ASSIGNED_MOTORCYCLES = 'VIEW_COMPANY_ASSIGNED_MOTORCYCLES',
 
-    // Gestion des Motos
-    MANAGE_MOTORCYCLES = 'MANAGE_MOTORCYCLES',
-    VIEW_MOTORCYCLES = 'VIEW_MOTORCYCLES',
-
-    // Maintenance
-    MANAGE_MAINTENANCE = 'MANAGE_MAINTENANCE',
-    VIEW_MAINTENANCE = 'VIEW_MAINTENANCE',
 }
 
 export type PermissionRequirement = Permission | Permission[];

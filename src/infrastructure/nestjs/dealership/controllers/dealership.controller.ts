@@ -151,11 +151,14 @@ export class DealershipController {
     @Request() req: AuthenticatedRequest,
     @Param('id') id: string,
   ) {
+    console.log('la requete = ' + JSON.stringify(req.user));
     try {
+      //
       const result = await this.getDealershipByIdUseCase.execute({
         dealershipId: id,
         userId: req.user.userId,
         userRole: req.user.role,
+        userDealershipId : req.user.userDealershipId
       });
 
       if (result instanceof Error) {
@@ -295,7 +298,7 @@ export class DealershipController {
         role: dto.role,
         userId: req.user.userId,
         userRole: req.user.role,
-        userDealershipId: req.user.dealershipId
+        userDealershipId: req.user.userDealershipId,
       });
 
       if (result instanceof Error) {
@@ -345,7 +348,7 @@ export class DealershipController {
         employeeId: employeeId,
         userId: req.user.userId,
         userRole: req.user.role,
-        userDealershipId: req.user.dealershipId
+        userDealershipId: req.user.userDealershipId,
       });
 
       if (result instanceof Error) {

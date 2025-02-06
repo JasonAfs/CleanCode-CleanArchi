@@ -1,4 +1,4 @@
-import { UpdateCompanyInfoDTO } from "@application/dtos/company/UpdateCompanyInfoDTO";
+import { UpdateCompanyInfoDTO } from "@application/dtos/company/request/UpdateCompanyInfoDTO";
 import { CompanyValidationError } from "@domain/errors/company/CompanyValidationError";
 import { Email } from "@domain/value-objects/Email";
 

@@ -13,18 +13,13 @@ export class PermissionRuleMapper {
         [Permission.MANAGE_ALL_DEALERSHIPS, 'dealership.access'],
         
         // Permissions liées aux motos
-        [Permission.MANAGE_MOTORCYCLES, 'dealership.access'],
-        [Permission.VIEW_MOTORCYCLES, 'dealership.access'],
         
         // Permissions de maintenance
-        [Permission.MANAGE_MAINTENANCE, 'dealership.access'],
-        [Permission.VIEW_MAINTENANCE, 'dealership.access'],
 
         // Permissions entreprises partenaires
         [Permission.MANAGE_COMPANY, 'company.access'],
         [Permission.MANAGE_COMPANY_USERS, 'company.access'],
         [Permission.VIEW_COMPANY_DETAILS, 'company.access'],
-        [Permission.VIEW_COMPANY_ASSIGNED_MOTORCYCLES, 'company.access']
     ]);
 
     public static getRuleType(permission: Permission): string {

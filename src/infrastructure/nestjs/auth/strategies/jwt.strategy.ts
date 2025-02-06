@@ -6,8 +6,8 @@ import { UserRole } from '@domain/enums/UserRole';
 interface JwtPayload {
   userId: string;
   role: UserRole;
-  dealershipId?: string;
-  companyId?: string;
+  userDealershipId?: string;
+  userCompanyId?: string;
 }
 
 @Injectable()
@@ -29,8 +29,8 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     return { 
       userId: payload.userId, 
       role: payload.role,
-      dealershipId: payload.dealershipId,
-      companyId: payload.companyId 
+      userDealershipId: payload.userDealershipId,
+      userCompanyId: payload.userCompanyId 
     };
   }
 }

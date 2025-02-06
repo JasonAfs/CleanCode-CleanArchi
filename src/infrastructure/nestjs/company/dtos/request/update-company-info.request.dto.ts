@@ -1,6 +1,6 @@
 import { IsString, IsEmail, IsOptional } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
-import { UpdateCompanyInfoDTO } from '@application/dtos/company/UpdateCompanyInfoDTO';
+import { UpdateCompanyInfoDTO } from '@application/dtos/company/request/UpdateCompanyInfoDTO';
 
 export class UpdateCompanyInfoRequestDTO implements Omit<UpdateCompanyInfoDTO, 'userId' | 'userRole' | 'companyId'> {
     @ApiProperty({ required: false })

@@ -1,6 +1,5 @@
 import { ICompanyRepository } from '@application/ports/repositories/ICompanyRepository';
-import { ICompanyMotorcycleRepository } from '@application/ports/repositories/ICompanyMotorcycleRepository';
-import { DeactivateCompanyDTO } from '@application/dtos/company/DeactivateCompanyDTO';
+import { DeactivateCompanyDTO } from '@application/dtos/company/request/DeactivateCompanyDTO';
 import { DeactivateCompanyValidator } from '@application/validation/company/DeactivateCompanyValidator';
 import { Authorize } from '@application/decorators/Authorize';
 import { IAuthorizationAware } from '@domain/services/authorization/ports/IAuthorizationAware';
@@ -17,7 +16,6 @@ export class DeactivateCompanyUseCase implements IAuthorizationAware {
 
   constructor(
     private readonly companyRepository: ICompanyRepository,
-    private readonly companyMotorcycleRepository: ICompanyMotorcycleRepository,
   ) {}
 
   public getAuthorizationContext(
@@ -68,17 +66,6 @@ export class DeactivateCompanyUseCase implements IAuthorizationAware {
       // Étape 3: Vérification de l'état actuel
       if (!company.isActive) {
         return new CompanyValidationError('Company is already deactivated');
-      }
-
-      // Étape 5: Vérification des motos assignées
-      const activeAssignments =
-        await this.companyMotorcycleRepository.findActiveByCompanyId(
-          dto.companyId,
-        );
-      if (activeAssignments.length > 0) {
-        return new CompanyValidationError(
-          'Cannot deactivate company with active motorcycle assignments',
-        );
       }
 
       // Étape 6: Désactivation et sauvegarde

@@ -49,9 +49,9 @@ import { PrismaUserRepository } from '@infrastructure/repositories/prisma/Prisma
     },
     {
       provide: GetDealershipByIdUseCase,
-      useFactory: (dealershipRepo: IDealershipRepository) => 
-        new GetDealershipByIdUseCase(dealershipRepo),
-      inject: ['IDealershipRepository'],
+      useFactory: (dealershipRepo: IDealershipRepository,userRepo : IUserRepository) => 
+        new GetDealershipByIdUseCase(dealershipRepo,userRepo),
+      inject: ['IDealershipRepository','IUserRepository'],
     },
     {
       provide: UpdateDealershipInfoUseCase,
