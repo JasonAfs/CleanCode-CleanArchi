@@ -13,6 +13,11 @@ export enum Permission {
     MANAGE_COMPANY_USERS = 'MANAGE_COMPANY_USERS',  // Pour la gestion des employés
     VIEW_COMPANY_DETAILS = 'VIEW_COMPANY_DETAILS',
 
+    // Permissions Moto
+    MANAGE_MOTORCYCLE = 'MANAGE_MOTORCYCLE',         // Création, modification, désactivation
+    ASSIGN_MOTORCYCLE = 'ASSIGN_MOTORCYCLE',         // Attribution à une concession ou entreprise
+    UPDATE_MOTORCYCLE_MILEAGE = 'UPDATE_MOTORCYCLE_MILEAGE', // Mise à jour du kilométrage
+    VIEW_MOTORCYCLE_DETAILS = 'VIEW_MOTORCYCLE_DETAILS',
 }
 
 export type PermissionRequirement = Permission | Permission[];

@@ -1,6 +1,7 @@
 import { Address } from '@domain/value-objects/Address';
 import { ContactInfo } from '@domain/value-objects/ContactInfo';
 import { DealershipEmployees } from '@domain/aggregates/dealership/DealershipEmployees';
+import { DealershipMotorcycles } from '@domain/aggregates/dealership/DealershipMotorcycles';
 
 export interface DealershipProps {
     id: string;
@@ -8,6 +9,7 @@ export interface DealershipProps {
     address: Address;
     contactInfo: ContactInfo;
     employees: DealershipEmployees;
+    motorcycles: DealershipMotorcycles;
     isActive: boolean;
     createdAt: Date;
     updatedAt: Date;
