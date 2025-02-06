@@ -9,6 +9,11 @@ export interface IDealershipRepository {
     findAll(): Promise<Dealership[]>;
     findActive(): Promise<Dealership[]>;
     exists(name: string): Promise<boolean>;
+
+    findByMotorcycle(motorcycleId: string): Promise<Dealership | null>;
+    findWithAvailableMotorcycles(): Promise<Dealership[]>;
+    findWithMotorcyclesInMaintenance(): Promise<Dealership[]>;
+    countMotorcycles(dealershipId: string): Promise<number>;
 }
 
 

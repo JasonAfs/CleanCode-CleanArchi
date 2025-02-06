@@ -10,7 +10,7 @@ import {
     MotorcycleStatusError, 
     MotorcycleAssignmentError 
 } from '@domain/errors/motorcycle/MotorcycleValidationError';
-import { MotorcycleStatus } from '@domain/enums/MotorcycleEnums';
+import { MotorcycleStatus,MotorcycleModel } from '@domain/enums/MotorcycleEnums';
 import { randomUUID } from 'crypto';
 
 export class Motorcycle {
@@ -106,6 +106,14 @@ export class Motorcycle {
 
     private updateLastModified(): void {
         this.props.updatedAt = new Date();
+    }
+
+    public updateModel(modelType: MotorcycleModel, year: number): void {
+        this.validateActiveState('update model');
+    
+        const newModel = Model.create(modelType, year);
+        this.props.model = newModel;
+        this.updateLastModified();
     }
 
     // Méthodes de validation d'état
