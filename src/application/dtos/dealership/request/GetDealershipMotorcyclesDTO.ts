@@ -1,7 +1,12 @@
-import { BaseAuthenticatedDTO } from "../../shared/BaseAuthenticatedDTO";
-import { MotorcycleStatus } from "@domain/enums/MotorcycleEnums";
+import { BaseAuthenticatedDTO } from '../../shared/BaseAuthenticatedDTO';
+import { MotorcycleStatus } from '@domain/enums/MotorcycleEnums';
+import { UserRole } from '@domain/enums/UserRole';
 
 export interface GetDealershipMotorcyclesDTO extends BaseAuthenticatedDTO {
-    statusFilter?: MotorcycleStatus;
-    includeInactive?: boolean;
+  dealershipId: string;
+  userId: string;
+  userRole: UserRole;
+  userDealershipId?: string;
+  statusFilter?: MotorcycleStatus;
+  includeInactive?: boolean;
 }

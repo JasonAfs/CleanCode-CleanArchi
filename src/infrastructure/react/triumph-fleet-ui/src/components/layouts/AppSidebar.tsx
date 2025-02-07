@@ -12,29 +12,43 @@ import {
   SidebarMenuItem,
   SidebarRail,
 } from "@/components/ui/sidebar";
-import { useAuth } from '@/hooks/useAuth';
-import { Bike, LayoutDashboard, Users, Building } from 'lucide-react';
-import { routes } from '@/navigation/routes';
+import { useAuth } from "@/hooks/useAuth";
+import {
+  Bike,
+  LayoutDashboard,
+  Users,
+  Building,
+  Store,
+  Truck,
+} from "lucide-react";
+import { appRoutes } from "@/navigation/routes";
 
 // Map des icônes en fonction des noms
-const iconMap = {
+const iconMap: { [key: string]: React.ElementType } = {
   LayoutDashboard: LayoutDashboard,
   Users: Users,
   Building: Building,
+  Store: Store,
+  Truck: Truck,
 };
 
-export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+export function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
   const location = useLocation();
   const { user } = useAuth();
 
-  // Filtrer les routes basées sur le rôle de l'utilisateur
-  const filteredRoutes = routes.filter(route => 
-    user?.role ? route.allowedRoles.includes(user.role) : false
+  // Filtrer les routes du sidebar :
+  // - On affiche uniquement celles qui possèdent une icône (pour le menu)
+  // - Et pour lesquelles l'utilisateur possède l'accès
+  const filteredRoutes = appRoutes.filter(
+    (route) =>
+      route.icon &&
+      user?.role &&
+      route.allowedRoles.includes(user.role)
   );
 
   // Fonction pour obtenir le composant icône
   const getIcon = (iconName: string) => {
-    const IconComponent = iconMap[iconName as keyof typeof iconMap];
+    const IconComponent = iconMap[iconName];
     return IconComponent ? <IconComponent className="h-4 w-4" /> : null;
   };
 
@@ -49,7 +63,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           {user?.firstName} {user?.lastName}
         </div>
       </SidebarHeader>
-      
+
       <SidebarContent>
         <SidebarGroup>
           <SidebarGroupLabel>Navigation</SidebarGroupLabel>
@@ -57,12 +71,12 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
             <SidebarMenu>
               {filteredRoutes.map((route) => (
                 <SidebarMenuItem key={route.path}>
-                  <SidebarMenuButton 
-                    asChild 
+                  <SidebarMenuButton
+                    asChild
                     isActive={location.pathname === route.path}
                   >
                     <Link to={route.path} className="flex items-center gap-2">
-                      {route.icon && getIcon(route.icon)}
+                      {getIcon(route.icon!)}
                       <span>{route.title}</span>
                     </Link>
                   </SidebarMenuButton>

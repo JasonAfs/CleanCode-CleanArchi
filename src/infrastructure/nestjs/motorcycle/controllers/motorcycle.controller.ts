@@ -66,7 +66,6 @@ export class MotorcycleController {
         userRole: req.user.role,
         dealershipId: dto.dealershipId,
       });
-      console.log(result);
 
       if (result instanceof Error) {
         if (result instanceof UnauthorizedError) {
@@ -278,7 +277,6 @@ export class MotorcycleController {
         userRole: req.user.role,
         dealershipId: req.user.userDealershipId,
       });
-      console.log(result)
       if (result instanceof Error) {
         if (result instanceof UnauthorizedError) {
           throw new UnauthorizedException(result.message);

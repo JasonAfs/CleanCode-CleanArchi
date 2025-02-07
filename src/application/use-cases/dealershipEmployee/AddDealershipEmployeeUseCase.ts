@@ -23,7 +23,6 @@ export class AddDealershipEmployeeUseCase implements IAuthorizationAware {
   public getAuthorizationContext(
     dto: AddDealershipEmployeeDTO,
   ): AuthorizationContext {
-    console.log('dto == ' + JSON.stringify(dto));
     return {
       userId: dto.userId,
       userRole: dto.userRole,

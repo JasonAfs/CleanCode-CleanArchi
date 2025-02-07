@@ -36,8 +36,6 @@ export class GetDealershipByIdUseCase {
       }
 
       // 2. Si ce n'est pas un admin, vérifier l'appartenance à la concession
-      console.log(dto.dealershipId)
-      console.log(dto.userDealershipId)
       if (dto.userRole !== UserRole.TRIUMPH_ADMIN && dto.userDealershipId !== dto.dealershipId) {
         return new UnauthorizedError("You don't have access to this dealership");
       }

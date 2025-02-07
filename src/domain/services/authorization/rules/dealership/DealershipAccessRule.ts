@@ -20,7 +20,6 @@ export class DealershipAccessRule implements IAuthorizationRule {
     }
 
     if (!context.dealershipId || !context.resourceId) {
-      console.log('coucou');
       return false;
     }
     return context.dealershipId === context.resourceId;

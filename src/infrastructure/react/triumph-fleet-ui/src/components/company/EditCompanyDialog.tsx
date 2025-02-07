@@ -72,12 +72,20 @@ export function EditCompanyDialog({ isOpen, data, toggleModal }: EditCompanyDial
   useEffect(() => {
     if (data) {
       setFormData({
-        name: data.name,
-        registrationNumber: data.registrationNumber,
-        address: { ...data.address },
-        contactInfo: { ...data.contactInfo },
-        isActive: data.isActive,
-        employees: [...data.employees]
+        name: data.name || '',
+        registrationNumber: data.registrationNumber || '',
+        address: { 
+          street: data.address?.street || '',
+          city: data.address?.city || '',
+          postalCode: data.address?.postalCode || '',
+          country: data.address?.country || ''
+        },
+        contactInfo: {
+          phone: data.contactInfo?.phoneNumber || '',
+          email: data.contactInfo?.email || ''
+        },
+        isActive: data.isActive ?? true,
+        employees: [...(data.employees || [])]
       });
     } else {
       setFormData(initialFormData);

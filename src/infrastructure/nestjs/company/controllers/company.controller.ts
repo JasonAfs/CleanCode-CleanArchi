@@ -110,7 +110,6 @@ export class CompanyController {
     @Body() dto: UpdateCompanyInfoRequestDTO,
   ) {
     try {
-      console.log("cacacacac"+req.user.userCompanyId)
       if (req.user.role === UserRole.COMPANY_MANAGER && req.user.userCompanyId !== companyId) {
         throw new UnauthorizedException('You can only update your own company');
       }

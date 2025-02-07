@@ -105,6 +105,14 @@ export class HttpClient {
         };
     }
 
+    async patch<T>(url: string, data?: unknown, config?: AxiosRequestConfig): Promise<HttpResponse<T>> {
+        const response: AxiosResponse<T> = await this.client.patch(url, data, config);
+        return {
+            data: response.data,
+            status: response.status,
+        };
+    }
+
     setAuthorizationHeader(token: string): void {
         this.client.defaults.headers.common['Authorization'] = `Bearer ${token}`;
     }

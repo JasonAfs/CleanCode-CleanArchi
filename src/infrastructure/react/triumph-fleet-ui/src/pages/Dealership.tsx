@@ -18,6 +18,7 @@ import {
 } from '@/components/dealership/EditDealershipDialog';
 import { useDealershipStore } from '@/store/dealershipStore';
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { useNavigate } from 'react-router-dom';
 
 export function Dealership() {
   const { isOpen, toggleModal, data, setData } = useDealershipDialogStore();
@@ -28,6 +29,7 @@ export function Dealership() {
     isLoading, 
     error 
   } = useDealershipStore();
+  const navigate = useNavigate();
 
   useEffect(() => {
     fetchDealerships().catch(console.error);
@@ -101,6 +103,24 @@ export function Dealership() {
                 className="cursor-pointer"
               >
                 Modifier
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={() => navigate(`/dealership/${dealership.id}`)}
+                className="cursor-pointer"
+              >
+                Voir les détails
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={() => navigate(`/dealership/${dealership.id}/employees`)}
+                className="cursor-pointer"
+              >
+                Gérer les employés
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={() => navigate(`/dealership/${dealership.id}/motorcycles`)}
+                className="cursor-pointer"
+              >
+                Gérer les motos
               </DropdownMenuItem>
               <DropdownMenuItem
                 onClick={() => {
