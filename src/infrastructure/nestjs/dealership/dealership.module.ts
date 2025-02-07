@@ -11,12 +11,16 @@ import { UpdateDealershipInfoUseCase } from '@application/use-cases/dealership/U
 import { DeactivateDealershipUseCase } from '@application/use-cases/dealership/DeactivateDealershipUseCase';
 import { AddDealershipEmployeeUseCase } from '@application/use-cases/dealershipEmployee/AddDealershipEmployeeUseCase';
 import { RemoveDealershipEmployeeUseCase } from '@application/use-cases/dealershipEmployee/RemoveDealershipEmployeeUseCase';
+import { GetDealershipMotorcyclesUseCase } from '@application/use-cases/dealership/GetDealershipMotorcyclesUseCase';
+import { GetDealershipEmployeesUseCase } from '@application/use-cases/dealershipEmployee/GetDealershipEmployeesUseCase';
 
 // Repositories
 import { IDealershipRepository } from '@application/ports/repositories/IDealershipRepository';
 import { IUserRepository } from '@application/ports/repositories/IUserRepository';
+import { IMotorcycleRepository } from '@application/ports/repositories/IMotorcycleRepository';
 import { PrismaDealershipRepository } from '@infrastructure/repositories/prisma/PrismaDealershipRepository';
 import { PrismaUserRepository } from '@infrastructure/repositories/prisma/PrismaUserRepository';
+import { PrismaMotorcycleRepository } from '@infrastructure/repositories/prisma/PrismaMotorcycleRepository';
 
 @Module({
   imports: [PrismaModule],
@@ -26,6 +30,11 @@ import { PrismaUserRepository } from '@infrastructure/repositories/prisma/Prisma
     {
       provide: 'IDealershipRepository',
       useFactory: (prisma: PrismaService) => new PrismaDealershipRepository(prisma),
+      inject: [PrismaService],
+    },
+    {
+      provide: 'IMotorcycleRepository',
+      useFactory: (prisma: PrismaService) => new PrismaMotorcycleRepository(prisma),
       inject: [PrismaService],
     },
     {
@@ -77,6 +86,18 @@ import { PrismaUserRepository } from '@infrastructure/repositories/prisma/Prisma
         new RemoveDealershipEmployeeUseCase(dealershipRepo, userRepo),
       inject: ['IDealershipRepository', 'IUserRepository'],
     },
+    {
+      provide: GetDealershipMotorcyclesUseCase,
+      useFactory: (motorcycleRepo: IMotorcycleRepository) => 
+        new GetDealershipMotorcyclesUseCase(motorcycleRepo),
+      inject: ['IMotorcycleRepository'],
+    },
+    {
+      provide: GetDealershipEmployeesUseCase,
+      useFactory: (dealershipRepo: IDealershipRepository) => 
+        new GetDealershipEmployeesUseCase(dealershipRepo),
+      inject: ['IDealershipRepository'],
+    },
   ],
   exports: [
     CreateDealershipUseCase,
@@ -86,6 +107,8 @@ import { PrismaUserRepository } from '@infrastructure/repositories/prisma/Prisma
     DeactivateDealershipUseCase,
     AddDealershipEmployeeUseCase,
     RemoveDealershipEmployeeUseCase,
+    GetDealershipMotorcyclesUseCase,
+    GetDealershipEmployeesUseCase,  
   ],
 })
 export class DealershipModule {}

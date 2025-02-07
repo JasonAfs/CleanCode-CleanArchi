@@ -31,6 +31,11 @@ import { UpdateDealershipInfoUseCase } from '@application/use-cases/dealership/U
 import { DeactivateDealershipUseCase } from '@application/use-cases/dealership/DeactivateDealershipUseCase';
 import { AddDealershipEmployeeUseCase } from '@application/use-cases/dealershipEmployee/AddDealershipEmployeeUseCase';
 import { RemoveDealershipEmployeeUseCase } from '@application/use-cases/dealershipEmployee/RemoveDealershipEmployeeUseCase';
+import { GetDealershipMotorcyclesUseCase } from '@application/use-cases/dealership/GetDealershipMotorcyclesUseCase';
+import { GetDealershipEmployeesUseCase } from '@application/use-cases/dealershipEmployee/GetDealershipEmployeesUseCase';
+import { GetDealershipMotorcyclesRequestDTO } from '../dtos/request/get-dealership-motorcycles.request.dto';
+import { GetDealershipEmployeesRequestDTO } from '../dtos/request/get-dealership-employees.request.dto';
+
 
 // DTOs
 import { CreateDealershipRequestDTO } from '../dtos/request/create-dealership.request.dto';
@@ -61,6 +66,9 @@ export class DealershipController {
     private readonly deactivateDealershipUseCase: DeactivateDealershipUseCase,
     private readonly addDealershipEmployeeUseCase: AddDealershipEmployeeUseCase,
     private readonly removeDealershipEmployeeUseCase: RemoveDealershipEmployeeUseCase,
+    private readonly getDealershipMotorcyclesUseCase: GetDealershipMotorcyclesUseCase,
+    private readonly getDealershipEmployeesUseCase: GetDealershipEmployeesUseCase,
+
   ) {}
 
   @Post()
@@ -383,4 +391,81 @@ export class DealershipController {
       );
     }
   }
+
+  @Get(':id/motorcycles')
+@ApiResponse({ status: 200, description: 'Retrieved dealership motorcycles' })
+@ApiResponse({ status: 401, description: 'Unauthorized' })
+@ApiResponse({ status: 404, description: 'Dealership not found' })
+@ApiParam({ name: 'id', type: String })
+async getDealershipMotorcycles(
+    @Request() req: AuthenticatedRequest,
+    @Param('id') id: string,
+    @Query() query: GetDealershipMotorcyclesRequestDTO,
+) {
+    try {
+        const result = await this.getDealershipMotorcyclesUseCase.execute({
+            userId: req.user.userId,
+            userRole: req.user.role,
+            userDealershipId: req.user.userDealershipId,
+            statusFilter: query.statusFilter,
+            includeInactive: query.includeInactive
+        });
+
+        if (result instanceof Error) {
+            if (result instanceof UnauthorizedError) {
+                throw new UnauthorizedException(result.message);
+            }
+            throw new BadRequestException(result.message);
+        }
+
+        return result;
+    } catch (err) {
+        const error = err as Error;
+        if (error instanceof UnauthorizedException) {
+            throw error;
+        }
+        throw new BadRequestException(
+            `Failed to retrieve dealership motorcycles: ${error.message}`,
+        );
+    }
+}
+
+@Get(':id/employees')
+@ApiResponse({ status: 200, description: 'Retrieved dealership employees' })
+@ApiResponse({ status: 401, description: 'Unauthorized' })
+@ApiResponse({ status: 404, description: 'Dealership not found' })
+@ApiParam({ name: 'id', type: String })
+async getDealershipEmployees(
+    @Request() req: AuthenticatedRequest,
+    @Param('id') id: string,
+    @Query() query: GetDealershipEmployeesRequestDTO,
+) {
+    try {
+        const result = await this.getDealershipEmployeesUseCase.execute({
+            dealershipId: id,
+            userId: req.user.userId,
+            userRole: req.user.role,
+            userDealershipId: req.user.userDealershipId,
+            roleFilter: query.roleFilter,
+            includeInactive: query.includeInactive
+        });
+
+        if (result instanceof Error) {
+            if (result instanceof UnauthorizedError) {
+                throw new UnauthorizedException(result.message);
+            }
+            throw new BadRequestException(result.message);
+        }
+
+        return result;
+    } catch (err) {
+        const error = err as Error;
+        if (error instanceof UnauthorizedException) {
+            throw error;
+        }
+        throw new BadRequestException(
+            `Failed to retrieve dealership employees: ${error.message}`,
+        );
+    }
+}
 }
