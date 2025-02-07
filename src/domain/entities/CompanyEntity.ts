@@ -7,8 +7,11 @@ import { Address } from '@domain/value-objects/Address';
 import { ContactInfo } from '@domain/value-objects/ContactInfo';
 import { RegistrationNumber } from '@domain/value-objects/RegistrationNumber';
 import { CompanyEmployees } from '@domain/aggregates/company/CompanyEmployees';
+import { CompanyMotorcycles } from '@domain/aggregates/company/CompanyMotorcycles';
 import { User } from '@domain/entities/UserEntity';
+import { Motorcycle } from '@domain/entities/MotorcycleEntity';
 import { CompanyValidationError } from '@domain/errors/company/CompanyValidationError';
+import { UserRole } from '@domain/enums/UserRole';
 import { randomUUID } from 'crypto';
 
 export class Company {
@@ -28,6 +31,7 @@ export class Company {
       ...props,
       id,
       employees: CompanyEmployees.create(),
+      motorcycles: CompanyMotorcycles.create(),
       isActive: true,
       createdAt: new Date(),
       updatedAt: new Date(),
@@ -37,10 +41,12 @@ export class Company {
   public static reconstitute(
     props: ReconstitueCompanyProps,
     employees: CompanyEmployees = CompanyEmployees.create(),
+    motorcycles: CompanyMotorcycles = CompanyMotorcycles.create(),
   ): Company {
     return new Company({
       ...props,
       employees,
+      motorcycles,
     });
   }
 
@@ -67,6 +73,10 @@ export class Company {
 
   get employees(): CompanyEmployees {
     return this.props.employees;
+  }
+
+  get motorcycles(): CompanyMotorcycles {
+    return this.props.motorcycles;
   }
 
   get isActive(): boolean {
@@ -172,6 +182,12 @@ export class Company {
   public getCompanyEmployees(): User[] {
     return this.props.employees.getCompanyEmployees();
   }
+
+  
+  
+
+  
+
 
   public belongsToDealership(dealershipId: string | undefined): boolean {
     if (!dealershipId || !this.props.createdByDealershipId) {

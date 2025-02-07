@@ -1,13 +1,7 @@
 import { Motorcycle } from '@domain/entities/MotorcycleEntity';
-import { DomainError } from '@domain/errors/DomainError';
 import { MotorcycleStatus } from '@domain/enums/MotorcycleEnums';
 import { UserRole } from '@domain/enums/UserRole';
-
-export class DealershipMotorcyclesError extends DomainError {
-    constructor(message: string) {
-        super(message);
-    }
-}
+import { DealershipMotorcyclesError } from '@domain/errors/motorcycle/DealershipMotorcyclesError';
 
 export class DealershipMotorcycles {
     private constructor(private readonly motorcycles: Motorcycle[]) {}
