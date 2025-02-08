@@ -18,6 +18,7 @@ import {
     useCompanyDialogStore,
 } from '@/components/company/EditCompanyDialog';
 import { useCompanyStore } from '@/store/companyStore';
+import { useNavigate } from 'react-router-dom';
 
 export function Company() {
     const { isOpen, toggleModal, data, setData } = useCompanyDialogStore();
@@ -28,6 +29,7 @@ export function Company() {
         isLoading, 
         error 
     } = useCompanyStore();
+    const navigate = useNavigate();
 
     useEffect(() => {
         fetchCompanies().catch(console.error);
@@ -101,6 +103,24 @@ export function Company() {
                                 className="cursor-pointer"
                             >
                                 Modifier
+                            </DropdownMenuItem>
+                            <DropdownMenuItem
+                                onClick={() => navigate(`/company/${company.id}`)}
+                                className="cursor-pointer"
+                            >
+                                Voir les détails
+                            </DropdownMenuItem>
+                            <DropdownMenuItem
+                                onClick={() => navigate(`/company/${company.id}/employees`)}
+                                className="cursor-pointer"
+                            >
+                                Gérer les employés
+                            </DropdownMenuItem>
+                            <DropdownMenuItem
+                                onClick={() => navigate(`/company/${company.id}/motorcycles`)}
+                                className="cursor-pointer"
+                            >
+                                Gérer les motos
                             </DropdownMenuItem>
                             <DropdownMenuItem
                                 onClick={() => {

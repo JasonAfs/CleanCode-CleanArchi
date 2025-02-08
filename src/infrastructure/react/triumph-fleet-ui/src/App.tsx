@@ -6,6 +6,9 @@ import { DashboardLayout } from "./components/layouts/DashboardLayout";
 import { useAuth } from "./hooks/useAuth";
 import { appRoutes } from "@/navigation/routes";
 import { UserRole } from "@domain/enums/UserRole";
+import { CompanyDetails } from '@/components/company/CompanyDetails';
+import { CompanyEmployees } from '@/components/company/CompanyEmployees';
+import { CompanyMotorcycles } from '@/components/company/CompanyMotorcycles';
 
 interface RoleBasedRouteProps {
   children: React.ReactNode;
@@ -57,6 +60,11 @@ const AppRoutes = () => {
       {/* Redirections par défaut */}
       <Route path="/" element={<Navigate to="/dashboard" replace />} />
       <Route path="*" element={<Navigate to="/dashboard" replace />} />
+
+      {/* Nouvelles routes */}
+      <Route path="/company/:id" element={<CompanyDetails />} />
+      <Route path="/company/:id/employees" element={<CompanyEmployees />} />
+      <Route path="/company/:id/motorcycles" element={<CompanyMotorcycles />} />
     </Routes>
   );
 };

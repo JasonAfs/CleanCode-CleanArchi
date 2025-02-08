@@ -172,6 +172,7 @@ export class MotorcycleController {
         userId: req.user.userId,
         userRole: req.user.role,
         userDealershipId: req.user.userDealershipId,
+        userCompanyId: req.user.userCompanyId,
       });
 
       if (result instanceof Error) {

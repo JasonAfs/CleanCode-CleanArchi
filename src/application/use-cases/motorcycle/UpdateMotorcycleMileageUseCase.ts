@@ -20,7 +20,7 @@ export class UpdateMotorcycleMileageUseCase {
     dto: UpdateMotorcycleMileageDTO,
   ): Promise<Result<UpdateMotorcycleMileageResponseDTO, Error>> {
     try {
-      // 1. Validation des données d'entrée et permissions
+      console.log('dto = ' + JSON.stringify(dto));
       try {
         this.validator.validate(dto);
       } catch (error) {
@@ -38,11 +38,22 @@ export class UpdateMotorcycleMileageUseCase {
         return new MotorcycleNotFoundError(dto.motorcycleId);
       }
       console.log('user role = ' + dto.userRole);
-      // 3. Vérification que l'employé appartient à la bonne concession
+      // 3. Vérification que l'employé appartient à la bonne concession ou société
       if (
         dto.userRole !== UserRole.TRIUMPH_ADMIN &&
+        dto.userRole !== UserRole.COMPANY_MANAGER &&
         (!motorcycle.dealershipId ||
           motorcycle.dealershipId !== dto.userDealershipId)
+      ) {
+        return new UnauthorizedError(
+          "You don't have access to update this motorcycle's mileage",
+        );
+      }
+
+      // Si c'est un COMPANY_MANAGER, vérifier qu'il appartient à la même société que la moto
+      if (
+        dto.userRole === UserRole.COMPANY_MANAGER &&
+        motorcycle.companyId !== dto.userCompanyId
       ) {
         return new UnauthorizedError(
           "You don't have access to update this motorcycle's mileage",

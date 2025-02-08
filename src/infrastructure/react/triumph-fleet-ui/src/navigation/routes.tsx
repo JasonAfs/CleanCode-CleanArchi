@@ -8,6 +8,9 @@ import { UserRole } from '@domain/enums/UserRole';
 import { DealershipEmployees } from '../pages/DealershipEmployees';
 import { DealershipMotorcycles } from '../pages/DealershipMotorcycles';
 import { DealershipEdit } from '../pages/DealershipEdit';
+import { CompanyDetails } from '../components/company/CompanyDetails';
+import { CompanyEmployees } from '../components/company/CompanyEmployees';
+import { CompanyMotorcycles } from '../components/company/CompanyMotorcycles';
 
 export interface AppRoute {
   path: string;
@@ -91,5 +94,35 @@ export const appRoutes: AppRoute[] = [
       UserRole.COMPANY_MANAGER,
     ],
     element: <DealershipFleet />,
+  },
+  {
+    path: '/company/:id',
+    title: 'Détails de l\'entreprise',
+    allowedRoles: [
+      UserRole.TRIUMPH_ADMIN,
+      UserRole.DEALERSHIP_MANAGER,
+      UserRole.COMPANY_MANAGER
+    ],
+    element: <CompanyDetails />,
+  },
+  {
+    path: '/company/:id/employees',
+    title: 'Employés de l\'entreprise',
+    allowedRoles: [
+      UserRole.TRIUMPH_ADMIN,
+      UserRole.DEALERSHIP_MANAGER,
+      UserRole.COMPANY_MANAGER
+    ],
+    element: <CompanyEmployees />,
+  },
+  {
+    path: '/company/:id/motorcycles',
+    title: 'Motos de l\'entreprise',
+    allowedRoles: [
+      UserRole.TRIUMPH_ADMIN,
+      UserRole.DEALERSHIP_MANAGER,
+      UserRole.COMPANY_MANAGER
+    ],
+    element: <CompanyMotorcycles />,
   },
 ];

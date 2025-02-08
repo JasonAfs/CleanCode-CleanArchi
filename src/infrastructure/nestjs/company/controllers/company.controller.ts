@@ -13,7 +13,13 @@ import {
   NotFoundException,
   Query,
 } from '@nestjs/common';
-import { ApiTags, ApiResponse, ApiBearerAuth, ApiParam,ApiQuery } from '@nestjs/swagger';
+import {
+  ApiTags,
+  ApiResponse,
+  ApiBearerAuth,
+  ApiParam,
+  ApiQuery,
+} from '@nestjs/swagger';
 import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
 
 // Use Cases
@@ -72,7 +78,7 @@ export class CompanyController {
         userRole: req.user.role,
         dealershipId: req.user.userDealershipId,
       });
-      
+
       if (result instanceof Error) {
         if (result instanceof UnauthorizedError) {
           throw new UnauthorizedException(result.message);
@@ -110,7 +116,10 @@ export class CompanyController {
     @Body() dto: UpdateCompanyInfoRequestDTO,
   ) {
     try {
-      if (req.user.role === UserRole.COMPANY_MANAGER && req.user.userCompanyId !== companyId) {
+      if (
+        req.user.role === UserRole.COMPANY_MANAGER &&
+        req.user.userCompanyId !== companyId
+      ) {
         throw new UnauthorizedException('You can only update your own company');
       }
 
@@ -153,14 +162,14 @@ export class CompanyController {
   @ApiQuery({ name: 'includeInactive', required: false, type: Boolean })
   async getCompanies(
     @Request() req: AuthenticatedRequest,
-    @Query() query: GetCompaniesRequestDTO
+    @Query() query: GetCompaniesRequestDTO,
   ) {
     try {
       const result = await this.getCompaniesUseCase.execute({
         userId: req.user.userId,
         userRole: req.user.role,
         userDealershipId: req.user.userDealershipId,
-        includeInactive: query.includeInactive
+        includeInactive: query.includeInactive,
       });
 
       if (result instanceof Error) {
@@ -245,8 +254,13 @@ export class CompanyController {
     @Request() req: AuthenticatedRequest,
     @Param('id') companyId: string,
   ) {
-    if (req.user.role === UserRole.COMPANY_MANAGER && req.user.userCompanyId !== companyId) {
-      throw new UnauthorizedException('You can only view your own company employees');
+    if (
+      req.user.role === UserRole.COMPANY_MANAGER &&
+      req.user.userCompanyId !== companyId
+    ) {
+      throw new UnauthorizedException(
+        'You can only view your own company employees',
+      );
     }
     try {
       const result = await this.getEmployeeHistoryUseCase.execute({
@@ -293,8 +307,13 @@ export class CompanyController {
     @Param('id') companyId: string,
     @Body() dto: AddCompanyEmployeeRequestDTO,
   ) {
-    if (req.user.role === UserRole.COMPANY_MANAGER && req.user.userCompanyId !== companyId) {
-      throw new UnauthorizedException('You can only add employees to your own company');
+    if (
+      req.user.role === UserRole.COMPANY_MANAGER &&
+      req.user.userCompanyId !== companyId
+    ) {
+      throw new UnauthorizedException(
+        'You can only add employees to your own company',
+      );
     }
 
     try {
@@ -346,8 +365,13 @@ export class CompanyController {
     @Param('id') companyId: string,
     @Param('employeeId') employeeId: string,
   ) {
-    if (req.user.role === UserRole.COMPANY_MANAGER && req.user.userCompanyId !== companyId) {
-      throw new UnauthorizedException('You can only remove employees from your own company');
+    if (
+      req.user.role === UserRole.COMPANY_MANAGER &&
+      req.user.userCompanyId !== companyId
+    ) {
+      throw new UnauthorizedException(
+        'You can only remove employees from your own company',
+      );
     }
 
     try {

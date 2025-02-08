@@ -114,4 +114,14 @@ export class HttpCompanyService extends AxiosAuthenticationGateway {
       throw error;
     }
   }
+
+  async getCompanyById(id: string): Promise<Company> {
+    try {
+      const response = await this.httpClient.get<Company>(`/companies/${id}`);
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching company details:', error);
+      throw error;
+    }
+  }
 }

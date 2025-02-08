@@ -46,11 +46,11 @@ import { GetCompaniesUseCase } from '@application/use-cases/company/GetCompanies
       inject: ['ICompanyRepository'],
     },
     {
-      provide : DeactivateCompanyUseCase,
-      useFactory : (companyRepo : ICompanyRepository) => {
+      provide: DeactivateCompanyUseCase,
+      useFactory: (companyRepo: ICompanyRepository) => {
         return new DeactivateCompanyUseCase(companyRepo);
       },
-      inject: ['ICompanyRepository']
+      inject: ['ICompanyRepository'],
     },
     {
       provide: CreateCompanyUseCase,
@@ -77,7 +77,7 @@ import { GetCompaniesUseCase } from '@application/use-cases/company/GetCompanies
       provide: AddCompanyEmployeeUseCase,
       useFactory: (
         companyRepo: ICompanyRepository,
-        userRepo: IUserRepository
+        userRepo: IUserRepository,
       ) => {
         return new AddCompanyEmployeeUseCase(companyRepo, userRepo);
       },
@@ -87,7 +87,7 @@ import { GetCompaniesUseCase } from '@application/use-cases/company/GetCompanies
       provide: RemoveCompanyEmployeeUseCase,
       useFactory: (
         companyRepo: ICompanyRepository,
-        userRepo: IUserRepository
+        userRepo: IUserRepository,
       ) => {
         return new RemoveCompanyEmployeeUseCase(companyRepo, userRepo);
       },
