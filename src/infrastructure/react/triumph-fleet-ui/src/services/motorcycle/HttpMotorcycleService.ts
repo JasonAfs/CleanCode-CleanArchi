@@ -1,5 +1,12 @@
 import { AxiosAuthenticationGateway } from '@infrastructure/gateways/AxiosAuthenticationGateway';
 import { TransferMotorcycleResponse } from '../../types/responses';
+import { MotorcycleStatus } from '@domain/enums/MotorcycleEnums';
+import { Motorcycle } from '@/types/motorcycle';
+
+interface GetMotorcyclesParams {
+  statusFilter?: MotorcycleStatus;
+  includeInactive?: boolean;
+}
 
 export class HttpMotorcycleService extends AxiosAuthenticationGateway {
   constructor() {
@@ -14,7 +21,11 @@ export class HttpMotorcycleService extends AxiosAuthenticationGateway {
   async createMotorcycle(motorcycle: {
     vin: string;
     registrationNumber: string;
-    model: string;
+    model: {
+      type: string;
+      year: number;
+      category: string;
+    };
     mileage: number;
     dealershipId: string;
   }): Promise<void> {
@@ -31,7 +42,11 @@ export class HttpMotorcycleService extends AxiosAuthenticationGateway {
     motorcycle: {
       vin?: string;
       registrationNumber?: string;
-      model?: string;
+      model?: {
+        type: string;
+        year: number;
+        category: string;
+      };
       mileage?: number;
     },
   ): Promise<void> {
@@ -114,6 +129,21 @@ export class HttpMotorcycleService extends AxiosAuthenticationGateway {
       );
     } catch (error) {
       console.error('Error releasing motorcycle from company:', error);
+      throw error;
+    }
+  }
+
+  async getMotorcycles(params?: GetMotorcyclesParams): Promise<Motorcycle[]> {
+    try {
+      const { data } = await this.httpClient.get<Motorcycle[]>('/motorcycles', {
+        params: {
+          statusFilter: params?.statusFilter,
+          includeInactive: params?.includeInactive,
+        },
+      });
+      return data;
+    } catch (error) {
+      console.error('Error fetching motorcycles:', error);
       throw error;
     }
   }

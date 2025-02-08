@@ -10,6 +10,8 @@ import {
   BadRequestException,
   UnauthorizedException,
   NotFoundException,
+  Get,
+  Query,
 } from '@nestjs/common';
 import { ApiTags, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
 import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
@@ -34,6 +36,9 @@ import { TransferMotorcycleBetweenCompaniesUseCase } from '@application/use-case
 import { CompanyValidationError } from '@domain/errors/company/CompanyValidationError';
 import { AssignMotorcycleCompanyRequestDTO } from '../dtos/request/assign-motorcycle-company.request.dto';
 import { TransferMotorcycleCompanyRequestDTO } from '../dtos/request/transfer-motorcycle-company.request.dto';
+import { GetMotorcyclesUseCase } from '@application/use-cases/motorcycle/GetMotorcyclesUseCase';
+import { GetMotorcyclesRequestDTO } from '../dtos/request/get-motorcycles.request.dto';
+import { UserNotFoundError } from '@domain/errors/user/UserNotFoundError';
 
 @ApiTags('motorcycles')
 @ApiBearerAuth()
@@ -48,6 +53,7 @@ export class MotorcycleController {
     private readonly assignMotorcycleToCompanyUseCase: AssignMotorcycleToCompanyUseCase,
     private readonly releaseMotorcycleFromCompanyUseCase: ReleaseMotorcycleFromCompanyUseCase,
     private readonly transferMotorcycleBetweenCompaniesUseCase: TransferMotorcycleBetweenCompaniesUseCase,
+    private readonly getMotorcyclesUseCase: GetMotorcyclesUseCase,
   ) {}
 
   @Post()
@@ -414,6 +420,46 @@ export class MotorcycleController {
       throw new BadRequestException(
         `Failed to transfer motorcycle between companies: ${error.message}`,
       );
+    }
+  }
+
+  @Get()
+  @ApiResponse({
+    status: 200,
+    description: 'Retrieved motorcycles successfully',
+  })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  async getMotorcycles(
+    @Request() req: AuthenticatedRequest,
+    @Query() query: GetMotorcyclesRequestDTO,
+  ) {
+    try {
+      const result = await this.getMotorcyclesUseCase.execute({
+        userId: req.user.userId,
+        userRole: req.user.role,
+        includeInactive: query.includeInactive,
+        statusFilter: query.statusFilter,
+      });
+      console.log('resulttttttt = ' + JSON.stringify(result));
+      if (result instanceof Error) {
+        if (result instanceof UnauthorizedError) {
+          throw new UnauthorizedException(result.message);
+        }
+        if (result instanceof UserNotFoundError) {
+          throw new BadRequestException(result.message);
+        }
+        throw new BadRequestException(result.message);
+      }
+     
+      return result;
+    } catch (error) {
+      if (
+        error instanceof UnauthorizedException ||
+        error instanceof BadRequestException
+      ) {
+        throw error;
+      }
+      throw new BadRequestException('Failed to retrieve motorcycles');
     }
   }
 }

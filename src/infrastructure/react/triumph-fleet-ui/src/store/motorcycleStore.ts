@@ -1,23 +1,18 @@
 import { create } from 'zustand';
 import { HttpMotorcycleService } from '@/services/motorcycle/HttpMotorcycleService';
 import { TransferMotorcycleResponse } from '@/types/responses';
-
-interface Motorcycle {
-  id: string;
-  vin: string;
-  registrationNumber: string;
-  model: string;
-  mileage: number;
-  dealershipId: string;
-  companyId?: string;
-}
+import { MotorcycleStatus } from '@domain/enums/MotorcycleEnums';
+import { Motorcycle } from '@/types/motorcycle';
 
 interface MotorcycleStore {
   motorcycles: Motorcycle[];
   isLoading: boolean;
   error: string | null;
 
-  fetchMotorcycles: () => Promise<void>;
+  fetchMotorcycles: (params?: {
+    statusFilter?: MotorcycleStatus;
+    includeInactive?: boolean;
+  }) => Promise<void>;
   createMotorcycle: (
     motorcycle: Omit<Motorcycle, 'id' | 'companyId'>,
   ) => Promise<void>;
@@ -46,24 +41,12 @@ export const useMotorcycleStore = create<MotorcycleStore>((set, get) => {
     isLoading: false,
     error: null,
 
-    fetchMotorcycles: async () => {
+    fetchMotorcycles: async (params) => {
       if (get().isLoading) return;
       set({ isLoading: true, error: null });
+
       try {
-        const response = await fetch(
-          `${import.meta.env.VITE_API_URL || 'http://localhost:3000'}/motorcycles`,
-          {
-            headers: {
-              Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
-            },
-          },
-        );
-
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-
-        const motorcycles = await response.json();
+        const motorcycles = await motorcycleService.getMotorcycles(params);
         set({ motorcycles });
       } catch (error) {
         let errorMessage =

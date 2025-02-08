@@ -73,7 +73,6 @@ export class TransferMotorcycleToDealershipUseCase {
       try {
         motorcycle.transferToDealership(dto.targetDealershipId);
       } catch (error) {
-        console.log('cacaboudin = ' + JSON.stringify(error));
         if (error instanceof Error) {
           return error;
         }

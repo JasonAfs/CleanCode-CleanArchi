@@ -11,7 +11,8 @@ export class UserMapper {
             lastName: prismaUser.lastName,
             role: prismaUser.role as UserRole,
             companyId: prismaUser.companyId ?? '',
-            hashedPassword: prismaUser.hashedPassword
+            hashedPassword: prismaUser.hashedPassword,
+            dealershipId: prismaUser.dealershipId ?? ''
         });
 
         Object.defineProperties(user, {

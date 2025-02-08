@@ -4,7 +4,6 @@ import { DataTable } from '@/components/ui/data-table';
 import { ColumnDef } from '@tanstack/react-table';
 import { Loader2, Edit2 } from 'lucide-react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { useDealershipStore } from '@/store/dealershipStore';
 import { useMotorcycleStore } from '@/store/motorcycleStore';
 import { Motorcycle } from '@/types/motorcycle';
 import {
@@ -36,7 +35,6 @@ import { Input } from '@/components/ui/input';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import * as z from 'zod';
-
 import { MotorcycleStatus } from '@domain/enums/MotorcycleEnums';
 
 const updateMileageSchema = z.object({
@@ -50,16 +48,11 @@ type UpdateMileageForm = z.infer<typeof updateMileageSchema>;
 
 export function DealershipFleet() {
   const {
-    currentDealershipMotorcycles,
-    fetchDealershipMotorcycles,
-    isLoading: isDealershipLoading,
-    error: dealershipError,
-  } = useDealershipStore();
-
-  const {
+    motorcycles,
+    fetchMotorcycles,
+    isLoading,
+    error,
     updateMotorcycleMileage,
-    isLoading: isMotorcycleLoading,
-    error: motorcycleError,
   } = useMotorcycleStore();
 
   const [statusFilter, setStatusFilter] = useState<string>('ALL');
@@ -76,11 +69,11 @@ export function DealershipFleet() {
   });
 
   useEffect(() => {
-    fetchDealershipMotorcycles({
-      statusFilter: statusFilter === 'ALL' ? '' : statusFilter,
+    fetchMotorcycles({
+      statusFilter: statusFilter === 'ALL' ? undefined : statusFilter as MotorcycleStatus,
       includeInactive,
     }).catch(console.error);
-  }, [fetchDealershipMotorcycles, statusFilter, includeInactive]);
+  }, [fetchMotorcycles, statusFilter, includeInactive]);
 
   useEffect(() => {
     if (selectedMotorcycle) {
@@ -95,8 +88,8 @@ export function DealershipFleet() {
 
     try {
       await updateMotorcycleMileage(selectedMotorcycle.id, data.mileage);
-      await fetchDealershipMotorcycles({
-        statusFilter: statusFilter === 'ALL' ? '' : statusFilter,
+      await fetchMotorcycles({
+        statusFilter: statusFilter === 'ALL' ? undefined : statusFilter as MotorcycleStatus,
         includeInactive,
       });
       setIsUpdateMileageOpen(false);
@@ -255,7 +248,7 @@ export function DealershipFleet() {
     },
   ];
 
-  if (isDealershipLoading || isMotorcycleLoading) {
+  if (isLoading) {
     return (
       <div className="flex justify-center items-center min-h-screen">
         <Loader2 className="h-8 w-8 animate-spin" />
@@ -263,17 +256,17 @@ export function DealershipFleet() {
     );
   }
 
-  if (dealershipError || motorcycleError) {
+  if (error) {
     return (
       <Alert variant="destructive" className="max-w-md mx-auto mt-4">
         <AlertDescription>
-          {dealershipError || motorcycleError}
+          {error}
           <Button
             variant="outline"
             className="ml-2"
             onClick={() =>
-              fetchDealershipMotorcycles({
-                statusFilter,
+              fetchMotorcycles({
+                statusFilter: statusFilter === 'ALL' ? undefined : statusFilter as MotorcycleStatus,
                 includeInactive,
               })
             }
@@ -324,7 +317,7 @@ export function DealershipFleet() {
         </div>
       </div>
 
-      <DataTable columns={columns} data={currentDealershipMotorcycles || []} />
+      <DataTable columns={columns} data={motorcycles || []} />
     </div>
   );
 }

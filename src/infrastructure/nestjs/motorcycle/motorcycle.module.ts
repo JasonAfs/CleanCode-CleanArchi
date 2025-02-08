@@ -11,14 +11,17 @@ import { TransferMotorcycleToDealershipUseCase } from '@application/use-cases/mo
 import { AssignMotorcycleToCompanyUseCase } from '@application/use-cases/motorcycle/AssignMotorcycleToCompanyUseCase';
 import { ReleaseMotorcycleFromCompanyUseCase } from '@application/use-cases/motorcycle/ReleaseMotorcycleFromCompanyUseCase';
 import { TransferMotorcycleBetweenCompaniesUseCase } from '@application/use-cases/motorcycle/TransferMotorcycleBetweenCompaniesUseCase';
+import { GetMotorcyclesUseCase } from '@application/use-cases/motorcycle/GetMotorcyclesUseCase';
 
 // Repositories
 import { IMotorcycleRepository } from '@application/ports/repositories/IMotorcycleRepository';
 import { IDealershipRepository } from '@application/ports/repositories/IDealershipRepository';
 import { ICompanyRepository } from '@application/ports/repositories/ICompanyRepository';
+import { IUserRepository } from '@application/ports/repositories/IUserRepository';
 import { PrismaMotorcycleRepository } from '@infrastructure/repositories/prisma/PrismaMotorcycleRepository';
 import { PrismaDealershipRepository } from '@infrastructure/repositories/prisma/PrismaDealershipRepository';
 import { PrismaCompanyRepository } from '@infrastructure/repositories/prisma/PrismaCompanyRepository';
+import { PrismaUserRepository } from '@infrastructure/repositories/prisma/PrismaUserRepository';
 
 @Module({
   imports: [PrismaModule],
@@ -27,17 +30,25 @@ import { PrismaCompanyRepository } from '@infrastructure/repositories/prisma/Pri
     // Repository providers
     {
       provide: 'IMotorcycleRepository',
-      useFactory: (prisma: PrismaService) => new PrismaMotorcycleRepository(prisma),
+      useFactory: (prisma: PrismaService) =>
+        new PrismaMotorcycleRepository(prisma),
       inject: [PrismaService],
     },
     {
       provide: 'IDealershipRepository',
-      useFactory: (prisma: PrismaService) => new PrismaDealershipRepository(prisma),
+      useFactory: (prisma: PrismaService) =>
+        new PrismaDealershipRepository(prisma),
       inject: [PrismaService],
     },
     {
       provide: 'ICompanyRepository',
-      useFactory: (prisma: PrismaService) => new PrismaCompanyRepository(prisma),
+      useFactory: (prisma: PrismaService) =>
+        new PrismaCompanyRepository(prisma),
+      inject: [PrismaService],
+    },
+    {
+      provide: 'IUserRepository',
+      useFactory: (prisma: PrismaService) => new PrismaUserRepository(prisma),
       inject: [PrismaService],
     },
 
@@ -71,7 +82,11 @@ import { PrismaCompanyRepository } from '@infrastructure/repositories/prisma/Pri
       useFactory: (
         motorcycleRepo: IMotorcycleRepository,
         dealershipRepo: IDealershipRepository,
-      ) => new TransferMotorcycleToDealershipUseCase(motorcycleRepo, dealershipRepo),
+      ) =>
+        new TransferMotorcycleToDealershipUseCase(
+          motorcycleRepo,
+          dealershipRepo,
+        ),
       inject: ['IMotorcycleRepository', 'IDealershipRepository'],
     },
     {
@@ -84,9 +99,8 @@ import { PrismaCompanyRepository } from '@infrastructure/repositories/prisma/Pri
     },
     {
       provide: ReleaseMotorcycleFromCompanyUseCase,
-      useFactory: (
-        motorcycleRepo: IMotorcycleRepository,
-      ) => new ReleaseMotorcycleFromCompanyUseCase(motorcycleRepo),
+      useFactory: (motorcycleRepo: IMotorcycleRepository) =>
+        new ReleaseMotorcycleFromCompanyUseCase(motorcycleRepo),
       inject: ['IMotorcycleRepository'],
     },
     {
@@ -94,8 +108,20 @@ import { PrismaCompanyRepository } from '@infrastructure/repositories/prisma/Pri
       useFactory: (
         motorcycleRepo: IMotorcycleRepository,
         companyRepo: ICompanyRepository,
-      ) => new TransferMotorcycleBetweenCompaniesUseCase(motorcycleRepo, companyRepo),
+      ) =>
+        new TransferMotorcycleBetweenCompaniesUseCase(
+          motorcycleRepo,
+          companyRepo,
+        ),
       inject: ['IMotorcycleRepository', 'ICompanyRepository'],
+    },
+    {
+      provide: GetMotorcyclesUseCase,
+      useFactory: (
+        motorcycleRepo: IMotorcycleRepository,
+        userRepo: IUserRepository,
+      ) => new GetMotorcyclesUseCase(motorcycleRepo, userRepo),
+      inject: ['IMotorcycleRepository', 'IUserRepository'],
     },
   ],
   exports: [
@@ -106,6 +132,7 @@ import { PrismaCompanyRepository } from '@infrastructure/repositories/prisma/Pri
     AssignMotorcycleToCompanyUseCase,
     ReleaseMotorcycleFromCompanyUseCase,
     TransferMotorcycleBetweenCompaniesUseCase,
+    GetMotorcyclesUseCase,
   ],
 })
 export class MotorcycleModule {}

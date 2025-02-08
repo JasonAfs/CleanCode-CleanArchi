@@ -1,5 +1,7 @@
 import { AxiosAuthenticationGateway } from '@infrastructure/gateways/AxiosAuthenticationGateway';
 import { Company } from '@/types/company';
+import { Employee } from '@/types/employee';
+import { UserRole } from '@domain/enums/UserRole';
 
 export class HttpCompanyService extends AxiosAuthenticationGateway {
   constructor() {
@@ -65,6 +67,50 @@ export class HttpCompanyService extends AxiosAuthenticationGateway {
       await this.httpClient.delete(`/companies/${id}`);
     } catch (error) {
       console.error('Error deleting company:', error);
+      throw error;
+    }
+  }
+
+  async getCompanyEmployees(companyId: string): Promise<Employee[]> {
+    try {
+      const response = await this.httpClient.get<Employee[]>(
+        `/companies/${companyId}/employees`,
+      );
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching company employees:', error);
+      throw error;
+    }
+  }
+
+  async addCompanyEmployee(
+    companyId: string,
+    employeeData: {
+      employeeId: string;
+      role: UserRole;
+    },
+  ): Promise<void> {
+    try {
+      await this.httpClient.post(
+        `/companies/${companyId}/employees`,
+        employeeData,
+      );
+    } catch (error) {
+      console.error('Error adding company employee:', error);
+      throw error;
+    }
+  }
+
+  async removeCompanyEmployee(
+    companyId: string,
+    employeeId: string,
+  ): Promise<void> {
+    try {
+      await this.httpClient.delete(
+        `/companies/${companyId}/employees/${employeeId}`,
+      );
+    } catch (error) {
+      console.error('Error removing company employee:', error);
       throw error;
     }
   }
