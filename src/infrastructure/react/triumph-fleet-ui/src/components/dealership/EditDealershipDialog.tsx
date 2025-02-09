@@ -84,7 +84,6 @@ export function EditDealershipDialog({ isOpen, data, toggleModal }: EditDealersh
           ...formData,
         });
       } else {
-        console.log('Form data being submitted:', formData);
         await addDealership(formData);
       }
       

@@ -51,7 +51,6 @@ export class AxiosAuthenticationGateway implements IAuthenticationGateway {
 
     protected async refreshTokens(): Promise<AuthTokensDTO> {
         const refreshToken = localStorage.getItem('refreshToken');
-        console.log('Attempting refresh with token:', refreshToken);
         if (!refreshToken) {
             throw new Error('No refresh token available');
         }

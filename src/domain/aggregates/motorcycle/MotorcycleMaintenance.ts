@@ -65,7 +65,20 @@ export class MotorcycleMaintenance {
   // Méthodes de calcul
   public isMaintenanceNeeded(currentMileage: number): boolean {
     const lastMaintenance = this.getLastMaintenance();
-    if (!lastMaintenance) return true;
+
+    if (!lastMaintenance) {
+      // Pour une nouvelle moto, vérifier si les seuils sont dépassés
+      // depuis sa mise en service (createdAt)
+      const monthsSinceCreation = this.getMonthsDifference(
+        new Date(this.motorcycleId), // Date de création de la moto
+        new Date(),
+      );
+
+      return (
+        currentMileage >= this.maintenanceInterval.distanceInterval ||
+        monthsSinceCreation >= this.maintenanceInterval.timeInterval
+      );
+    }
 
     const mileageDifference = currentMileage - lastMaintenance.mileage;
     const monthsDifference = this.getMonthsDifference(

@@ -22,6 +22,10 @@ import { PrismaMotorcycleRepository } from '@infrastructure/repositories/prisma/
 import { PrismaDealershipRepository } from '@infrastructure/repositories/prisma/PrismaDealershipRepository';
 import { PrismaCompanyRepository } from '@infrastructure/repositories/prisma/PrismaCompanyRepository';
 import { PrismaUserRepository } from '@infrastructure/repositories/prisma/PrismaUserRepository';
+import { PrismaMaintenanceRepository } from '@infrastructure/repositories/prisma/PrismaMaintenanceRepository';
+import { PrismaMaintenanceNotificationRepository } from '@infrastructure/repositories/prisma/PrismaMaintenanceNotificationRepository';
+import { IMaintenanceRepository } from '@application/ports/repositories/IMaintenanceRepository';
+import { IMaintenanceNotificationRepository } from '@application/ports/repositories/IMaintenanceNotificationRepository';
 
 @Module({
   imports: [PrismaModule],
@@ -51,6 +55,18 @@ import { PrismaUserRepository } from '@infrastructure/repositories/prisma/Prisma
       useFactory: (prisma: PrismaService) => new PrismaUserRepository(prisma),
       inject: [PrismaService],
     },
+    {
+      provide: 'IMaintenanceRepository',
+      useFactory: (prisma: PrismaService) =>
+        new PrismaMaintenanceRepository(prisma),
+      inject: [PrismaService],
+    },
+    {
+      provide: 'IMaintenanceNotificationRepository',
+      useFactory: (prisma: PrismaService) =>
+        new PrismaMaintenanceNotificationRepository(prisma),
+      inject: [PrismaService],
+    },
 
     // Use Case providers
     {
@@ -74,8 +90,21 @@ import { PrismaUserRepository } from '@infrastructure/repositories/prisma/Prisma
       useFactory: (
         motorcycleRepo: IMotorcycleRepository,
         dealershipRepo: IDealershipRepository,
-      ) => new UpdateMotorcycleMileageUseCase(motorcycleRepo, dealershipRepo),
-      inject: ['IMotorcycleRepository', 'IDealershipRepository'],
+        maintenanceRepo: IMaintenanceRepository,
+        notificationRepo: IMaintenanceNotificationRepository,
+      ) =>
+        new UpdateMotorcycleMileageUseCase(
+          motorcycleRepo,
+          dealershipRepo,
+          maintenanceRepo,
+          notificationRepo,
+        ),
+      inject: [
+        'IMotorcycleRepository',
+        'IDealershipRepository',
+        'IMaintenanceRepository',
+        'IMaintenanceNotificationRepository',
+      ],
     },
     {
       provide: TransferMotorcycleToDealershipUseCase,

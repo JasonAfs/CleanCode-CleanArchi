@@ -1,5 +1,7 @@
 import { IMotorcycleRepository } from '@application/ports/repositories/IMotorcycleRepository';
 import { IDealershipRepository } from '@application/ports/repositories/IDealershipRepository';
+import { IMaintenanceRepository } from '@application/ports/repositories/IMaintenanceRepository';
+import { IMaintenanceNotificationRepository } from '@application/ports/repositories/IMaintenanceNotificationRepository';
 import { UpdateMotorcycleMileageDTO } from '@application/dtos/motorcycle/request/UpdateMotorcycleMileageDTO';
 import { UpdateMotorcycleMileageValidator } from '@application/validation/motorcycle/UpdateMotorcycleMileageValidator';
 import { Result } from '@domain/shared/Result';
@@ -7,6 +9,8 @@ import { MotorcycleNotFoundError } from '@domain/errors/motorcycle/MotorcycleVal
 import { UnauthorizedError } from '@domain/errors/authorization/UnauthorizedError';
 import { UpdateMotorcycleMileageResponseDTO } from '@application/dtos/motorcycle/response/UpdateMotorcycleMileageResponseDTO';
 import { UserRole } from '@domain/enums/UserRole';
+import { MaintenanceType } from '@domain/enums/MaintenanceEnums';
+import { MaintenanceNotification } from '@domain/entities/MaintenanceNotificationEntity';
 
 export class UpdateMotorcycleMileageUseCase {
   private readonly validator = new UpdateMotorcycleMileageValidator();
@@ -14,13 +18,14 @@ export class UpdateMotorcycleMileageUseCase {
   constructor(
     private readonly motorcycleRepository: IMotorcycleRepository,
     private readonly dealershipRepository: IDealershipRepository,
+    private readonly maintenanceRepository: IMaintenanceRepository,
+    private readonly notificationRepository: IMaintenanceNotificationRepository,
   ) {}
 
   public async execute(
     dto: UpdateMotorcycleMileageDTO,
   ): Promise<Result<UpdateMotorcycleMileageResponseDTO, Error>> {
     try {
-      console.log('dto = ' + JSON.stringify(dto));
       try {
         this.validator.validate(dto);
       } catch (error) {
@@ -37,7 +42,6 @@ export class UpdateMotorcycleMileageUseCase {
       if (!motorcycle) {
         return new MotorcycleNotFoundError(dto.motorcycleId);
       }
-      console.log('user role = ' + dto.userRole);
       // 3. Vérification que l'employé appartient à la bonne concession ou société
       if (
         dto.userRole !== UserRole.TRIUMPH_ADMIN &&
@@ -70,6 +74,31 @@ export class UpdateMotorcycleMileageUseCase {
         }
         throw error;
       }
+      console.log('motorcycle.isMaintenanceNeeded() = ' + motorcycle.isMaintenanceNeeded());
+      // Vérifier si une maintenance est nécessaire
+      if (motorcycle.isMaintenanceNeeded()) {
+        // Créer la maintenance
+        const nextDue = motorcycle.getNextMaintenanceDue();
+        const maintenance = motorcycle.planMaintenance(
+          motorcycle.dealershipId!,
+          nextDue.dueDate,
+          `Maintenance préventive - Intervalle ${motorcycle.model.getType()} atteint`,
+          MaintenanceType.PREVENTIVE,
+        );
+
+        // Créer la notification
+        const notification = MaintenanceNotification.create(
+          motorcycle.id,
+          motorcycle.dealershipId!,
+          `Maintenance requise pour la moto ${motorcycle.vin.toString()}. 
+           Kilométrage actuel: ${motorcycle.mileage}km.`,
+          motorcycle.companyId,
+        );
+
+        // Sauvegarder
+        await this.maintenanceRepository.create(maintenance);
+        await this.notificationRepository.create(notification);
+      }
 
       // 5. Persistence
       await this.motorcycleRepository.updateMileage(motorcycle.id, dto.mileage);
@@ -87,7 +116,7 @@ export class UpdateMotorcycleMileageUseCase {
         return error;
       }
       return new Error(
-        'An unexpected error occurred while updating motorcycle mileage',
+        'An unexpected error occurred while updating motorcycle mileaxge',
       );
     }
   }

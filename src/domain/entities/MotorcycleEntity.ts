@@ -362,7 +362,7 @@ export class Motorcycle {
     scheduledDate: Date,
     description: string,
     type: MaintenanceType = MaintenanceType.PREVENTIVE,
-  ): void {
+  ): Maintenance {
     if (!this.props.isActive) {
       throw new MotorcycleValidationError(
         'Cannot plan maintenance for inactive motorcycle',
@@ -386,6 +386,8 @@ export class Motorcycle {
 
     this.props.maintenance = this.props.maintenance.addMaintenance(maintenance);
     this.updateLastModified();
+
+    return maintenance; // Retourner la maintenance créée
   }
 
   public getMaintenanceHistory(): Maintenance[] {

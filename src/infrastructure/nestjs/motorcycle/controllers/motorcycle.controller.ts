@@ -441,7 +441,6 @@ export class MotorcycleController {
         includeInactive: query.includeInactive,
         statusFilter: query.statusFilter,
       });
-      console.log('resulttttttt = ' + JSON.stringify(result));
       if (result instanceof Error) {
         if (result instanceof UnauthorizedError) {
           throw new UnauthorizedException(result.message);
@@ -451,7 +450,7 @@ export class MotorcycleController {
         }
         throw new BadRequestException(result.message);
       }
-     
+
       return result;
     } catch (error) {
       if (

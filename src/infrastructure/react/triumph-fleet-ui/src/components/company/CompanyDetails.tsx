@@ -16,7 +16,6 @@ import { useCompanyDialogStore } from '@/components/company/EditCompanyDialog';
 export function CompanyDetails() {
   const { id } = useParams<{ id: string }>();
   const { currentCompany, fetchCompanyById, isLoading, error } = useCompanyStore();
-  console.log(currentCompany?.address);
 
   useEffect(() => {
     if (id) {

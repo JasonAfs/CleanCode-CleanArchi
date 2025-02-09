@@ -39,7 +39,6 @@ export class GetMotorcyclesUseCase {
       if (!user) {
         return new UserNotFoundError(dto.userId);
       }
-      console.log('user = ' + JSON.stringify(user));
       let motorcycles = [];
 
       // 3. Logique de récupération selon le rôle
@@ -50,10 +49,8 @@ export class GetMotorcyclesUseCase {
           break;
 
         case UserRole.DEALERSHIP_MANAGER:
-          console.log('dealership manager');
           // Le manager de concession voit les motos de sa concession
           if (!user.dealershipId) {
-            console.log('user.dealershipId = ' + user.dealershipId);
             return new UnauthorizedError(
               'User is not associated with any dealership',
             );

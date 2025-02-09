@@ -33,6 +33,21 @@ export class MaintenanceNotification {
     });
   }
 
+  public static reconstitute(
+    props: MaintenanceNotificationProps,
+  ): MaintenanceNotification {
+    return new MaintenanceNotification({
+      id: props.id,
+      motorcycleId: props.motorcycleId,
+      dealershipId: props.dealershipId,
+      message: props.message,
+      isRead: props.isRead,
+      companyId: props.companyId,
+      createdAt: props.createdAt,
+      updatedAt: props.updatedAt,
+    });
+  }
+
   // Getters
   get id(): string {
     return this.props.id;

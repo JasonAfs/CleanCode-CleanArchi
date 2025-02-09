@@ -5,6 +5,7 @@ import { MotorcycleStatus } from '@domain/enums/MotorcycleEnums';
 import { VIN } from '@domain/value-objects/VIN';
 import { Model } from '@domain/value-objects/Model';
 import { MotorcycleMapper } from '../mappers/MotorcycleMapper';
+import { MaintenanceInterval } from '@domain/value-objects/MaintenanceInterval';
 
 export class PrismaMotorcycleRepository implements IMotorcycleRepository {
   constructor(private readonly prisma: PrismaClient) {}
@@ -139,6 +140,53 @@ export class PrismaMotorcycleRepository implements IMotorcycleRepository {
           dealershipId ? { dealershipId } : {},
         ],
       },
+    });
+  }
+
+  async findRequiringMaintenance(
+    currentDate: Date,
+    dealershipId?: string,
+    companyId?: string,
+  ): Promise<Motorcycle[]> {
+    const motorcycles = await this.prisma.motorcycle.findMany({
+      where: {
+        ...(dealershipId && { dealershipId }),
+        ...(companyId && { companyId }),
+        isActive: true,
+      },
+      include: {
+        maintenances: {
+          orderBy: { completedDate: 'desc' },
+          take: 1,
+        },
+      },
+    });
+
+    return motorcycles
+      .map(MotorcycleMapper.toDomain)
+      .filter((motorcycle) => motorcycle.isMaintenanceNeeded());
+  }
+
+  async findByMaintenanceInterval(
+    interval: MaintenanceInterval,
+    dealershipId?: string,
+  ): Promise<Motorcycle[]> {
+    const motorcycles = await this.prisma.motorcycle.findMany({
+      where: {
+        dealershipId,
+        isActive: true,
+      },
+    });
+    return motorcycles.map(MotorcycleMapper.toDomain);
+  }
+
+  async updateMaintenanceStatus(
+    motorcycleId: string,
+    status: MotorcycleStatus.MAINTENANCE | MotorcycleStatus.AVAILABLE,
+  ): Promise<void> {
+    await this.prisma.motorcycle.update({
+      where: { id: motorcycleId },
+      data: { status },
     });
   }
 }

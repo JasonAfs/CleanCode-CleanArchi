@@ -33,62 +33,69 @@ model User {
 }
 
 model Company {
-  id                    String              @id @default(uuid())
-  name                  String
-  registrationNumber    String              @unique
-  street                String
-  city                  String
-  postalCode            String
-  country               String
-  phone                 String
-  email                 String
-  isActive              Boolean             @default(true)
-  createdAt             DateTime            @default(now())
-  updatedAt             DateTime            @updatedAt
-  employees             User[]
-  motorcycles Motorcycle[]
-  
-  createdByDealershipId String?
-  createdByDealership   Dealership?         @relation(fields: [createdByDealershipId], references: [id])
+  id                 String       @id @default(uuid())
+  name               String
+  registrationNumber String       @unique
+  street             String
+  city               String
+  postalCode         String
+  country            String
+  phone              String
+  email              String
+  isActive           Boolean      @default(true)
+  createdAt          DateTime     @default(now())
+  updatedAt          DateTime     @updatedAt
+  employees          User[]
+  motorcycles        Motorcycle[]
+
+  createdByDealershipId   String?
+  createdByDealership     Dealership?               @relation(fields: [createdByDealershipId], references: [id])
+  MaintenanceNotification MaintenanceNotification[]
 
   @@map("companies")
 }
 
 model Dealership {
-  id          String       @id @default(uuid())
-  name        String       @unique
-  street      String
-  city        String
-  postalCode  String
-  country     String
-  phone       String
-  email       String
-  isActive    Boolean      @default(true)
-  createdAt   DateTime     @default(now())
-  updatedAt   DateTime     @updatedAt
-  employees   User[]
-  Company     Company[]
-  motorcycles Motorcycle[]
+  id                      String                    @id @default(uuid())
+  name                    String                    @unique
+  street                  String
+  city                    String
+  postalCode              String
+  country                 String
+  phone                   String
+  email                   String
+  isActive                Boolean                   @default(true)
+  createdAt               DateTime                  @default(now())
+  updatedAt               DateTime                  @updatedAt
+  employees               User[]
+  Company                 Company[]
+  motorcycles             Motorcycle[]
+  Maintenance             Maintenance[]
+  MaintenanceNotification MaintenanceNotification[]
 
   @@map("dealerships")
 }
 
 model Motorcycle {
-  id        String   @id
-  vin       String   @unique
+  id        String           @id
+  vin       String           @unique
   modelType MotorcycleModel
   year      Int
   color     String
   mileage   Int
   status    MotorcycleStatus @default(AVAILABLE)
-  isActive  Boolean  @default(true)
-  
+  isActive  Boolean          @default(true)
+
   // Holder
   dealershipId String?
   dealership   Dealership? @relation(fields: [dealershipId], references: [id])
   companyId    String?
   company      Company?    @relation(fields: [companyId], references: [id])
   assignedAt   DateTime    @default(now())
+
+  // Relation avec Maintenance
+  maintenances             Maintenance[]
+  maintenanceNotifications MaintenanceNotification[]
 
   // Timestamps
   createdAt DateTime @default(now())
@@ -106,6 +113,48 @@ model RefreshToken {
   user      User     @relation(fields: [userId], references: [id])
 
   @@map("refresh_tokens")
+}
+
+model Maintenance {
+  id            String            @id @default(uuid())
+  type          MaintenanceType
+  status        MaintenanceStatus @default(PLANNED)
+  description   String
+  mileage       Int
+  scheduledDate DateTime
+  completedDate DateTime?
+
+  // Relations
+  motorcycleId String
+  motorcycle   Motorcycle @relation(fields: [motorcycleId], references: [id])
+  dealershipId String
+  dealership   Dealership @relation(fields: [dealershipId], references: [id])
+
+  // Timestamps
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("maintenances")
+}
+
+model MaintenanceNotification {
+  id      String  @id @default(uuid())
+  message String
+  isRead  Boolean @default(false)
+
+  // Relations
+  motorcycleId String
+  motorcycle   Motorcycle @relation(fields: [motorcycleId], references: [id])
+  dealershipId String
+  dealership   Dealership @relation(fields: [dealershipId], references: [id])
+  companyId    String?
+  company      Company?   @relation(fields: [companyId], references: [id])
+
+  // Timestamps
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("maintenance_notifications")
 }
 
 enum UserRole {
@@ -130,9 +179,22 @@ enum MotorcycleModel {
 }
 
 enum MotorcycleStatus {
-  AVAILABLE
-  IN_USE
-  IN_MAINTENANCE
-  IN_TRANSIT
-  OUT_OF_SERVICE
+  AVAILABLE // Disponible pour attribution à une entreprise
+  IN_USE // Utilisée par une entreprise
+  MAINTENANCE // En maintenance
+  IN_TRANSIT // En transit entre concessions
+  OUT_OF_SERVICE // Hors service (accident, panne majeure...)
+}
+
+enum MaintenanceType {
+  PREVENTIVE
+  CORRECTIVE
+  WARRANTY
+}
+
+enum MaintenanceStatus {
+  PLANNED
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
 }
