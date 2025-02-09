@@ -30,9 +30,12 @@ export enum MotorcycleStatus {
 
 // Caractéristiques par modèle
 export interface ModelCharacteristics {
-  displacement: number; // en cc
+  displacement: number;
   category: string;
-  maintenanceInterval: number; // en km
+  maintenanceInterval: {
+    kilometers: number;
+    months: number;
+  };
 }
 
 export const MODEL_CHARACTERISTICS: Record<
@@ -42,41 +45,65 @@ export const MODEL_CHARACTERISTICS: Record<
   [MotorcycleModel.STREET_TRIPLE_765_RS]: {
     displacement: 765,
     category: 'Roadster',
-    maintenanceInterval: 10000,
+    maintenanceInterval: {
+      kilometers: 10000,
+      months: 12,
+    },
   },
   [MotorcycleModel.TIGER_900_RALLY_PRO]: {
     displacement: 900,
     category: 'Adventure',
-    maintenanceInterval: 12000,
+    maintenanceInterval: {
+      kilometers: 12000,
+      months: 12,
+    },
   },
   [MotorcycleModel.SPEED_TRIPLE_1200_RS]: {
     displacement: 1200,
     category: 'Roadster',
-    maintenanceInterval: 10000,
+    maintenanceInterval: {
+      kilometers: 10000,
+      months: 12,
+    },
   },
   [MotorcycleModel.TRIDENT_660]: {
     displacement: 660,
     category: 'Roadster',
-    maintenanceInterval: 10000,
+    maintenanceInterval: {
+      kilometers: 10000,
+      months: 12,
+    },
   },
   [MotorcycleModel.ROCKET_3_GT]: {
     displacement: 2458,
     category: 'Cruiser',
-    maintenanceInterval: 10000,
+    maintenanceInterval: {
+      kilometers: 10000,
+      months: 12,
+    },
   },
   [MotorcycleModel.BONNEVILLE_T120]: {
     displacement: 1200,
     category: 'Modern Classics',
-    maintenanceInterval: 10000,
+    maintenanceInterval: {
+      kilometers: 10000,
+      months: 12,
+    },
   },
   [MotorcycleModel.TIGER_1200_GT_EXPLORER]: {
     displacement: 1200,
     category: 'Adventure',
-    maintenanceInterval: 12000,
+    maintenanceInterval: {
+      kilometers: 12000,
+      months: 12,
+    },
   },
   [MotorcycleModel.SCRAMBLER_1200_XE]: {
     displacement: 1200,
     category: 'Modern Classics',
-    maintenanceInterval: 10000,
+    maintenanceInterval: {
+      kilometers: 10000,
+      months: 12,
+    },
   },
 };

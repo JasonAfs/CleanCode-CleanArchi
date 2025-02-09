@@ -1,50 +1,54 @@
-import { MotorcycleModel, MODEL_CHARACTERISTICS, MotorcycleModelDisplayNames } from "@domain/enums/MotorcycleEnums";
-import { InvalidModelError } from "@domain/errors/motorcycle/InvalidModelError";
-
+import {
+  MotorcycleModel,
+  MODEL_CHARACTERISTICS,
+  MotorcycleModelDisplayNames,
+} from '@domain/enums/MotorcycleEnums';
+import { InvalidModelError } from '@domain/errors/motorcycle/InvalidModelError';
 
 export class Model {
-    private constructor(
-        private readonly _modelType: MotorcycleModel,
-        private readonly _year: number,
-    ) {}
+  private constructor(
+    private readonly _modelType: MotorcycleModel,
+    private readonly _year: number,
+  ) {}
 
-    public static create(
-        modelType: MotorcycleModel,
-        year: number,
-    ): Model {
-        if (!this.isValidYear(year)) {
-            throw new InvalidModelError("Invalid year");
-        }
-
-        return new Model(modelType, year);
+  public static create(modelType: MotorcycleModel, year: number): Model {
+    if (!this.isValidYear(year)) {
+      throw new InvalidModelError('Invalid year');
     }
 
-    private static isValidYear(year: number): boolean {
-        const currentYear = new Date().getFullYear();
-        return year >= 1900 && year <= currentYear + 1;
-    }
+    return new Model(modelType, year);
+  }
 
-    get modelType(): MotorcycleModel {
-        return this._modelType;
-    }
+  private static isValidYear(year: number): boolean {
+    const currentYear = new Date().getFullYear();
+    return year >= 1900 && year <= currentYear + 1;
+  }
 
-    get year(): number {
-        return this._year;
-    }
+  get modelType(): MotorcycleModel {
+    return this._modelType;
+  }
 
-    get displacement(): number {
-        return MODEL_CHARACTERISTICS[this._modelType].displacement;
-    }
+  get year(): number {
+    return this._year;
+  }
 
-    get category(): string {
-        return MODEL_CHARACTERISTICS[this._modelType].category;
-    }
+  get displacement(): number {
+    return MODEL_CHARACTERISTICS[this._modelType].displacement;
+  }
 
-    get maintenanceInterval(): number {
-        return MODEL_CHARACTERISTICS[this._modelType].maintenanceInterval;
-    }
+  get category(): string {
+    return MODEL_CHARACTERISTICS[this._modelType].category;
+  }
 
-    public toString(): string {
-        return `${this._year} ${MotorcycleModelDisplayNames[this._modelType]}`;
-    }
+  get maintenanceInterval(): { kilometers: number; months: number } {
+    return MODEL_CHARACTERISTICS[this._modelType].maintenanceInterval;
+  }
+
+  public toString(): string {
+    return `${this._year} ${MotorcycleModelDisplayNames[this._modelType]}`;
+  }
+
+  public getType(): MotorcycleModel {
+    return this._modelType;
+  }
 }

@@ -101,7 +101,7 @@ export class PrismaMotorcycleRepository implements IMotorcycleRepository {
   async findInMaintenance(dealershipId?: string): Promise<Motorcycle[]> {
     const motorcycles = await this.prisma.motorcycle.findMany({
       where: {
-        status: MotorcycleStatus.IN_MAINTENANCE,
+        status: MotorcycleStatus.MAINTENANCE,
         dealershipId: dealershipId || undefined,
       },
     });

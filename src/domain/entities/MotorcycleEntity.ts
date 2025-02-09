@@ -13,8 +13,14 @@ import {
 import {
   MotorcycleStatus,
   MotorcycleModel,
+  MODEL_CHARACTERISTICS,
 } from '@domain/enums/MotorcycleEnums';
 import { randomUUID } from 'crypto';
+import { MaintenanceInterval } from '@domain/value-objects/MaintenanceInterval';
+import { MotorcycleMaintenance } from '@domain/aggregates/motorcycle/MotorcycleMaintenance';
+import { Maintenance } from '@domain/entities/MaintenanceEntity';
+import { MaintenanceType } from '@domain/enums/MaintenanceEnums';
+import { MaintenanceNotification } from '@domain/entities/MaintenanceNotificationEntity';
 
 export class Motorcycle {
   private readonly props: MotorcycleProps;
@@ -32,6 +38,12 @@ export class Motorcycle {
       throw new MotorcycleValidationError('Invalid mileage value');
     }
 
+    const maintenanceInterval = MaintenanceInterval.create(
+      MODEL_CHARACTERISTICS[props.model.getType()].maintenanceInterval
+        .kilometers,
+      MODEL_CHARACTERISTICS[props.model.getType()].maintenanceInterval.months,
+    );
+
     return new Motorcycle({
       ...props,
       id: randomUUID(),
@@ -40,6 +52,11 @@ export class Motorcycle {
         dealershipId: props.dealershipId,
         assignedAt: new Date(),
       },
+      maintenance: MotorcycleMaintenance.create(
+        randomUUID(),
+        maintenanceInterval,
+        undefined,
+      ),
       isActive: true,
       createdAt: new Date(),
       updatedAt: new Date(),
@@ -137,10 +154,10 @@ export class Motorcycle {
       Record<MotorcycleStatus, MotorcycleStatus[]>
     > = {
       [MotorcycleStatus.IN_USE]: [MotorcycleStatus.AVAILABLE],
-      [MotorcycleStatus.IN_MAINTENANCE]: [MotorcycleStatus.IN_USE],
+      [MotorcycleStatus.MAINTENANCE]: [MotorcycleStatus.IN_USE],
       [MotorcycleStatus.IN_TRANSIT]: [
         MotorcycleStatus.IN_USE,
-        MotorcycleStatus.IN_MAINTENANCE,
+        MotorcycleStatus.MAINTENANCE,
       ],
     };
 
@@ -192,20 +209,14 @@ export class Motorcycle {
   }
 
   // Méthodes de mise à jour
-  public updateMileage(mileage: number): void {
-    this.validateActiveState('update mileage');
-
-    if (!Motorcycle.isValidMileage(mileage)) {
-      throw new MotorcycleValidationError('Invalid mileage value');
-    }
-
-    if (mileage < this.props.mileage) {
+  public updateMileage(newMileage: number): void {
+    if (newMileage < this.props.mileage) {
       throw new MotorcycleValidationError(
         'New mileage cannot be less than current mileage',
       );
     }
 
-    this.props.mileage = mileage;
+    this.props.mileage = newMileage;
     this.updateLastModified();
   }
 
@@ -266,7 +277,7 @@ export class Motorcycle {
       );
     }
 
-    if (this.props.status === MotorcycleStatus.IN_MAINTENANCE) {
+    if (this.props.status === MotorcycleStatus.MAINTENANCE) {
       throw new MotorcycleStatusError(
         'Cannot transfer motorcycle while in maintenance',
       );
@@ -303,7 +314,7 @@ export class Motorcycle {
   public startMaintenance(): void {
     this.validateActiveState('start maintenance');
 
-    if (this.props.status === MotorcycleStatus.IN_MAINTENANCE) {
+    if (this.props.status === MotorcycleStatus.MAINTENANCE) {
       throw new MotorcycleStatusError('Motorcycle is already in maintenance');
     }
 
@@ -319,18 +330,69 @@ export class Motorcycle {
       );
     }
 
-    this.props.status = MotorcycleStatus.IN_MAINTENANCE;
+    this.props.status = MotorcycleStatus.MAINTENANCE;
     this.updateLastModified();
   }
 
   public completeMaintenance(): void {
     this.validateActiveState('complete maintenance');
 
-    if (this.props.status !== MotorcycleStatus.IN_MAINTENANCE) {
+    if (this.props.status !== MotorcycleStatus.MAINTENANCE) {
       throw new MotorcycleStatusError('Motorcycle is not in maintenance');
     }
 
     this.props.status = MotorcycleStatus.AVAILABLE;
     this.updateLastModified();
+  }
+
+  // Nouvelles méthodes pour la maintenance
+  public isMaintenanceNeeded(): boolean {
+    return this.props.maintenance.isMaintenanceNeeded(this.props.mileage);
+  }
+
+  public getNextMaintenanceDue(): {
+    dueDate: Date;
+    dueMileage: number;
+  } {
+    return this.props.maintenance.getNextMaintenanceDue(this.props.mileage);
+  }
+
+  public planMaintenance(
+    dealershipId: string,
+    scheduledDate: Date,
+    description: string,
+    type: MaintenanceType = MaintenanceType.PREVENTIVE,
+  ): void {
+    if (!this.props.isActive) {
+      throw new MotorcycleValidationError(
+        'Cannot plan maintenance for inactive motorcycle',
+      );
+    }
+
+    if (this.props.status === MotorcycleStatus.MAINTENANCE) {
+      throw new MotorcycleStatusError(
+        'Cannot plan maintenance while motorcycle is already in maintenance',
+      );
+    }
+
+    const maintenance = Maintenance.create({
+      motorcycleId: this.id,
+      dealershipId,
+      type,
+      description,
+      mileage: this.props.mileage,
+      scheduledDate,
+    });
+
+    this.props.maintenance = this.props.maintenance.addMaintenance(maintenance);
+    this.updateLastModified();
+  }
+
+  public getMaintenanceHistory(): Maintenance[] {
+    return this.props.maintenance.getAll();
+  }
+
+  public getUpcomingMaintenances(): Maintenance[] {
+    return this.props.maintenance.getUpcomingMaintenances();
   }
 }

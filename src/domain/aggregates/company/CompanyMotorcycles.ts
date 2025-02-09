@@ -54,7 +54,7 @@ export class CompanyMotorcycles {
    }
 
    public getInMaintenanceMotorcycles(): Motorcycle[] {
-       return this.getByStatus(MotorcycleStatus.IN_MAINTENANCE);
+       return this.getByStatus(MotorcycleStatus.MAINTENANCE);
    }
 
    public getInUseMotorcycles(): Motorcycle[] {

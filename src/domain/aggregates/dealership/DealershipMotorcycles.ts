@@ -50,7 +50,7 @@ export class DealershipMotorcycles {
             );
         }
 
-        if (motorcycle.status === MotorcycleStatus.IN_MAINTENANCE) {
+        if (motorcycle.status === MotorcycleStatus.MAINTENANCE) {
             throw new DealershipMotorcyclesError(
                 'Cannot remove motorcycle while it is in maintenance'
             );
@@ -87,7 +87,7 @@ export class DealershipMotorcycles {
     }
 
     public getInMaintenanceMotorcycles(): Motorcycle[] {
-        return this.getByStatus(MotorcycleStatus.IN_MAINTENANCE);
+        return this.getByStatus(MotorcycleStatus.MAINTENANCE);
     }
 
     public getInUseMotorcycles(): Motorcycle[] {
