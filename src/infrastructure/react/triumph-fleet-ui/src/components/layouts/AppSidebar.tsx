@@ -20,6 +20,7 @@ import {
   Building,
   Store,
   Truck,
+  LogOut,
 } from "lucide-react";
 import { appRoutes } from "@/navigation/routes";
 
@@ -34,7 +35,7 @@ const iconMap: { [key: string]: React.ElementType } = {
 
 export function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
   const location = useLocation();
-  const { user } = useAuth();
+  const { user, logout } = useAuth();
 
   // Filtrer les routes du sidebar :
   // - On affiche uniquement celles qui possèdent une icône (pour le menu)
@@ -82,6 +83,24 @@ export function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               ))}
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+
+        <SidebarGroup className="mt-auto">
+          <SidebarGroupContent>
+            <SidebarMenu>
+              <SidebarMenuItem>
+                <SidebarMenuButton
+                  onClick={logout}
+                  className="w-full text-red-500 hover:text-red-600"
+                >
+                  <div className="flex items-center gap-2">
+                    <LogOut className="h-4 w-4" />
+                    <span>Se déconnecter</span>
+                  </div>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
