@@ -4,6 +4,35 @@ import { TransferMotorcycleResponse } from '@/types/responses';
 import { MotorcycleStatus } from '@domain/enums/MotorcycleEnums';
 import { Motorcycle } from '@/types/motorcycle';
 
+interface CreateMotorcycleData {
+  model: {
+    type: string;
+    year: number;
+    displacement: number;
+    category: string;
+    maintenanceInterval: number;
+  };
+  vin: string;
+  mileage: number;
+  status: 'AVAILABLE' | 'MAINTENANCE';
+  holder: {
+    dealershipId: string;
+  };
+}
+
+interface UpdateMotorcycleData {
+  model: {
+    type: string;
+    year: number;
+    displacement: number;
+    category: string;
+    maintenanceInterval: number;
+  };
+  vin: string;
+  mileage: number;
+  status: 'AVAILABLE' | 'MAINTENANCE';
+}
+
 interface MotorcycleStore {
   motorcycles: Motorcycle[];
   isLoading: boolean;
@@ -13,12 +42,10 @@ interface MotorcycleStore {
     statusFilter?: MotorcycleStatus;
     includeInactive?: boolean;
   }) => Promise<void>;
-  createMotorcycle: (
-    motorcycle: Omit<Motorcycle, 'id' | 'companyId'>,
-  ) => Promise<void>;
+  createMotorcycle: (motorcycle: CreateMotorcycleData) => Promise<void>;
   updateMotorcycle: (
     id: string,
-    motorcycle: Partial<Omit<Motorcycle, 'id' | 'dealershipId' | 'companyId'>>,
+    motorcycle: UpdateMotorcycleData,
   ) => Promise<void>;
   updateMotorcycleMileage: (id: string, mileage: number) => Promise<void>;
   transferMotorcycle: (

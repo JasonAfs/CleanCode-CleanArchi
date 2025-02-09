@@ -172,6 +172,7 @@ export function Company() {
                     id: '',
                     name: '',
                     registrationNumber: '',
+                    dealershipId: '',
                     address: {
                         street: '',
                         city: '',

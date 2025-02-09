@@ -19,43 +19,39 @@ export class HttpMotorcycleService extends AxiosAuthenticationGateway {
   }
 
   async createMotorcycle(motorcycle: {
-    vin: string;
-    registrationNumber: string;
     model: {
       type: string;
       year: number;
+      displacement: number;
       category: string;
+      maintenanceInterval: number;
     };
+    vin: string;
     mileage: number;
-    dealershipId: string;
-  }): Promise<void> {
-    try {
-      await this.httpClient.post('/motorcycles', motorcycle);
-    } catch (error) {
-      console.error('Error creating motorcycle:', error);
-      throw error;
-    }
+    status: 'AVAILABLE' | 'MAINTENANCE';
+    holder: {
+      dealershipId: string;
+    };
+  }) {
+    return this.httpClient.post<Motorcycle>('/motorcycles', motorcycle);
   }
 
   async updateMotorcycle(
     id: string,
     motorcycle: {
-      vin?: string;
-      registrationNumber?: string;
-      model?: {
+      model: {
         type: string;
         year: number;
+        displacement: number;
         category: string;
+        maintenanceInterval: number;
       };
-      mileage?: number;
+      vin: string;
+      mileage: number;
+      status: 'AVAILABLE' | 'MAINTENANCE';
     },
-  ): Promise<void> {
-    try {
-      await this.httpClient.patch(`/motorcycles/${id}`, motorcycle);
-    } catch (error) {
-      console.error('Error updating motorcycle:', error);
-      throw error;
-    }
+  ) {
+    return this.httpClient.put<Motorcycle>(`/motorcycles/${id}`, motorcycle);
   }
 
   async updateMotorcycleMileage(id: string, mileage: number): Promise<void> {

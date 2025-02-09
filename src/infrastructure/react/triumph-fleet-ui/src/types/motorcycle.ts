@@ -17,19 +17,12 @@ export interface MotorcycleHolder {
 export interface Motorcycle {
   id: string;
   vin: string;
-  registrationNumber: string;
-  model: {
-    type: string;
-    year: number;
-    category: string;
-  };
-  mileage: number;
-  dealershipId: string;
-  companyId?: string;
-  status: MotorcycleStatus;
-  isActive: boolean;
+  model: MotorcycleModel;
   color: string;
+  mileage: number;
+  status: 'AVAILABLE' | 'MAINTENANCE' | 'IN_USE';
   holder: MotorcycleHolder;
-  createdAt: Date;
-  updatedAt: Date;
+  isActive: boolean;
+  createdAt: string;
+  updatedAt: string;
 }
