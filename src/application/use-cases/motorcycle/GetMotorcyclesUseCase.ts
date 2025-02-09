@@ -58,6 +58,7 @@ export class GetMotorcyclesUseCase {
           motorcycles = await this.motorcycleRepository.findByDealership(
             user.dealershipId,
           );
+          console.log(motorcycles.length);
           break;
 
         case UserRole.COMPANY_MANAGER:

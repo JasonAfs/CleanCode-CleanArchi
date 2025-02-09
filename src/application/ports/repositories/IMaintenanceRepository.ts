@@ -51,4 +51,5 @@ export interface IMaintenanceRepository {
     date: Date,
     excludeId?: string,
   ): Promise<boolean>;
+
 }

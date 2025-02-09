@@ -1,4 +1,4 @@
-import { DomainError } from "@domain/errors/DomainError";
+import { DomainError } from "../../../errors/DomainError";
 
 export class InvalidVINError extends DomainError {
     constructor(message: string) {

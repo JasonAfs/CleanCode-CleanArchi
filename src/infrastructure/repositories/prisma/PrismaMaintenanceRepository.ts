@@ -153,4 +153,5 @@ export class PrismaMaintenanceRepository implements IMaintenanceRepository {
     });
     return maintenances.map(MaintenanceMapper.toDomain);
   }
+
 }

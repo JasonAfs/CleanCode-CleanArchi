@@ -11,6 +11,7 @@ import { DealershipEdit } from '../pages/DealershipEdit';
 import { CompanyDetails } from '../components/company/CompanyDetails';
 import { CompanyEmployees } from '../components/company/CompanyEmployees';
 import { CompanyMotorcycles } from '../components/company/CompanyMotorcycles';
+import { MaintenanceList } from '../pages/MaintenanceList';
 
 export interface AppRoute {
   path: string;
@@ -124,5 +125,17 @@ export const appRoutes: AppRoute[] = [
       UserRole.COMPANY_MANAGER
     ],
     element: <CompanyMotorcycles />,
+  },
+  {
+    path: '/maintenances',
+    title: 'Maintenances',
+    icon: 'Wrench',
+    allowedRoles: [
+      UserRole.TRIUMPH_ADMIN,
+      UserRole.DEALERSHIP_MANAGER,
+      UserRole.DEALERSHIP_TECHNICIAN,
+      UserRole.COMPANY_MANAGER,
+    ],
+    element: <MaintenanceList />,
   },
 ];

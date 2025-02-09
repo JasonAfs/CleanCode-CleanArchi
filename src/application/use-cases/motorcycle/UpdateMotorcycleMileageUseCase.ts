@@ -74,7 +74,6 @@ export class UpdateMotorcycleMileageUseCase {
         }
         throw error;
       }
-      console.log('motorcycle.isMaintenanceNeeded() = ' + motorcycle.isMaintenanceNeeded());
       // Vérifier si une maintenance est nécessaire
       if (motorcycle.isMaintenanceNeeded()) {
         // Créer la maintenance

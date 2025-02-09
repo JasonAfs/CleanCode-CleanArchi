@@ -77,7 +77,7 @@ model Dealership {
 }
 
 model Motorcycle {
-  id        String           @id
+  id        String           @id @default(uuid())
   vin       String           @unique
   modelType MotorcycleModel
   year      Int

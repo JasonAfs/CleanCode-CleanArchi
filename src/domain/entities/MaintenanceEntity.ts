@@ -103,6 +103,18 @@ export class Maintenance {
     return this.props.completedDate;
   }
 
+  get startDate(): Date | undefined {
+    return this.props.startDate;
+  }
+
+  get createdAt(): Date {
+    return this.props.createdAt;
+  }
+
+  get updatedAt(): Date {
+    return this.props.updatedAt;
+  }
+
   private updateLastModified(): void {
     this.props.updatedAt = new Date();
   }

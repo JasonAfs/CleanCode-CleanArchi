@@ -1,4 +1,4 @@
-import { InvalidVINError } from "@domain/errors/value-objects/vin/InvalidVINError";
+import { InvalidVINError } from "../errors/value-objects/vin/InvalidVINError";
 
 export class VIN {
     private readonly value: string;
