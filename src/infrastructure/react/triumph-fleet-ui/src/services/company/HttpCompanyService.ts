@@ -2,6 +2,8 @@ import { AxiosAuthenticationGateway } from '@infrastructure/gateways/AxiosAuthen
 import { Company } from '@/types/company';
 import { Employee } from '@/types/employee';
 import { UserRole } from '@domain/enums/UserRole';
+import { MotorcycleStatus } from '@domain/enums/MotorcycleEnums';
+import { Motorcycle } from '@/types/motorcycle';
 
 export class HttpCompanyService extends AxiosAuthenticationGateway {
   constructor() {
@@ -121,6 +123,37 @@ export class HttpCompanyService extends AxiosAuthenticationGateway {
       return response.data;
     } catch (error) {
       console.error('Error fetching company details:', error);
+      throw error;
+    }
+  }
+
+  async getCompanyMotorcycles(
+    companyId: string,
+    params?: {
+      includeInactive?: boolean;
+      statusFilter?: MotorcycleStatus;
+    },
+  ): Promise<Motorcycle[]> {
+    try {
+      const queryParams = new URLSearchParams();
+      if (params?.includeInactive !== undefined) {
+        queryParams.append(
+          'includeInactive',
+          params.includeInactive.toString(),
+        );
+      }
+      if (params?.statusFilter) {
+        queryParams.append('statusFilter', params.statusFilter);
+      }
+
+      const url = `/companies/${companyId}/motorcycles${
+        queryParams.toString() ? `?${queryParams.toString()}` : ''
+      }`;
+
+      const response = await this.httpClient.get<Motorcycle[]>(url);
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching company motorcycles:', error);
       throw error;
     }
   }

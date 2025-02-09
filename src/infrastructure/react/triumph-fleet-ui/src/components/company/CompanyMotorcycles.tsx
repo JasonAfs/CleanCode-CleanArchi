@@ -10,13 +10,23 @@ import { Motorcycle } from '@/types/motorcycle';
 
 export function CompanyMotorcycles() {
   const { id } = useParams<{ id: string }>();
-  const { currentCompany, fetchCompanyById, isLoading, error } = useCompanyStore();
+  const { 
+    currentCompany, 
+    fetchCompanyById, 
+    companyMotorcycles,
+    fetchCompanyMotorcycles,
+    isLoading, 
+    isLoadingMotorcycles,
+    error,
+    motorcyclesError
+  } = useCompanyStore();
 
   useEffect(() => {
     if (id) {
       fetchCompanyById(id);
+      fetchCompanyMotorcycles(id);
     }
-  }, [id, fetchCompanyById]);
+  }, [id, fetchCompanyById, fetchCompanyMotorcycles]);
 
   const columns: ColumnDef<Motorcycle>[] = [
     {
@@ -48,7 +58,7 @@ export function CompanyMotorcycles() {
     },
   ];
 
-  if (isLoading) {
+  if (isLoading || isLoadingMotorcycles) {
     return (
       <div className="flex justify-center items-center min-h-screen">
         <Loader2 className="h-8 w-8 animate-spin" />
@@ -56,15 +66,20 @@ export function CompanyMotorcycles() {
     );
   }
 
-  if (error) {
+  if (error || motorcyclesError) {
     return (
       <Alert variant="destructive" className="max-w-md mx-auto mt-4">
         <AlertDescription>
-          {error}
+          {error || motorcyclesError}
           <Button 
             variant="outline" 
             className="ml-2"
-            onClick={() => id && fetchCompanyById(id)}
+            onClick={() => {
+              if (id) {
+                fetchCompanyById(id);
+                fetchCompanyMotorcycles(id);
+              }
+            }}
           >
             Réessayer
           </Button>
@@ -77,7 +92,7 @@ export function CompanyMotorcycles() {
     <div className="container mx-auto py-10">
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center space-x-4">
-          <Link to={`/company/${id}`}>
+          <Link to={`/companies/${id}`}>
             <Button variant="ghost" size="icon">
               <ArrowLeft className="h-5 w-5" />
             </Button>
@@ -99,7 +114,7 @@ export function CompanyMotorcycles() {
 
       <DataTable 
         columns={columns} 
-        data={currentCompany?.motorcycles || []} 
+        data={companyMotorcycles} 
       />
     </div>
   );

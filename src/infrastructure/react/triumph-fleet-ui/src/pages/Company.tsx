@@ -105,19 +105,19 @@ export function Company() {
                                 Modifier
                             </DropdownMenuItem>
                             <DropdownMenuItem
-                                onClick={() => navigate(`/company/${company.id}`)}
+                                onClick={() => navigate(`/companies/${company.id}`)}
                                 className="cursor-pointer"
                             >
                                 Voir les détails
                             </DropdownMenuItem>
                             <DropdownMenuItem
-                                onClick={() => navigate(`/company/${company.id}/employees`)}
+                                onClick={() => navigate(`/companies/${company.id}/employees`)}
                                 className="cursor-pointer"
                             >
                                 Gérer les employés
                             </DropdownMenuItem>
                             <DropdownMenuItem
-                                onClick={() => navigate(`/company/${company.id}/motorcycles`)}
+                                onClick={() => navigate(`/companies/${company.id}/motorcycles`)}
                                 className="cursor-pointer"
                             >
                                 Gérer les motos

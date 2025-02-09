@@ -96,7 +96,7 @@ export const appRoutes: AppRoute[] = [
     element: <DealershipFleet />,
   },
   {
-    path: '/company/:id',
+    path: '/companies/:id',
     title: 'Détails de l\'entreprise',
     allowedRoles: [
       UserRole.TRIUMPH_ADMIN,
@@ -106,7 +106,7 @@ export const appRoutes: AppRoute[] = [
     element: <CompanyDetails />,
   },
   {
-    path: '/company/:id/employees',
+    path: '/companies/:id/employees',
     title: 'Employés de l\'entreprise',
     allowedRoles: [
       UserRole.TRIUMPH_ADMIN,
@@ -116,7 +116,7 @@ export const appRoutes: AppRoute[] = [
     element: <CompanyEmployees />,
   },
   {
-    path: '/company/:id/motorcycles',
+    path: '/companies/:id/motorcycles',
     title: 'Motos de l\'entreprise',
     allowedRoles: [
       UserRole.TRIUMPH_ADMIN,

@@ -46,6 +46,9 @@ import { UserRole } from '@domain/enums/UserRole';
 
 import { GetCompaniesUseCase } from '@application/use-cases/company/GetCompaniesUseCase';
 import { GetCompaniesRequestDTO } from '../dtos/request/get-companies.request.dto';
+import { GetCompanyMotorcyclesUseCase } from '@application/use-cases/company/GetCompanyMotorcyclesUseCase';
+import { GetCompanyMotorcyclesRequestDTO } from '../dtos/request/get-company-motorcycles.request.dto';
+import { GetCompanyByIdUseCase } from '@application/use-cases/company/GetCompanyByIdUseCase';
 
 @ApiTags('companies')
 @ApiBearerAuth()
@@ -60,6 +63,8 @@ export class CompanyController {
     private readonly addEmployeeUseCase: AddCompanyEmployeeUseCase,
     private readonly removeEmployeeUseCase: RemoveCompanyEmployeeUseCase,
     private readonly getCompaniesUseCase: GetCompaniesUseCase,
+    private readonly getCompanyMotorcyclesUseCase: GetCompanyMotorcyclesUseCase,
+    private readonly getCompanyByIdUseCase: GetCompanyByIdUseCase,
   ) {}
 
   @Post()
@@ -408,6 +413,99 @@ export class CompanyController {
       }
       throw new BadRequestException(
         `Failed to remove employee from company: ${error.message}`,
+      );
+    }
+  }
+
+  @Get(':id/motorcycles')
+  @ApiResponse({
+    status: 200,
+    description: 'Retrieved company motorcycles successfully',
+  })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  @ApiResponse({ status: 404, description: 'Company not found' })
+  @ApiParam({ name: 'id', type: String })
+  async getCompanyMotorcycles(
+    @Request() req: AuthenticatedRequest,
+    @Param('id') companyId: string,
+    @Query() query: GetCompanyMotorcyclesRequestDTO,
+  ) {
+    try {
+      const result = await this.getCompanyMotorcyclesUseCase.execute({
+        companyId,
+        userId: req.user.userId,
+        userRole: req.user.role,
+        userDealershipId: req.user.userDealershipId,
+        userCompanyId: req.user.userCompanyId,
+        includeInactive: query.includeInactive,
+        statusFilter: query.statusFilter,
+      });
+
+      if (result instanceof Error) {
+        if (result instanceof UnauthorizedError) {
+          throw new UnauthorizedException(result.message);
+        }
+        if (result instanceof CompanyValidationError) {
+          throw new BadRequestException(result.message);
+        }
+        throw new BadRequestException('Failed to retrieve company motorcycles');
+      }
+
+      return result;
+    } catch (err) {
+      const error = err as Error;
+      if (
+        error instanceof UnauthorizedException ||
+        error instanceof BadRequestException
+      ) {
+        throw error;
+      }
+      throw new BadRequestException(
+        `Failed to retrieve company motorcycles: ${error.message}`,
+      );
+    }
+  }
+
+  @Get(':id')
+  @ApiResponse({ status: 200, description: 'Company retrieved successfully' })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  @ApiResponse({ status: 404, description: 'Company not found' })
+  @ApiParam({ name: 'id', type: String })
+  async getCompanyById(
+    @Request() req: AuthenticatedRequest,
+    @Param('id') id: string,
+  ) {
+    try {
+      const result = await this.getCompanyByIdUseCase.execute({
+        companyId: id,
+        userId: req.user.userId,
+        userRole: req.user.role,
+        userDealershipId: req.user.userDealershipId,
+        userCompanyId: req.user.userCompanyId,
+      });
+
+      if (result instanceof Error) {
+        if (result instanceof UnauthorizedError) {
+          throw new UnauthorizedException(result.message);
+        }
+        if (result instanceof CompanyValidationError) {
+          throw new NotFoundException(result.message);
+        }
+        throw new BadRequestException(result.message);
+      }
+
+      return result;
+    } catch (err) {
+      const error = err as Error;
+      if (
+        error instanceof UnauthorizedException ||
+        error instanceof NotFoundException ||
+        error instanceof BadRequestException
+      ) {
+        throw error;
+      }
+      throw new BadRequestException(
+        `Failed to retrieve company: ${error.message}`,
       );
     }
   }

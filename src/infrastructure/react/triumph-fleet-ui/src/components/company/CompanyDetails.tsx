@@ -11,10 +11,12 @@ import {
 } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { Phone, Mail, MapPin, ArrowLeft, Edit, Users, Bike } from 'lucide-react';
+import { useCompanyDialogStore } from '@/components/company/EditCompanyDialog';
 
 export function CompanyDetails() {
   const { id } = useParams<{ id: string }>();
   const { currentCompany, fetchCompanyById, isLoading, error } = useCompanyStore();
+  console.log(currentCompany?.address);
 
   useEffect(() => {
     if (id) {
@@ -38,7 +40,7 @@ export function CompanyDetails() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div className="flex items-center space-x-4">
-          <Link to="/company">
+          <Link to="/companies">
             <Button variant="ghost" size="icon">
               <ArrowLeft className="h-5 w-5" />
             </Button>
@@ -46,13 +48,13 @@ export function CompanyDetails() {
           <h1 className="text-3xl font-bold">{currentCompany.name}</h1>
         </div>
         <div className="flex space-x-4">
-          <Link to={`/company/${id}/employees`}>
+          <Link to={`/companies/${id}/employees`}>
             <Button variant="outline" className="flex items-center space-x-2">
               <Users className="h-4 w-4" />
               <span>Employés</span>
             </Button>
           </Link>
-          <Link to={`/company/${id}/motorcycles`}>
+          <Link to={`/companies/${id}/motorcycles`}>
             <Button variant="outline" className="flex items-center space-x-2">
               <Bike className="h-4 w-4" />
               <span>Motos</span>

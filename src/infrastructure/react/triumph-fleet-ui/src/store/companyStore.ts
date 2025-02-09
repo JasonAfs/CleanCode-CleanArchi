@@ -2,6 +2,8 @@
 import { create } from 'zustand';
 import { Company } from '@/types/company';
 import { HttpCompanyService } from '@/services/company/HttpCompanyService';
+import { MotorcycleStatus } from '@domain/enums/MotorcycleEnums';
+import { Motorcycle } from '@/types/motorcycle';
 
 interface CompanyStore {
   companies: Company[];
@@ -13,6 +15,16 @@ interface CompanyStore {
   deleteCompany: (id: string) => Promise<void>;
   currentCompany: Company | null;
   fetchCompanyById: (id: string) => Promise<void>;
+  companyMotorcycles: Motorcycle[];
+  isLoadingMotorcycles: boolean;
+  motorcyclesError: string | null;
+  fetchCompanyMotorcycles: (
+    companyId: string,
+    params?: {
+      includeInactive?: boolean;
+      statusFilter?: MotorcycleStatus;
+    },
+  ) => Promise<void>;
 }
 
 export const useCompanyStore = create<CompanyStore>((set, get) => {
@@ -23,6 +35,9 @@ export const useCompanyStore = create<CompanyStore>((set, get) => {
     isLoading: false,
     error: null,
     currentCompany: null,
+    companyMotorcycles: [],
+    isLoadingMotorcycles: false,
+    motorcyclesError: null,
 
     fetchCompanies: async () => {
       if (get().isLoading) return;
@@ -117,6 +132,33 @@ export const useCompanyStore = create<CompanyStore>((set, get) => {
         throw error;
       } finally {
         set({ isLoading: false });
+      }
+    },
+
+    fetchCompanyMotorcycles: async (companyId, params) => {
+      if (get().isLoadingMotorcycles) return;
+
+      set({ isLoadingMotorcycles: true, motorcyclesError: null });
+      try {
+        const motorcycles = await companyService.getCompanyMotorcycles(
+          companyId,
+          params,
+        );
+        set({ companyMotorcycles: motorcycles });
+      } catch (error) {
+        let errorMessage =
+          'Une erreur est survenue lors du chargement des motos';
+        if (error instanceof Error) {
+          if (error.message.includes('401')) {
+            errorMessage = 'Session expirée. Veuillez vous reconnecter.';
+          } else {
+            errorMessage = error.message;
+          }
+        }
+        set({ motorcyclesError: errorMessage });
+        throw error;
+      } finally {
+        set({ isLoadingMotorcycles: false });
       }
     },
   };

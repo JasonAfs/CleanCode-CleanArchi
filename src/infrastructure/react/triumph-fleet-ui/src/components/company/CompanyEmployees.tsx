@@ -6,7 +6,15 @@ import { DataTable } from '@/components/ui/data-table';
 import { ColumnDef } from '@tanstack/react-table';
 import { ArrowLeft, Plus, Loader2 } from 'lucide-react';
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Employee } from '@/types/employee';
+
+type EmployeeData = {
+  id: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  role: string;
+  isActive: boolean;
+};
 
 export function CompanyEmployees() {
   const { id } = useParams<{ id: string }>();
@@ -18,7 +26,7 @@ export function CompanyEmployees() {
     }
   }, [id, fetchCompanyById]);
 
-  const columns: ColumnDef<Employee>[] = [
+  const columns: ColumnDef<EmployeeData>[] = [
     {
       accessorKey: 'firstName',
       header: 'Prénom',
@@ -81,7 +89,7 @@ export function CompanyEmployees() {
     <div className="container mx-auto py-10">
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center space-x-4">
-          <Link to={`/company/${id}`}>
+          <Link to={`/companies/${id}`}>
             <Button variant="ghost" size="icon">
               <ArrowLeft className="h-5 w-5" />
             </Button>
@@ -103,7 +111,7 @@ export function CompanyEmployees() {
 
       <DataTable 
         columns={columns} 
-        data={currentCompany?.employees || []} 
+        data={currentCompany?.employees as EmployeeData[] || []} 
       />
     </div>
   );

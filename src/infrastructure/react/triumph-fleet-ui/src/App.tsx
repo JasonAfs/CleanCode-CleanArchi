@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
+import { Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider } from "./providers/AuthProvider";
 import { LoginForm } from "./components/auth/LoginForm";
 import { RegisterForm } from "./components/auth/RegisterForm";
@@ -9,6 +9,7 @@ import { UserRole } from "@domain/enums/UserRole";
 import { CompanyDetails } from '@/components/company/CompanyDetails';
 import { CompanyEmployees } from '@/components/company/CompanyEmployees';
 import { CompanyMotorcycles } from '@/components/company/CompanyMotorcycles';
+import { Company } from '@/pages/Company';
 
 interface RoleBasedRouteProps {
   children: React.ReactNode;
@@ -62,19 +63,18 @@ const AppRoutes = () => {
       <Route path="*" element={<Navigate to="/dashboard" replace />} />
 
       {/* Nouvelles routes */}
-      <Route path="/company/:id" element={<CompanyDetails />} />
-      <Route path="/company/:id/employees" element={<CompanyEmployees />} />
-      <Route path="/company/:id/motorcycles" element={<CompanyMotorcycles />} />
+      <Route path="/companies/:id" element={<CompanyDetails />} />
+      <Route path="/companies/:id/employees" element={<CompanyEmployees />} />
+      <Route path="/companies/:id/motorcycles" element={<CompanyMotorcycles />} />
+      <Route path="/companies" element={<Company />} />
     </Routes>
   );
 };
 
 export const App = () => {
   return (
-    <Router>
-      <AuthProvider>
-        <AppRoutes />
-      </AuthProvider>
-    </Router>
+    <AuthProvider>
+      <AppRoutes />
+    </AuthProvider>
   );
 };
