@@ -16,6 +16,7 @@ import { ColumnDef } from '@tanstack/react-table';
 import { Loader2 } from 'lucide-react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import type { Maintenance } from '@/store/maintenanceStore';
+import { useNavigate } from 'react-router-dom';
 
 export function MaintenanceList() {
   const { maintenances, isLoading, error, fetchMaintenances } = useMaintenanceStore();
@@ -25,6 +26,7 @@ export function MaintenanceList() {
     status: '',
     type: '',
   });
+  const navigate = useNavigate();
 
   const columns: ColumnDef<Maintenance>[] = [
     {
@@ -57,6 +59,17 @@ export function MaintenanceList() {
       accessorKey: 'mileage',
       header: 'Kilométrage',
       cell: ({ row }) => `${row.original.mileage} km`,
+    },
+    {
+      id: 'actions',
+      cell: ({ row }) => (
+        <Button
+          variant="ghost"
+          onClick={() => navigate(`/maintenances/${row.original.id}`)}
+        >
+          Voir détails
+        </Button>
+      ),
     },
   ];
 

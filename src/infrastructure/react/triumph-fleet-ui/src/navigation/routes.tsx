@@ -13,6 +13,7 @@ import { CompanyEmployees } from '../components/company/CompanyEmployees';
 import { CompanyMotorcycles } from '../components/company/CompanyMotorcycles';
 import { MaintenanceList } from '../pages/MaintenanceList';
 import { MaintenanceNotifications } from '../pages/MaintenanceNotifications';
+import { MaintenanceDetails } from '../pages/MaintenanceDetails';
 
 export interface AppRoute {
   path: string;
@@ -138,6 +139,17 @@ export const appRoutes: AppRoute[] = [
       UserRole.COMPANY_MANAGER,
     ],
     element: <MaintenanceList />,
+  },
+  {
+    path: '/maintenances/:id',
+    title: 'Détails de la maintenance',
+    allowedRoles: [
+      UserRole.TRIUMPH_ADMIN,
+      UserRole.DEALERSHIP_MANAGER,
+      UserRole.DEALERSHIP_TECHNICIAN,
+      UserRole.COMPANY_MANAGER,
+    ],
+    element: <MaintenanceDetails />,
   },
   {
     path: '/maintenance/notifications',

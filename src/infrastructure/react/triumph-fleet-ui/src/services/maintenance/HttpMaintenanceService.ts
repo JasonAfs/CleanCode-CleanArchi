@@ -57,4 +57,16 @@ export class HttpMaintenanceService extends AxiosAuthenticationGateway {
       throw error;
     }
   }
+
+  async getMaintenanceDetails(maintenanceId: string): Promise<Maintenance> {
+    try {
+      const { data } = await this.httpClient.get<Maintenance>(
+        `/maintenances/${maintenanceId}`,
+      );
+      return data;
+    } catch (error) {
+      console.error('Error fetching maintenance details:', error);
+      throw error;
+    }
+  }
 }
