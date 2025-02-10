@@ -29,27 +29,27 @@ export class AuthorizationService implements IAuthorizationService {
     context: AuthorizationContext,
     requiredPermission: Permission,
   ): boolean {
-    // 1. Vérification des permissions de base du rôle
+
     const userPermissions = this.permissionRegistry.get(context.userRole);
     if (!userPermissions?.has(requiredPermission)) {
       return false;
     }
 
     try {
-      // 2. Récupération et application des règles spécifiques
+
       const ruleType = PermissionRuleMapper.getRuleType(requiredPermission);
       const [domain] = ruleType.split('.') as [keyof OperationCheckers];
 
-      // 3. Vérification avec le checker approprié
+
       const checker = this.operationCheckers[domain];
       if (checker) {
         return checker.verifyAccess(context, requiredPermission);
       }
 
-      // 4. Fallback pour les permissions sans règles spécifiques
+
       return true;
     } catch {
-      // 5. Si aucune règle n'est mappée, on considère que c'est une permission simple
+
       return true;
     }
   }

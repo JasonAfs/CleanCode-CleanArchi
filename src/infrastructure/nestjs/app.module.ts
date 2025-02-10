@@ -6,6 +6,8 @@ import { DealershipModule } from './dealership/dealership.module';
 import { MotorcycleModule } from './motorcycle/motorcycle.module';
 import { MaintenanceModule } from './maintenance/maintenance.module';
 import { MaintenanceNotificationModule } from './maintenance-notification/maintenance-notification.module';
+import { SparePartModule } from './spare-part/spare-part.module';
+import { SparePartOrderModule } from './spare-part-order/spare-part-order.module';
 
 @Module({
   imports: [
@@ -16,6 +18,8 @@ import { MaintenanceNotificationModule } from './maintenance-notification/mainte
     MotorcycleModule,
     MaintenanceModule,
     MaintenanceNotificationModule,
+    SparePartModule,
+    SparePartOrderModule,
   ],
 })
 export class AppModule {}

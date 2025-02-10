@@ -72,6 +72,7 @@ model Dealership {
   motorcycles             Motorcycle[]
   Maintenance             Maintenance[]
   MaintenanceNotification MaintenanceNotification[]
+  stocks                  DealershipStock[]
 
   @@map("dealerships")
 }
@@ -116,13 +117,14 @@ model RefreshToken {
 }
 
 model Maintenance {
-  id            String            @id @default(uuid())
-  type          MaintenanceType
-  status        MaintenanceStatus @default(PLANNED)
-  description   String
-  mileage       Int
-  scheduledDate DateTime
-  completedDate DateTime?
+  id             String                     @id @default(uuid())
+  type           MaintenanceType
+  status         MaintenanceStatus          @default(PLANNED)
+  description    String
+  mileage        Int
+  scheduledDate  DateTime
+  completedDate  DateTime?
+  usedSpareParts MaintenanceUsedSparePart[]
 
   // Relations
   motorcycleId String
@@ -155,6 +157,101 @@ model MaintenanceNotification {
   updatedAt DateTime @updatedAt
 
   @@map("maintenance_notifications")
+}
+
+model SparePart {
+  id               String            @id @default(uuid())
+  reference        String            @unique
+  name             String
+  category         SparePartCategory
+  description      String
+  manufacturer     String
+  compatibleModels String[]
+  minimumThreshold Int
+  unitPrice        Float
+  isActive         Boolean           @default(true)
+
+  // Relations
+  stocks            DealershipStock[]
+  usedInMaintenance MaintenanceUsedSparePart[]
+
+  // Timestamps
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("spare_parts")
+}
+
+model DealershipStock {
+  id           String @id @default(uuid())
+  dealershipId String
+  sparePartId  String
+  quantity     Int
+  threshold    Int
+
+  // Relations
+  dealership     Dealership       @relation(fields: [dealershipId], references: [id])
+  sparePart      SparePart        @relation(fields: [sparePartId], references: [id])
+  stockMovements StockMovement[]
+  orders         SparePartOrder[]
+
+  // Timestamps
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([dealershipId, sparePartId])
+  @@map("dealership_stocks")
+}
+
+model StockMovement {
+  id                String            @id @default(uuid())
+  dealershipStockId String
+  quantity          Int
+  type              StockMovementType
+  reason            String
+
+  // Relations
+  dealershipStock DealershipStock @relation(fields: [dealershipStockId], references: [id])
+
+  // Timestamps
+  createdAt DateTime @default(now())
+
+  @@map("stock_movements")
+}
+
+model SparePartOrder {
+  id                    String      @id @default(uuid())
+  dealershipStockId     String
+  quantity              Int
+  unitPrice             Float
+  status                OrderStatus @default(PENDING)
+  estimatedDeliveryDate DateTime?
+  deliveredAt           DateTime?
+
+  // Relations
+  dealershipStock DealershipStock @relation(fields: [dealershipStockId], references: [id])
+
+  // Timestamps
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("spare_part_orders")
+}
+
+model MaintenanceUsedSparePart {
+  id            String   @id @default(uuid())
+  maintenanceId String
+  sparePartId   String
+  quantity      Int
+  unitPrice     Float
+  totalPrice    Float
+  usedAt        DateTime @default(now())
+
+  // Relations
+  maintenance Maintenance @relation(fields: [maintenanceId], references: [id])
+  sparePart   SparePart   @relation(fields: [sparePartId], references: [id])
+
+  @@map("maintenance_used_spare_parts")
 }
 
 enum UserRole {
@@ -196,5 +293,28 @@ enum MaintenanceStatus {
   PLANNED
   IN_PROGRESS
   COMPLETED
+  CANCELLED
+}
+
+enum SparePartCategory {
+  FILTER
+  TIRE
+  BRAKE
+  ENGINE
+  TRANSMISSION
+  ELECTRICAL
+  OTHER
+}
+
+enum StockMovementType {
+  IN
+  OUT
+}
+
+enum OrderStatus {
+  PENDING
+  CONFIRMED
+  SHIPPED
+  DELIVERED
   CANCELLED
 }

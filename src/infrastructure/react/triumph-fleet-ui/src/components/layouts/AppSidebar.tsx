@@ -23,6 +23,8 @@ import {
   LogOut,
   Wrench,
   Bell,
+  Drill,
+  ShoppingCart
 } from "lucide-react";
 import { appRoutes } from "@/navigation/routes";
 
@@ -35,6 +37,8 @@ const iconMap: { [key: string]: React.ElementType } = {
   Truck: Truck,
   Wrench: Wrench,
   Bell: Bell,
+  Drill: Drill,
+  ShoppingCart: ShoppingCart,
 };
 
 export function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {

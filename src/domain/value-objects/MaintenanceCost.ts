@@ -1,5 +1,4 @@
 import { DomainError } from '@domain/errors/DomainError';
-import { IMaintenanceCostProps } from '@domain/interfaces/maintenance/IMaintenanceCostProps';
 
 export class MaintenanceCostError extends DomainError {
   constructor(message: string) {
@@ -8,52 +7,61 @@ export class MaintenanceCostError extends DomainError {
 }
 
 export class MaintenanceCost {
-  private readonly props: IMaintenanceCostProps;
-
-  private constructor(props: IMaintenanceCostProps) {
-    this.props = props;
-  }
-
-  public static create(props: IMaintenanceCostProps): MaintenanceCost {
-    if (props.laborCost < 0) {
+  private constructor(
+    private readonly laborCost: number,
+    private readonly taxAmount: number,
+    private readonly partsCost: number,
+    private readonly currency: string = 'EUR',
+  ) {
+    if (laborCost < 0) {
       throw new MaintenanceCostError('Labor cost cannot be negative');
     }
-
-    if (props.partsCost < 0) {
+    if (partsCost < 0) {
       throw new MaintenanceCostError('Parts cost cannot be negative');
     }
-
-    if (props.taxRate && (props.taxRate < 0 || props.taxRate > 100)) {
-      throw new MaintenanceCostError('Tax rate must be between 0 and 100');
+    if (taxAmount < 0) {
+      throw new MaintenanceCostError('Tax amount cannot be negative');
     }
+  }
 
-    return new MaintenanceCost(props);
+  public static create(props: {
+    laborCost: number;
+    taxAmount: number;
+    partsCost: number;
+    currency?: string;
+  }): MaintenanceCost {
+    return new MaintenanceCost(
+      props.laborCost,
+      props.taxAmount,
+      props.partsCost,
+      props.currency,
+    );
+  }
+
+  get totalCost(): number {
+    return this.laborCost + this.taxAmount + this.partsCost;
   }
 
   // Getters
-  get laborCost(): number {
-    return this.props.laborCost;
+  get maintenanceLaborCost(): number {
+    return this.laborCost;
   }
 
-  get partsCost(): number {
-    return this.props.partsCost;
+  get maintenanceTaxAmount(): number {
+    return this.taxAmount;
   }
 
-  get currency(): string {
-    return this.props.currency;
+  get maintenancePartsCost(): number {
+    return this.partsCost;
   }
 
-  get taxRate(): number {
-    return this.props.taxRate ?? 0;
+  get maintenanceCurrency(): string {
+    return this.currency;
   }
 
   // Calculs
   get subtotal(): number {
     return this.laborCost + this.partsCost;
-  }
-
-  get taxAmount(): number {
-    return this.subtotal * (this.taxRate / 100);
   }
 
   get total(): number {

@@ -139,17 +139,18 @@ export class GetMaintenanceDetailsUseCase {
       startDate: maintenance.startDate,
       completedDate: maintenance.completedDate,
       spareParts: maintenance.getSpareParts().map((part) => ({
-        reference: part.reference,
-        name: part.name,
+        reference: part.sparePartReference,
+        name: part.sparePartName,
         quantity: part.quantity,
         unitPrice: part.unitPrice,
         totalPrice: part.totalPrice,
       })),
       costs: maintenance.getCosts() && {
-        laborCost: maintenance.getCosts()!.laborCost,
-        partsCost: maintenance.getCosts()!.partsCost,
+        laborCost: maintenance.getCosts()!.maintenanceLaborCost,
+        partsCost: maintenance.getCosts()!.maintenancePartsCost,
         total:
-          maintenance.getCosts()!.laborCost + maintenance.getCosts()!.partsCost,
+          maintenance.getCosts()!.maintenanceLaborCost +
+          maintenance.getCosts()!.maintenancePartsCost,
       },
       recommendations: maintenance.getRecommendations().map((rec) => ({
         description: rec.description,

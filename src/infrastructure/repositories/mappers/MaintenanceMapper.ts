@@ -20,6 +20,7 @@ export class MaintenanceMapper {
       createdAt: prismaMaintenance.createdAt,
       updatedAt: prismaMaintenance.updatedAt,
       spareParts: [],
+      usedSpareParts: [],
       recommendations: [],
     });
   }

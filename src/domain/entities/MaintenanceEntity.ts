@@ -21,6 +21,14 @@ export class MaintenanceValidationError extends DomainError {
   }
 }
 
+interface UsedSparePart {
+  sparePart: SparePart;
+  quantity: number;
+  unitPrice: number;
+  totalPrice: number;
+  usedAt: Date;
+}
+
 export class Maintenance {
   private readonly props: IMaintenanceProps;
 
@@ -57,6 +65,7 @@ export class Maintenance {
       status: MaintenanceStatus.PLANNED,
       spareParts: [],
       recommendations: [],
+      usedSpareParts: [],
       createdAt: new Date(),
       updatedAt: new Date(),
     });
@@ -160,7 +169,7 @@ export class Maintenance {
       );
     }
     this.props.spareParts = this.props.spareParts.filter(
-      (part) => part.reference !== reference,
+      (part) => part.sparePartReference !== reference,
     );
     this.updateLastModified();
   }
@@ -190,6 +199,69 @@ export class Maintenance {
     return this.props.costs;
   }
 
+  public addUsedSparePart(
+    sparePart: SparePart,
+    quantity: number,
+    unitPrice: number,
+  ): void {
+    if (this.props.status !== MaintenanceStatus.IN_PROGRESS) {
+      throw new MaintenanceValidationError(
+        'Cannot add spare parts unless maintenance is in progress',
+      );
+    }
+
+    if (quantity <= 0) {
+      throw new MaintenanceValidationError('Quantity must be greater than 0');
+    }
+
+    if (unitPrice < 0) {
+      throw new MaintenanceValidationError('Unit price cannot be negative');
+    }
+
+    const usedSparePart: UsedSparePart = {
+      sparePart,
+      quantity,
+      unitPrice,
+      totalPrice: quantity * unitPrice,
+      usedAt: new Date(),
+    };
+
+    this.props.usedSpareParts.push(usedSparePart);
+    this.updateLastModified();
+  }
+
+  public removeUsedSparePart(sparePartReference: string): void {
+    if (this.props.status !== MaintenanceStatus.IN_PROGRESS) {
+      throw new MaintenanceValidationError(
+        'Cannot remove spare parts unless maintenance is in progress',
+      );
+    }
+
+    const initialLength = this.props.usedSpareParts.length;
+    this.props.usedSpareParts = this.props.usedSpareParts.filter(
+      (part) => part.sparePart.sparePartReference !== sparePartReference,
+    );
+
+    if (this.props.usedSpareParts.length === initialLength) {
+      throw new MaintenanceValidationError(
+        'Spare part not found in this maintenance',
+      );
+    }
+
+    this.updateLastModified();
+  }
+
+  public getUsedSpareParts(): UsedSparePart[] {
+    return [...this.props.usedSpareParts];
+  }
+
+  public getTotalSparePartsCost(): number {
+    return this.props.usedSpareParts.reduce(
+      (total, part) => total + part.totalPrice,
+      0,
+    );
+  }
+
   public complete(): void {
     if (this.props.status !== MaintenanceStatus.IN_PROGRESS) {
       throw new MaintenanceValidationError(
@@ -203,9 +275,36 @@ export class Maintenance {
       );
     }
 
+    if (this.props.costs) {
+      const totalSparePartsCost = this.getTotalSparePartsCost();
+      this.props.costs = MaintenanceCost.create({
+        ...this.props.costs,
+        laborCost: this.props.costs.maintenanceLaborCost,
+        taxAmount:
+          this.props.costs.maintenanceTaxAmount + totalSparePartsCost * 0.2,
+        partsCost: totalSparePartsCost,
+      });
+    }
+
     this.props.status = MaintenanceStatus.COMPLETED;
     this.props.completedDate = new Date();
     this.updateLastModified();
+  }
+
+  public getCostSummary(): {
+    laborCost: number;
+    sparePartsCost: number;
+    totalCost: number;
+  } {
+    const sparePartsCost = this.getTotalSparePartsCost();
+    const laborCost = this.props.costs?.maintenanceLaborCost || 0;
+    const taxAmount = this.props.costs?.maintenanceTaxAmount || 0;
+
+    return {
+      laborCost,
+      sparePartsCost,
+      totalCost: laborCost + sparePartsCost + taxAmount,
+    };
   }
 
   public addRecommendation(recommendation: TechnicianRecommendation): void {

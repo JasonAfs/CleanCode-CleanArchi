@@ -14,6 +14,9 @@ import { CompanyMotorcycles } from '../components/company/CompanyMotorcycles';
 import { MaintenanceList } from '../pages/MaintenanceList';
 import { MaintenanceNotifications } from '../pages/MaintenanceNotifications';
 import { MaintenanceDetails } from '../pages/MaintenanceDetails';
+import { SpareParts } from '@/pages/SpareParts';
+import { DealershipSparePartStock } from '../pages/dealership/DealershipSparePartStock';
+import { SparePartOrderValidation } from '../pages/admin/SparePartOrderValidation';
 
 export interface AppRoute {
   path: string;
@@ -163,4 +166,29 @@ export const appRoutes: AppRoute[] = [
     ],
     element: <MaintenanceNotifications />,
   },
+  {
+    path: '/spare-parts',
+    title: 'Catalogue Pièces',
+    icon: 'Drill',
+    allowedRoles: [UserRole.TRIUMPH_ADMIN, UserRole.DEALERSHIP_MANAGER],
+    element: <SpareParts />,
+  },
+  {
+    path: '/spare-parts/stock',
+    title: 'Stock & Commandes',
+    icon: 'ShoppingCart',
+    allowedRoles: [
+      UserRole.DEALERSHIP_MANAGER,
+      UserRole.DEALERSHIP_STOCK_MANAGER,
+      UserRole.DEALERSHIP_TECHNICIAN
+    ],
+    element: <DealershipSparePartStock />,
+  },
+  {
+    path: '/spare-parts/orders/validation',
+    title: 'Validation Commandes',
+    icon: 'CheckSquare',
+    allowedRoles: [UserRole.TRIUMPH_ADMIN],
+    element: <SparePartOrderValidation />,
+  }
 ];

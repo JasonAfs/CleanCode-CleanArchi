@@ -1,5 +1,17 @@
 import { DomainError } from '@domain/errors/DomainError';
 import { ISparePartProps } from '@domain/interfaces/maintenance/ISparePartProps';
+import { Model } from '@domain/value-objects/Model';
+import { MotorcycleModel } from '@domain/enums/MotorcycleEnums';
+
+export enum SparePartCategory {
+  FILTER = 'FILTER',
+  TIRE = 'TIRE',
+  BRAKE = 'BRAKE',
+  ENGINE = 'ENGINE',
+  TRANSMISSION = 'TRANSMISSION',
+  ELECTRICAL = 'ELECTRICAL',
+  OTHER = 'OTHER',
+}
 
 export class SparePartError extends DomainError {
   constructor(message: string) {
@@ -7,60 +19,115 @@ export class SparePartError extends DomainError {
   }
 }
 
-export class SparePart {
-  private readonly props: ISparePartProps;
+export interface SparePartProps {
+  reference: string;
+  name: string;
+  category: SparePartCategory;
+  description: string;
+  manufacturer: string;
+  compatibleModels: MotorcycleModel[];
+  minimumStockThreshold: number;
+  unitPrice: number;
+  isActive: boolean;
+  createdAt: Date;
+  updatedAt: Date;
+}
 
-  private constructor(props: ISparePartProps) {
+export class SparePart {
+  private readonly props: SparePartProps;
+
+  private constructor(props: SparePartProps) {
     this.props = props;
   }
 
-  public static create(props: ISparePartProps): SparePart {
-    // Validations
-    if (!props.reference || props.reference.trim().length === 0) {
-      throw new SparePartError('Reference is required');
-    }
-
-    if (!props.name || props.name.trim().length === 0) {
-      throw new SparePartError('Name is required');
-    }
-
-    if (props.quantity <= 0) {
-      throw new SparePartError('Quantity must be greater than 0');
-    }
-
-    if (props.unitPrice < 0) {
-      throw new SparePartError('Unit price cannot be negative');
-    }
-
+  public static create(
+    props: Omit<SparePartProps, 'isActive' | 'createdAt' | 'updatedAt'>,
+  ): SparePart {
     return new SparePart({
       ...props,
-      reference: props.reference.trim(),
-      name: props.name.trim(),
+      isActive: true,
+      createdAt: new Date(),
+      updatedAt: new Date(),
     });
   }
 
   // Getters
-  get reference(): string {
+  get sparePartReference(): string {
     return this.props.reference;
   }
 
-  get name(): string {
+  get sparePartName(): string {
     return this.props.name;
   }
 
+  get sparePartCategory(): SparePartCategory {
+    return this.props.category;
+  }
+
   get quantity(): number {
-    return this.props.quantity;
+    // This property is not provided in the constructor or the create method
+    throw new Error(
+      'Quantity is not provided in the constructor or create method',
+    );
   }
 
   get unitPrice(): number {
-    return this.props.unitPrice;
+    // This property is not provided in the constructor or the create method
+    throw new Error(
+      'Unit price is not provided in the constructor or create method',
+    );
   }
 
   get currency(): string {
-    return this.props.currency;
+    // This property is not provided in the constructor or the create method
+    throw new Error(
+      'Currency is not provided in the constructor or create method',
+    );
   }
 
   get totalPrice(): number {
-    return this.quantity * this.unitPrice;
+    // This property is not provided in the constructor or the create method
+    throw new Error(
+      'Total price is not provided in the constructor or create method',
+    );
+  }
+
+  get sparePartDescription(): string {
+    return this.props.description;
+  }
+
+  get sparePartManufacturer(): string {
+    return this.props.manufacturer;
+  }
+
+  get sparePartCompatibleModels(): MotorcycleModel[] {
+    return this.props.compatibleModels;
+  }
+
+  get sparePartMinimumThreshold(): number {
+    return this.props.minimumStockThreshold;
+  }
+
+  get sparePartUnitPrice(): number {
+    return this.props.unitPrice;
+  }
+
+  get isActive(): boolean {
+    return this.props.isActive;
+  }
+
+  get createdAt(): Date {
+    return this.props.createdAt;
+  }
+
+  get updatedAt(): Date {
+    return this.props.updatedAt;
+  }
+
+  public getPrice(): number {
+    // This property is not provided in the constructor or the create method
+    throw new Error(
+      'Price is not provided in the constructor or create method',
+    );
   }
 }
