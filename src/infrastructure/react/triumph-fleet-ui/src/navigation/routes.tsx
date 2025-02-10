@@ -12,6 +12,7 @@ import { CompanyDetails } from '../components/company/CompanyDetails';
 import { CompanyEmployees } from '../components/company/CompanyEmployees';
 import { CompanyMotorcycles } from '../components/company/CompanyMotorcycles';
 import { MaintenanceList } from '../pages/MaintenanceList';
+import { MaintenanceNotifications } from '../pages/MaintenanceNotifications';
 
 export interface AppRoute {
   path: string;
@@ -137,5 +138,17 @@ export const appRoutes: AppRoute[] = [
       UserRole.COMPANY_MANAGER,
     ],
     element: <MaintenanceList />,
+  },
+  {
+    path: '/maintenance/notifications',
+    title: 'Notifications',
+    icon: 'Bell',
+    allowedRoles: [
+      UserRole.TRIUMPH_ADMIN,
+      UserRole.DEALERSHIP_MANAGER,
+      UserRole.DEALERSHIP_TECHNICIAN,
+      UserRole.COMPANY_MANAGER,
+    ],
+    element: <MaintenanceNotifications />,
   },
 ];

@@ -6,6 +6,7 @@ import {
   MaintenanceType,
 } from '@domain/enums/MaintenanceEnums';
 import { MaintenanceMapper } from '../mappers/MaintenanceMapper';
+import { MaintenanceFilters } from '@application/ports/repositories/IMaintenanceRepository';
 
 export class PrismaMaintenanceRepository implements IMaintenanceRepository {
   constructor(private readonly prisma: PrismaClient) {}
@@ -154,4 +155,36 @@ export class PrismaMaintenanceRepository implements IMaintenanceRepository {
     return maintenances.map(MaintenanceMapper.toDomain);
   }
 
+  async findMaintenancesByFilters(
+    filters: MaintenanceFilters,
+  ): Promise<Maintenance[]> {
+    const maintenances = await this.prisma.maintenance.findMany({
+      where: {
+        scheduledDate: {
+          gte: filters.startDate,
+          lte: filters.endDate,
+        },
+        ...(filters.dealershipId && { dealershipId: filters.dealershipId }),
+        ...(filters.companyId && {
+          motorcycle: {
+            company: {
+              id: filters.companyId,
+            },
+          },
+        }),
+        ...(filters.status && { status: filters.status }),
+        ...(filters.type && { type: filters.type }),
+        ...(filters.motorcycleId && { motorcycleId: filters.motorcycleId }),
+      },
+      include: {
+        motorcycle: {
+          include: {
+            company: true,
+          },
+        },
+      },
+    });
+
+    return maintenances.map(MaintenanceMapper.toDomain);
+  }
 }

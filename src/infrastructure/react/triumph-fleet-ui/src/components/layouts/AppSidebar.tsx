@@ -22,6 +22,7 @@ import {
   Truck,
   LogOut,
   Wrench,
+  Bell,
 } from "lucide-react";
 import { appRoutes } from "@/navigation/routes";
 
@@ -33,6 +34,7 @@ const iconMap: { [key: string]: React.ElementType } = {
   Store: Store,
   Truck: Truck,
   Wrench: Wrench,
+  Bell: Bell,
 };
 
 export function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {

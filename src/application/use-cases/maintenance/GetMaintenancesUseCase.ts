@@ -17,21 +17,20 @@ export class GetMaintenancesUseCase {
       throw new UnauthorizedError('User not found');
     }
 
-    // Vérification des autorisations selon le rôle
     switch (user.role) {
       case UserRole.TRIUMPH_ADMIN:
-        // Admin peut tout voir, pas de filtres supplémentaires nécessaires
+        // L'admin peut tout voir
         return this.getMaintenances(dto);
 
       case UserRole.DEALERSHIP_MANAGER:
       case UserRole.DEALERSHIP_EMPLOYEE:
       case UserRole.DEALERSHIP_TECHNICIAN:
-        // Vérifie que l'utilisateur appartient bien au dealership demandé
         if (!dto.dealershipId || user.dealershipId !== dto.dealershipId) {
           throw new UnauthorizedError(
             "Access denied to this dealership's maintenances",
           );
         }
+        // Ne voir que les maintenances du dealership
         return this.getMaintenances({
           ...dto,
           dealershipId: user.dealershipId,
@@ -39,12 +38,12 @@ export class GetMaintenancesUseCase {
 
       case UserRole.COMPANY_MANAGER:
       case UserRole.COMPANY_DRIVER:
-        // Vérifie que l'utilisateur appartient bien à la company demandée
         if (!dto.companyId || user.companyId !== dto.companyId) {
           throw new UnauthorizedError(
             "Access denied to this company's maintenances",
           );
         }
+        // Ne voir que les maintenances des motos de la company
         return this.getMaintenances({
           ...dto,
           companyId: user.companyId,
@@ -59,26 +58,15 @@ export class GetMaintenancesUseCase {
     dto: GetMaintenancesDTO,
   ): Promise<MaintenanceResponseDTO[]> {
     let maintenances =
-      await this.maintenanceRepository.findMaintenancesByDateRange(
-        dto.startDate || new Date(0),
-        dto.endDate || new Date(),
-        dto.dealershipId,
-      );
-
-    // Applique les filtres supplémentaires
-    if (dto.status) {
-      maintenances = maintenances.filter((m) => m.status === dto.status);
-    }
-
-    if (dto.type) {
-      maintenances = maintenances.filter((m) => m.type === dto.type);
-    }
-
-    if (dto.motorcycleId) {
-      maintenances = maintenances.filter(
-        (m) => m.motorcycleId === dto.motorcycleId,
-      );
-    }
+      await this.maintenanceRepository.findMaintenancesByFilters({
+        startDate: dto.startDate || new Date(0),
+        endDate: dto.endDate || new Date(),
+        dealershipId: dto.dealershipId,
+        companyId: dto.companyId,
+        status: dto.status,
+        type: dto.type,
+        motorcycleId: dto.motorcycleId,
+      });
 
     // Transforme les entités en DTO
     return maintenances.map((maintenance) => ({

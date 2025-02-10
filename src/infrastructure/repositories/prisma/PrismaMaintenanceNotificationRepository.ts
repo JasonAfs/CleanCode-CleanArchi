@@ -131,4 +131,9 @@ export class PrismaMaintenanceNotificationRepository
     });
     return count > 0;
   }
+
+  async findAll(): Promise<MaintenanceNotification[]> {
+    const notifications = await this.prisma.maintenanceNotification.findMany();
+    return notifications.map(MaintenanceNotificationMapper.toDomain);
+  }
 }

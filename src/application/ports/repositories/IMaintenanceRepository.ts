@@ -4,6 +4,16 @@ import {
   MaintenanceType,
 } from '@domain/enums/MaintenanceEnums';
 
+export interface MaintenanceFilters {
+  startDate: Date;
+  endDate: Date;
+  dealershipId?: string;
+  companyId?: string;
+  status?: MaintenanceStatus;
+  type?: MaintenanceType;
+  motorcycleId?: string;
+}
+
 export interface IMaintenanceRepository {
   // Opérations de base
   create(maintenance: Maintenance): Promise<void>;
@@ -52,4 +62,7 @@ export interface IMaintenanceRepository {
     excludeId?: string,
   ): Promise<boolean>;
 
+  findMaintenancesByFilters(
+    filters: MaintenanceFilters,
+  ): Promise<Maintenance[]>;
 }

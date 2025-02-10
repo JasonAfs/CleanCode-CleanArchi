@@ -32,4 +32,6 @@ export interface IMaintenanceNotificationRepository {
 
   // Vérifications
   exists(id: string): Promise<boolean>;
+
+  findAll(): Promise<MaintenanceNotification[]>;
 }
