@@ -21,17 +21,19 @@ export function NewOrderDialog() {
     e.preventDefault();
 
     const reference = items[0].sparePartReference.trim();
-    
+
     if (!reference) {
       console.error('La référence est requise');
       return;
     }
 
     const orderData = {
-      items: [{
-        sparePartReference: reference,
-        quantity: items[0].quantity
-      }]
+      items: [
+        {
+          sparePartReference: reference,
+          quantity: items[0].quantity,
+        },
+      ],
     };
 
     console.log('Frontend - Submitting order:', orderData);
@@ -46,10 +48,7 @@ export function NewOrderDialog() {
   };
 
   return (
-    <Dialog 
-      open={isOpen} 
-      onOpenChange={setIsOpen}
-    >
+    <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
         <Button onClick={() => setIsOpen(true)}>
           <Plus className="mr-2 h-4 w-4" />
@@ -66,10 +65,12 @@ export function NewOrderDialog() {
             <Input
               value={items[0].sparePartReference}
               onChange={(e) => {
-                setItems([{
-                  ...items[0],
-                  sparePartReference: e.target.value
-                }]);
+                setItems([
+                  {
+                    ...items[0],
+                    sparePartReference: e.target.value,
+                  },
+                ]);
               }}
               placeholder="Entrez la référence"
               required
@@ -80,10 +81,12 @@ export function NewOrderDialog() {
               min="1"
               value={items[0].quantity}
               onChange={(e) => {
-                setItems([{
-                  ...items[0],
-                  quantity: parseInt(e.target.value) || 1
-                }]);
+                setItems([
+                  {
+                    ...items[0],
+                    quantity: parseInt(e.target.value) || 1,
+                  },
+                ]);
               }}
               required
             />
@@ -95,4 +98,4 @@ export function NewOrderDialog() {
       </DialogContent>
     </Dialog>
   );
-} 
+}

@@ -19,14 +19,12 @@ export class CreateSparePartUseCase {
         );
       }
 
-
       const exists = await this.sparePartRepository.exists(dto.reference);
       if (exists) {
         throw new Error(
           `Spare part with reference ${dto.reference} already exists`,
         );
       }
-
 
       const sparePart = SparePart.create({
         reference: dto.reference,
@@ -38,7 +36,6 @@ export class CreateSparePartUseCase {
         minimumStockThreshold: dto.minimumThreshold,
         unitPrice: dto.unitPrice,
       });
-
 
       await this.sparePartRepository.create(sparePart);
 

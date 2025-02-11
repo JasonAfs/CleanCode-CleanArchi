@@ -17,18 +17,13 @@ import {
   useDealershipDialogStore,
 } from '@/components/dealership/EditDealershipDialog';
 import { useDealershipStore } from '@/store/dealershipStore';
-import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Alert, AlertDescription } from '@/components/ui/alert';
 import { useNavigate } from 'react-router-dom';
 
 export function Dealership() {
   const { isOpen, toggleModal, data, setData } = useDealershipDialogStore();
-  const { 
-    dealerships, 
-    fetchDealerships, 
-    deleteDealership, 
-    isLoading, 
-    error 
-  } = useDealershipStore();
+  const { dealerships, fetchDealerships, deleteDealership, isLoading, error } =
+    useDealershipStore();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -48,7 +43,9 @@ export function Dealership() {
         return contactInfo ? (
           <div>
             <div>{contactInfo.email}</div>
-            <div className="text-sm text-gray-500">{contactInfo.phoneNumber}</div>
+            <div className="text-sm text-gray-500">
+              {contactInfo.phoneNumber}
+            </div>
           </div>
         ) : null;
       },
@@ -98,7 +95,7 @@ export function Dealership() {
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
               <DropdownMenuLabel>Actions</DropdownMenuLabel>
-              <DropdownMenuItem 
+              <DropdownMenuItem
                 onClick={() => setData(dealership)}
                 className="cursor-pointer"
               >
@@ -111,20 +108,28 @@ export function Dealership() {
                 Voir les détails
               </DropdownMenuItem>
               <DropdownMenuItem
-                onClick={() => navigate(`/dealership/${dealership.id}/employees`)}
+                onClick={() =>
+                  navigate(`/dealership/${dealership.id}/employees`)
+                }
                 className="cursor-pointer"
               >
                 Gérer les employés
               </DropdownMenuItem>
               <DropdownMenuItem
-                onClick={() => navigate(`/dealership/${dealership.id}/motorcycles`)}
+                onClick={() =>
+                  navigate(`/dealership/${dealership.id}/motorcycles`)
+                }
                 className="cursor-pointer"
               >
                 Gérer les motos
               </DropdownMenuItem>
               <DropdownMenuItem
                 onClick={() => {
-                  if (window.confirm('Êtes-vous sûr de vouloir supprimer cette concession ?')) {
+                  if (
+                    window.confirm(
+                      'Êtes-vous sûr de vouloir supprimer cette concession ?',
+                    )
+                  ) {
                     deleteDealership(dealership.id);
                   }
                 }}
@@ -147,13 +152,13 @@ export function Dealership() {
         street: '',
         city: '',
         postalCode: '',
-        country: ''
+        country: '',
       },
       contactInfo: {
         phoneNumber: '',
-        email: ''
+        email: '',
       },
-      isActive: true
+      isActive: true,
     });
   };
 
@@ -170,8 +175,8 @@ export function Dealership() {
       <Alert variant="destructive" className="max-w-md mx-auto mt-4">
         <AlertDescription>
           {error}
-          <Button 
-            variant="outline" 
+          <Button
+            variant="outline"
             className="ml-2"
             onClick={() => fetchDealerships()}
           >
@@ -192,10 +197,7 @@ export function Dealership() {
         </Button>
       </div>
 
-      <DataTable 
-        columns={columns} 
-        data={dealerships || []}
-      />
+      <DataTable columns={columns} data={dealerships || []} />
 
       <EditDealershipDialog
         isOpen={isOpen}

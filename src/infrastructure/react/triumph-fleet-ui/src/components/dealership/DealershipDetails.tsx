@@ -10,7 +10,15 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
-import { Phone, Mail, MapPin, ArrowLeft, Edit, Users, Bike } from 'lucide-react';
+import {
+  Phone,
+  Mail,
+  MapPin,
+  ArrowLeft,
+  Edit,
+  Users,
+  Bike,
+} from 'lucide-react';
 
 export function DealershipDetails() {
   const { id } = useParams<{ id: string }>();
@@ -126,4 +134,4 @@ export function DealershipDetails() {
       </div>
     </div>
   );
-} 
+}

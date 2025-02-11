@@ -3,40 +3,40 @@ import { IRefreshTokenRepository } from '@application/ports/repositories/IRefres
 import { PrismaService } from '@infrastructure/nestjs/prisma/prisma.service';
 
 export class PrismaRefreshTokenRepository implements IRefreshTokenRepository {
-    constructor(private readonly prisma: PrismaService) {}
+  constructor(private readonly prisma: PrismaService) {}
 
-    async save(token: string, userId: string, expiresAt: Date): Promise<void> {
-        await this.revokeAllForUser(userId);
-        await this.prisma.refreshToken.create({
-            data: {
-                token,
-                userId,
-                expiresAt
-            }
-        });
+  async save(token: string, userId: string, expiresAt: Date): Promise<void> {
+    await this.revokeAllForUser(userId);
+    await this.prisma.refreshToken.create({
+      data: {
+        token,
+        userId,
+        expiresAt,
+      },
+    });
+  }
+
+  async verify(token: string): Promise<string | null> {
+    const refreshToken = await this.prisma.refreshToken.findUnique({
+      where: { token },
+    });
+
+    if (!refreshToken || refreshToken.expiresAt < new Date()) {
+      return null;
     }
 
-    async verify(token: string): Promise<string | null> {
-        const refreshToken = await this.prisma.refreshToken.findUnique({
-            where: { token }
-        });
-        
-        if (!refreshToken || refreshToken.expiresAt < new Date()) {
-            return null;
-        }
-        
-        return refreshToken.userId;
-    }
+    return refreshToken.userId;
+  }
 
-    async revoke(token: string): Promise<void> {
-        await this.prisma.refreshToken.delete({
-            where: { token }
-        });
-    }
+  async revoke(token: string): Promise<void> {
+    await this.prisma.refreshToken.delete({
+      where: { token },
+    });
+  }
 
-    async revokeAllForUser(userId: string): Promise<void> {
-        await this.prisma.refreshToken.deleteMany({
-            where: { userId }
-        });
-    }
+  async revokeAllForUser(userId: string): Promise<void> {
+    await this.prisma.refreshToken.deleteMany({
+      where: { userId },
+    });
+  }
 }

@@ -5,30 +5,30 @@ import { CompanyEmployees } from '@domain/aggregates/company/CompanyEmployees';
 import { CompanyMotorcycles } from '@domain/aggregates/company/CompanyMotorcycles';
 
 export interface CompanyProps {
-    id: string;
-    name: string;
-    registrationNumber: RegistrationNumber;
-    address: Address;
-    contactInfo: ContactInfo;
-    employees: CompanyEmployees;
-    motorcycles: CompanyMotorcycles;
-    createdByDealershipId?: string;
-    isActive: boolean;
-    createdAt: Date;
-    updatedAt: Date;
+  id: string;
+  name: string;
+  registrationNumber: RegistrationNumber;
+  address: Address;
+  contactInfo: ContactInfo;
+  employees: CompanyEmployees;
+  motorcycles: CompanyMotorcycles;
+  createdByDealershipId?: string;
+  isActive: boolean;
+  createdAt: Date;
+  updatedAt: Date;
 }
 
 export interface CreateCompanyProps {
-    name: string;
-    registrationNumber: RegistrationNumber;
-    address: Address;
-    contactInfo: ContactInfo;
-    createdByDealershipId?: string;
+  name: string;
+  registrationNumber: RegistrationNumber;
+  address: Address;
+  contactInfo: ContactInfo;
+  createdByDealershipId?: string;
 }
 
 export interface ReconstitueCompanyProps extends CreateCompanyProps {
-    id: string;
-    isActive: boolean;
-    createdAt: Date;
-    updatedAt: Date;
+  id: string;
+  isActive: boolean;
+  createdAt: Date;
+  updatedAt: Date;
 }

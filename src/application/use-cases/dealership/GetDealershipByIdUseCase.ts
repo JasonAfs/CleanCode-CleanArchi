@@ -17,7 +17,7 @@ export class GetDealershipByIdUseCase {
 
   constructor(
     private readonly dealershipRepository: IDealershipRepository,
-    private readonly userRepository : IUserRepository
+    private readonly userRepository: IUserRepository,
   ) {}
 
   private hasPermission(role: UserRole, permission: Permission): boolean {
@@ -25,19 +25,27 @@ export class GetDealershipByIdUseCase {
     return permissions?.has(permission) ?? false;
   }
 
-
   public async execute(
     dto: GetDealershipByIdDTO,
   ): Promise<Result<DealershipWithEmployeesDTO, Error>> {
     try {
       // 1. Vérification des permissions
-      if (!this.hasPermission(dto.userRole, Permission.VIEW_DEALERSHIP_DETAILS)) {
-        return new UnauthorizedError("You don't have permission to view dealership details");
+      if (
+        !this.hasPermission(dto.userRole, Permission.VIEW_DEALERSHIP_DETAILS)
+      ) {
+        return new UnauthorizedError(
+          "You don't have permission to view dealership details",
+        );
       }
 
       // 2. Si ce n'est pas un admin, vérifier l'appartenance à la concession
-      if (dto.userRole !== UserRole.TRIUMPH_ADMIN && dto.userDealershipId !== dto.dealershipId) {
-        return new UnauthorizedError("You don't have access to this dealership");
+      if (
+        dto.userRole !== UserRole.TRIUMPH_ADMIN &&
+        dto.userDealershipId !== dto.dealershipId
+      ) {
+        return new UnauthorizedError(
+          "You don't have access to this dealership",
+        );
       }
 
       // 3. Validation des données d'entrée
@@ -51,7 +59,9 @@ export class GetDealershipByIdUseCase {
       }
 
       // 4. Récupération de la concession
-      const dealership = await this.dealershipRepository.findById(dto.dealershipId);
+      const dealership = await this.dealershipRepository.findById(
+        dto.dealershipId,
+      );
       if (!dealership) {
         return new DealershipNotFoundError(dto.dealershipId);
       }
@@ -62,8 +72,9 @@ export class GetDealershipByIdUseCase {
       if (error instanceof Error) {
         return error;
       }
-      return new Error('An unexpected error occurred while retrieving the dealership');
+      return new Error(
+        'An unexpected error occurred while retrieving the dealership',
+      );
     }
   }
 }
-

@@ -10,12 +10,21 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
-import { Phone, Mail, MapPin, ArrowLeft, Edit, Users, Bike } from 'lucide-react';
+import {
+  Phone,
+  Mail,
+  MapPin,
+  ArrowLeft,
+  Edit,
+  Users,
+  Bike,
+} from 'lucide-react';
 import { useCompanyDialogStore } from '@/components/company/EditCompanyDialog';
 
 export function CompanyDetails() {
   const { id } = useParams<{ id: string }>();
-  const { currentCompany, fetchCompanyById, isLoading, error } = useCompanyStore();
+  const { currentCompany, fetchCompanyById, isLoading, error } =
+    useCompanyStore();
 
   useEffect(() => {
     if (id) {
@@ -59,8 +68,8 @@ export function CompanyDetails() {
               <span>Motos</span>
             </Button>
           </Link>
-          <Button 
-            variant="outline" 
+          <Button
+            variant="outline"
             className="flex items-center space-x-2"
             onClick={() => {
               // Ouvrir le dialog de modification
@@ -134,4 +143,4 @@ export function CompanyDetails() {
       </div>
     </div>
   );
-} 
+}

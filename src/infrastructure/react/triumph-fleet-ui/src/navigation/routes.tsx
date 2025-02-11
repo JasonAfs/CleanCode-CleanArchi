@@ -32,7 +32,7 @@ export const appRoutes: AppRoute[] = [
     title: 'Dashboard',
     icon: 'LayoutDashboard',
     allowedRoles: Object.values(UserRole),
-    element: <Dashboard/>,
+    element: <Dashboard />,
   },
   {
     path: '/dealership',
@@ -48,7 +48,7 @@ export const appRoutes: AppRoute[] = [
     allowedRoles: [
       UserRole.TRIUMPH_ADMIN,
       UserRole.DEALERSHIP_MANAGER,
-      UserRole.DEALERSHIP_EMPLOYEE
+      UserRole.DEALERSHIP_EMPLOYEE,
     ],
     element: <DealershipDetails />,
   },
@@ -58,7 +58,7 @@ export const appRoutes: AppRoute[] = [
     allowedRoles: [
       UserRole.TRIUMPH_ADMIN,
       UserRole.DEALERSHIP_MANAGER,
-      UserRole.DEALERSHIP_EMPLOYEE
+      UserRole.DEALERSHIP_EMPLOYEE,
     ],
     element: <DealershipEmployees />,
   },
@@ -68,17 +68,14 @@ export const appRoutes: AppRoute[] = [
     allowedRoles: [
       UserRole.TRIUMPH_ADMIN,
       UserRole.DEALERSHIP_MANAGER,
-      UserRole.DEALERSHIP_EMPLOYEE
+      UserRole.DEALERSHIP_EMPLOYEE,
     ],
     element: <DealershipMotorcycles />,
   },
   {
     path: '/dealership/:id/edit',
     title: 'Modifier la concession',
-    allowedRoles: [
-      UserRole.TRIUMPH_ADMIN,
-      UserRole.DEALERSHIP_MANAGER
-    ],
+    allowedRoles: [UserRole.TRIUMPH_ADMIN, UserRole.DEALERSHIP_MANAGER],
     element: <DealershipEdit />,
   },
   {
@@ -103,31 +100,31 @@ export const appRoutes: AppRoute[] = [
   },
   {
     path: '/companies/:id',
-    title: 'Détails de l\'entreprise',
+    title: "Détails de l'entreprise",
     allowedRoles: [
       UserRole.TRIUMPH_ADMIN,
       UserRole.DEALERSHIP_MANAGER,
-      UserRole.COMPANY_MANAGER
+      UserRole.COMPANY_MANAGER,
     ],
     element: <CompanyDetails />,
   },
   {
     path: '/companies/:id/employees',
-    title: 'Employés de l\'entreprise',
+    title: "Employés de l'entreprise",
     allowedRoles: [
       UserRole.TRIUMPH_ADMIN,
       UserRole.DEALERSHIP_MANAGER,
-      UserRole.COMPANY_MANAGER
+      UserRole.COMPANY_MANAGER,
     ],
     element: <CompanyEmployees />,
   },
   {
     path: '/companies/:id/motorcycles',
-    title: 'Motos de l\'entreprise',
+    title: "Motos de l'entreprise",
     allowedRoles: [
       UserRole.TRIUMPH_ADMIN,
       UserRole.DEALERSHIP_MANAGER,
-      UserRole.COMPANY_MANAGER
+      UserRole.COMPANY_MANAGER,
     ],
     element: <CompanyMotorcycles />,
   },
@@ -180,7 +177,7 @@ export const appRoutes: AppRoute[] = [
     allowedRoles: [
       UserRole.DEALERSHIP_MANAGER,
       UserRole.DEALERSHIP_STOCK_MANAGER,
-      UserRole.DEALERSHIP_TECHNICIAN
+      UserRole.DEALERSHIP_TECHNICIAN,
     ],
     element: <DealershipSparePartStock />,
   },
@@ -190,5 +187,5 @@ export const appRoutes: AppRoute[] = [
     icon: 'CheckSquare',
     allowedRoles: [UserRole.TRIUMPH_ADMIN],
     element: <SparePartOrderValidation />,
-  }
+  },
 ];

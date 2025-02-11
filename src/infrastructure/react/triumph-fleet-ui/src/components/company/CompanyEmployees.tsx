@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { DataTable } from '@/components/ui/data-table';
 import { ColumnDef } from '@tanstack/react-table';
 import { ArrowLeft, Plus, Loader2 } from 'lucide-react';
-import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Alert, AlertDescription } from '@/components/ui/alert';
 
 type EmployeeData = {
   id: string;
@@ -18,7 +18,8 @@ type EmployeeData = {
 
 export function CompanyEmployees() {
   const { id } = useParams<{ id: string }>();
-  const { currentCompany, fetchCompanyById, isLoading, error } = useCompanyStore();
+  const { currentCompany, fetchCompanyById, isLoading, error } =
+    useCompanyStore();
 
   useEffect(() => {
     if (id) {
@@ -73,8 +74,8 @@ export function CompanyEmployees() {
       <Alert variant="destructive" className="max-w-md mx-auto mt-4">
         <AlertDescription>
           {error}
-          <Button 
-            variant="outline" 
+          <Button
+            variant="outline"
             className="ml-2"
             onClick={() => id && fetchCompanyById(id)}
           >
@@ -109,10 +110,10 @@ export function CompanyEmployees() {
         </Button>
       </div>
 
-      <DataTable 
-        columns={columns} 
-        data={currentCompany?.employees as EmployeeData[] || []} 
+      <DataTable
+        columns={columns}
+        data={(currentCompany?.employees as EmployeeData[]) || []}
       />
     </div>
   );
-} 
+}

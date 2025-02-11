@@ -2,8 +2,6 @@ import { DomainError } from '@domain/errors/DomainError';
 import { randomUUID } from 'crypto';
 import { MaintenanceNotificationProps } from '@domain/interfaces/Notification/MaintenanceNotificationProps';
 
-
-
 export class MaintenanceNotification {
   private readonly props: MaintenanceNotificationProps;
 

@@ -1,4 +1,4 @@
 export interface AuthTokensDTO {
-    accessToken: string;
-    refreshToken: string;
+  accessToken: string;
+  refreshToken: string;
 }

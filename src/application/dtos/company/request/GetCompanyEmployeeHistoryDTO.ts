@@ -1,7 +1,7 @@
-import { BaseAuthenticatedDTO } from "../../shared/BaseAuthenticatedDTO";
+import { BaseAuthenticatedDTO } from '../../shared/BaseAuthenticatedDTO';
 
-export interface GetCompanyEmployeeHistoryDTO extends BaseAuthenticatedDTO{
-    dealershipId?: string;
-    companyId: string;
-    includeInactive?: boolean;
+export interface GetCompanyEmployeeHistoryDTO extends BaseAuthenticatedDTO {
+  dealershipId?: string;
+  companyId: string;
+  includeInactive?: boolean;
 }

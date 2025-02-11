@@ -1,4 +1,13 @@
-import { Controller, Post, Body, HttpCode, HttpStatus, BadRequestException, ConflictException, UnauthorizedException } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  Body,
+  HttpCode,
+  HttpStatus,
+  BadRequestException,
+  ConflictException,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { ApiTags, ApiResponse } from '@nestjs/swagger';
 import { LoginRequestDTO } from '../dtos/request/login.request.dto';
 import { RegisterRequestDTO } from '../dtos/request/register.request.dto';
@@ -24,7 +33,7 @@ export class AuthController {
   @ApiResponse({ status: 401, description: 'Invalid credentials' })
   async login(@Body() dto: LoginRequestDTO) {
     const result = await this.loginUseCase.execute(dto);
-    
+
     if (result instanceof Error) {
       if (result instanceof InvalidCredentialsError) {
         throw new BadRequestException(result.message);
@@ -56,8 +65,10 @@ export class AuthController {
   @ApiResponse({ status: 200, description: 'Tokens refreshed successfully' })
   @ApiResponse({ status: 401, description: 'Invalid refresh token' })
   async refreshTokens(@Body() refreshTokenDto: { refreshToken: string }) {
-    const result = await this.refreshTokenUseCase.execute(refreshTokenDto.refreshToken);
-    
+    const result = await this.refreshTokenUseCase.execute(
+      refreshTokenDto.refreshToken,
+    );
+
     if (result instanceof Error) {
       if (result instanceof AuthValidationError) {
         throw new UnauthorizedException(result.message);

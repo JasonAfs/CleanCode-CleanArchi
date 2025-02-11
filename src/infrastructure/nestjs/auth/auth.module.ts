@@ -73,10 +73,14 @@ import { PrismaService } from '../prisma/prisma.service';
           refreshTokenRepo,
           dealershipRepo,
           companyRepo,
-          process.env.JWT_SECRET
+          process.env.JWT_SECRET,
         );
       },
-      inject: ['IRefreshTokenRepository', 'IDealershipRepository', 'ICompanyRepository'],
+      inject: [
+        'IRefreshTokenRepository',
+        'IDealershipRepository',
+        'ICompanyRepository',
+      ],
     },
     {
       provide: 'IPasswordService',

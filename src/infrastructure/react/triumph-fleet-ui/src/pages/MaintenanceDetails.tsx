@@ -55,9 +55,7 @@ export function MaintenanceDetails() {
             <ArrowLeft className="h-5 w-5" />
           </Button>
         </Link>
-        <h1 className="text-2xl font-bold">
-          Détails de la maintenance
-        </h1>
+        <h1 className="text-2xl font-bold">Détails de la maintenance</h1>
       </div>
 
       <div className="grid gap-6">
@@ -78,7 +76,9 @@ export function MaintenanceDetails() {
               <div>
                 <p className="text-sm text-gray-500">Date prévue</p>
                 <p>
-                  {new Date(currentMaintenance.scheduledDate).toLocaleDateString()}
+                  {new Date(
+                    currentMaintenance.scheduledDate,
+                  ).toLocaleDateString()}
                 </p>
               </div>
               <div>
@@ -133,4 +133,4 @@ export function MaintenanceDetails() {
       </div>
     </div>
   );
-} 
+}

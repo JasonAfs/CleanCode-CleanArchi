@@ -126,7 +126,9 @@ export function RegisterForm({ className, ...props }: RegisterFormProps) {
                 </div>
 
                 <div className="grid gap-2">
-                  <Label htmlFor="confirmPassword">Confirmer le mot de passe</Label>
+                  <Label htmlFor="confirmPassword">
+                    Confirmer le mot de passe
+                  </Label>
                   <Input
                     id="confirmPassword"
                     type="password"

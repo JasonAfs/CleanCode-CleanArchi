@@ -1,5 +1,5 @@
 export interface DeactivateCompanyResponseDTO {
-    success: boolean;
-    message: string;
-    companyId: string;
+  success: boolean;
+  message: string;
+  companyId: string;
 }

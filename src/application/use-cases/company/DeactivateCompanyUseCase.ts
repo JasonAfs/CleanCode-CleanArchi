@@ -14,9 +14,7 @@ import { UserRole } from '@domain/enums/UserRole';
 export class DeactivateCompanyUseCase implements IAuthorizationAware {
   private readonly validator = new DeactivateCompanyValidator();
 
-  constructor(
-    private readonly companyRepository: ICompanyRepository,
-  ) {}
+  constructor(private readonly companyRepository: ICompanyRepository) {}
 
   public getAuthorizationContext(
     dto: DeactivateCompanyDTO,

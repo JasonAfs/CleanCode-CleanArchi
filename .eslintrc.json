@@ -1,13 +1,41 @@
 {
     "parser": "@typescript-eslint/parser",
-    "plugins": ["@typescript-eslint"],
+    "plugins": ["@typescript-eslint", "import", "prettier"],
     "extends": [
       "eslint:recommended",
-      "plugin:@typescript-eslint/recommended"
+      "plugin:@typescript-eslint/recommended",
+      "plugin:import/errors",
+      "plugin:import/warnings",
+      "plugin:import/typescript",
+      "prettier"
     ],
     "rules": {
-      "@typescript-eslint/explicit-function-return-type": "warn",
+      "@typescript-eslint/explicit-function-return-type": "error",
       "@typescript-eslint/no-explicit-any": "error",
-      "@typescript-eslint/no-unused-vars": "error"
+      "@typescript-eslint/no-unused-vars": ["error", { "argsIgnorePattern": "^_" }],
+      "@typescript-eslint/naming-convention": [
+        "error",
+        {
+          "selector": "interface",
+          "format": ["PascalCase"],
+          "prefix": ["I"]
+        },
+        {
+          "selector": "class",
+          "format": ["PascalCase"]
+        }
+      ],
+      "import/order": [
+        "error",
+        {
+          "groups": ["builtin", "external", "internal", "parent", "sibling", "index"],
+          "newlines-between": "always",
+          "alphabetize": { "order": "asc" }
+        }
+      ],
+      "max-lines-per-function": ["error", { "max": 20 }],
+      "complexity": ["error", 5],
+      "max-depth": ["error", 3],
+      "no-magic-numbers": "error"
     }
   }

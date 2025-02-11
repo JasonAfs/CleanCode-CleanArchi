@@ -61,4 +61,4 @@ export function SpareParts() {
       <SparePartDialog />
     </div>
   );
-} 
+}

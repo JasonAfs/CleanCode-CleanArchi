@@ -1,5 +1,5 @@
-import { BaseAuthenticatedDTO } from "../../shared/BaseAuthenticatedDTO";
+import { BaseAuthenticatedDTO } from '../../shared/BaseAuthenticatedDTO';
 
 export interface GetCompaniesDTO extends BaseAuthenticatedDTO {
-    includeInactive?: boolean;
+  includeInactive?: boolean;
 }

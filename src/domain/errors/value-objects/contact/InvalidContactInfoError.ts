@@ -1,7 +1,7 @@
-import { DomainError } from "@domain/errors/DomainError";
+import { DomainError } from '@domain/errors/DomainError';
 
 export class InvalidContactInfoError extends DomainError {
-    constructor(message: string) {
-        super(`Invalid contact information: ${message}`);
-    }
+  constructor(message: string) {
+    super(`Invalid contact information: ${message}`);
+  }
 }

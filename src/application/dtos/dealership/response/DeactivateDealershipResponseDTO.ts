@@ -1,5 +1,5 @@
 export interface DeactivateDealershipResponseDTO {
-    success: boolean;
-    message: string;
-    dealershipId: string;
+  success: boolean;
+  message: string;
+  dealershipId: string;
 }

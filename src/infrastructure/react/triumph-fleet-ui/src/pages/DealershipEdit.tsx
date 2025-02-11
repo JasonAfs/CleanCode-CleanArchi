@@ -1,12 +1,16 @@
 import { useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useDealershipStore } from '@/store/dealershipStore';
-import { EditDealershipDialog, useDealershipDialogStore } from '@/components/dealership/EditDealershipDialog';
+import {
+  EditDealershipDialog,
+  useDealershipDialogStore,
+} from '@/components/dealership/EditDealershipDialog';
 
 export function DealershipEdit() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const { currentDealership, fetchDealershipById, isLoading, error } = useDealershipStore();
+  const { currentDealership, fetchDealershipById, isLoading, error } =
+    useDealershipStore();
   const { setData } = useDealershipDialogStore();
 
   useEffect(() => {
@@ -40,4 +44,4 @@ export function DealershipEdit() {
       toggleModal={() => navigate('/dealership')}
     />
   );
-} 
+}

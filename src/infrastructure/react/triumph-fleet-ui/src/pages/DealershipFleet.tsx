@@ -70,7 +70,8 @@ export function DealershipFleet() {
 
   useEffect(() => {
     fetchMotorcycles({
-      statusFilter: statusFilter === 'ALL' ? undefined : statusFilter as MotorcycleStatus,
+      statusFilter:
+        statusFilter === 'ALL' ? undefined : (statusFilter as MotorcycleStatus),
       includeInactive,
     }).catch(console.error);
   }, [fetchMotorcycles, statusFilter, includeInactive]);
@@ -89,7 +90,10 @@ export function DealershipFleet() {
     try {
       await updateMotorcycleMileage(selectedMotorcycle.id, data.mileage);
       await fetchMotorcycles({
-        statusFilter: statusFilter === 'ALL' ? undefined : statusFilter as MotorcycleStatus,
+        statusFilter:
+          statusFilter === 'ALL'
+            ? undefined
+            : (statusFilter as MotorcycleStatus),
         includeInactive,
       });
       setIsUpdateMileageOpen(false);
@@ -266,7 +270,10 @@ export function DealershipFleet() {
             className="ml-2"
             onClick={() =>
               fetchMotorcycles({
-                statusFilter: statusFilter === 'ALL' ? undefined : statusFilter as MotorcycleStatus,
+                statusFilter:
+                  statusFilter === 'ALL'
+                    ? undefined
+                    : (statusFilter as MotorcycleStatus),
                 includeInactive,
               })
             }

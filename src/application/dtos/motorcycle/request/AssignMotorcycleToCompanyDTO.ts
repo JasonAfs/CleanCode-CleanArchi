@@ -1,7 +1,7 @@
 import { BaseAuthenticatedDTO } from '../../shared/BaseAuthenticatedDTO';
 
 export interface AssignMotorcycleToCompanyDTO extends BaseAuthenticatedDTO {
-    motorcycleId: string;
-    companyId: string;
-    dealershipId?: string;
+  motorcycleId: string;
+  companyId: string;
+  dealershipId?: string;
 }

@@ -78,19 +78,18 @@ export class ValidateSparePartOrderUseCase {
   }
 }
 
-
 export interface ValidateSparePartOrderDTO extends BaseAuthenticatedDTO {
-    orderId: string;
-    action: 'CONFIRM' | 'CANCEL';
-  }
-  
-  export interface ValidateSparePartOrderResponseDTO {
-    success: boolean;
-    message: string;
-    orderId: string;
-    newStatus: OrderStatus;
-    updatedStock?: {
-      sparePartReference: string;
-      newQuantity: number;
-    }[];
-  }
+  orderId: string;
+  action: 'CONFIRM' | 'CANCEL';
+}
+
+export interface ValidateSparePartOrderResponseDTO {
+  success: boolean;
+  message: string;
+  orderId: string;
+  newStatus: OrderStatus;
+  updatedStock?: {
+    sparePartReference: string;
+    newQuantity: number;
+  }[];
+}

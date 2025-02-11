@@ -1,34 +1,34 @@
-import { useState, FormEvent } from 'react'
-import { useNavigate, Link } from 'react-router-dom'
-import { useAuth } from '../../hooks/useAuth'
-import { cn } from "@/lib/utils"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { GalleryVerticalEnd } from "lucide-react"
+import { useState, FormEvent } from 'react';
+import { useNavigate, Link } from 'react-router-dom';
+import { useAuth } from '../../hooks/useAuth';
+import { cn } from '@/lib/utils';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { GalleryVerticalEnd } from 'lucide-react';
 
-interface LoginFormProps extends React.ComponentPropsWithoutRef<"form"> {
-  className?: string
+interface LoginFormProps extends React.ComponentPropsWithoutRef<'form'> {
+  className?: string;
 }
 
 export function LoginForm({ className, ...props }: LoginFormProps) {
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
-  const [error, setError] = useState<string | null>(null)
-  const { login } = useAuth()
-  const navigate = useNavigate()
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState<string | null>(null);
+  const { login } = useAuth();
+  const navigate = useNavigate();
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault()
-    setError(null)
+    e.preventDefault();
+    setError(null);
 
     try {
-      await login({ email, password })
-      navigate('/')
+      await login({ email, password });
+      navigate('/');
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'An error occurred')
+      setError(err instanceof Error ? err.message : 'An error occurred');
     }
-  }
+  };
 
   return (
     <div className="grid min-h-svh lg:grid-cols-2">
@@ -43,7 +43,11 @@ export function LoginForm({ className, ...props }: LoginFormProps) {
         </div>
         <div className="flex flex-1 items-center justify-center">
           <div className="w-full max-w-xs">
-            <form onSubmit={handleSubmit} className={cn("flex flex-col gap-6", className)} {...props}>
+            <form
+              onSubmit={handleSubmit}
+              className={cn('flex flex-col gap-6', className)}
+              {...props}
+            >
               <div className="flex flex-col items-center gap-2 text-center">
                 <h1 className="text-2xl font-bold">Connexion</h1>
                 <p className="text-balance text-sm text-muted-foreground">
@@ -53,10 +57,10 @@ export function LoginForm({ className, ...props }: LoginFormProps) {
               <div className="grid gap-6">
                 <div className="grid gap-2">
                   <Label htmlFor="email">Email</Label>
-                  <Input 
-                    id="email" 
-                    type="email" 
-                    placeholder="m@example.com" 
+                  <Input
+                    id="email"
+                    type="email"
+                    placeholder="m@example.com"
                     required
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
@@ -72,25 +76,21 @@ export function LoginForm({ className, ...props }: LoginFormProps) {
                       Mot de passe oublié ?
                     </a>
                   </div>
-                  <Input 
-                    id="password" 
-                    type="password" 
+                  <Input
+                    id="password"
+                    type="password"
                     required
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                   />
                 </div>
-                {error && (
-                  <div className="text-red-600 text-sm">
-                    {error}
-                  </div>
-                )}
+                {error && <div className="text-red-600 text-sm">{error}</div>}
                 <Button type="submit" className="w-full">
                   Connexion
                 </Button>
               </div>
               <div className="text-center text-sm">
-                Pas encore de compte{" "}
+                Pas encore de compte{' '}
                 <Link to="/register" className="underline underline-offset-4">
                   S'enregistrer
                 </Link>
@@ -107,5 +107,5 @@ export function LoginForm({ className, ...props }: LoginFormProps) {
         />
       </div>
     </div>
-  )
+  );
 }

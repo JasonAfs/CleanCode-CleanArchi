@@ -1,7 +1,10 @@
 import { UserRole } from '@domain/enums/UserRole';
 import { Permission } from './Permission';
 
-export const ROLE_PERMISSIONS: ReadonlyMap<UserRole, ReadonlySet<Permission>> = new Map<UserRole, ReadonlySet<Permission>>([
+export const ROLE_PERMISSIONS: ReadonlyMap<
+  UserRole,
+  ReadonlySet<Permission>
+> = new Map<UserRole, ReadonlySet<Permission>>([
   [
     UserRole.TRIUMPH_ADMIN,
     new Set([
@@ -86,9 +89,5 @@ export const ROLE_PERMISSIONS: ReadonlyMap<UserRole, ReadonlySet<Permission>> = 
       Permission.UPDATE_MOTORCYCLE_MILEAGE, // Les conducteurs peuvent mettre à jour le kilométrage
     ]) as ReadonlySet<Permission>,
   ],
-  [
-    UserRole.CLIENT,
-    new Set([
-    ]) as ReadonlySet<Permission>,
-  ]
+  [UserRole.CLIENT, new Set([]) as ReadonlySet<Permission>],
 ]);

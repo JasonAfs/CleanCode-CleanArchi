@@ -3,11 +3,11 @@ import { ApiProperty } from '@nestjs/swagger';
 import { UserRole } from '@domain/enums/UserRole';
 
 export class AddDealershipEmployeeRequestDTO {
-    @ApiProperty()
-    @IsString()
-    employeeId!: string;
+  @ApiProperty()
+  @IsString()
+  employeeId!: string;
 
-    @ApiProperty({ enum: UserRole })
-    @IsEnum(UserRole)
-    role!: UserRole;
+  @ApiProperty({ enum: UserRole })
+  @IsEnum(UserRole)
+  role!: UserRole;
 }

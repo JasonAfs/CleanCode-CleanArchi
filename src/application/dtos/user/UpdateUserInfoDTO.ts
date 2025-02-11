@@ -1,5 +1,5 @@
 export interface UpdateUserInfoDTO {
-    userId: string;
-    firstName: string;
-    lastName: string;
+  userId: string;
+  firstName: string;
+  lastName: string;
 }

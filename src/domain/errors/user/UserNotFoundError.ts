@@ -1,7 +1,7 @@
-import { DomainError } from "../DomainError";
+import { DomainError } from '../DomainError';
 
 export class UserNotFoundError extends DomainError {
-    constructor(identifier: string) {
-        super(`User not found with identifier: ${identifier}`);
-    }
+  constructor(identifier: string) {
+    super(`User not found with identifier: ${identifier}`);
+  }
 }

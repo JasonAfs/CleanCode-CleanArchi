@@ -4,15 +4,16 @@ import { Button } from '@/components/ui/button';
 import { DataTable } from '@/components/ui/data-table';
 import { ColumnDef } from '@tanstack/react-table';
 import { Bell, Loader2 } from 'lucide-react';
-import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Switch } from "@/components/ui/switch"
-import { Label } from "@/components/ui/label"
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Switch } from '@/components/ui/switch';
+import { Label } from '@/components/ui/label';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import { MaintenanceNotification } from '@/types/maintenanceNotification';
 
 export function MaintenanceNotifications() {
-  const { notifications, isLoading, error, fetchNotifications } = useMaintenanceNotificationStore();
+  const { notifications, isLoading, error, fetchNotifications } =
+    useMaintenanceNotificationStore();
 
   useEffect(() => {
     fetchNotifications({ includeRead: false });
@@ -66,8 +67,8 @@ export function MaintenanceNotifications() {
       <Alert variant="destructive" className="max-w-md mx-auto mt-4">
         <AlertDescription>
           {error}
-          <Button 
-            variant="outline" 
+          <Button
+            variant="outline"
             className="ml-2"
             onClick={() => fetchNotifications({ includeRead: false })}
           >
@@ -88,10 +89,7 @@ export function MaintenanceNotifications() {
           </p>
         </div>
         <div className="flex items-center space-x-2">
-          <Switch
-            id="include-read"
-            onCheckedChange={handleIncludeReadChange}
-          />
+          <Switch id="include-read" onCheckedChange={handleIncludeReadChange} />
           <Label htmlFor="include-read">Inclure les notifications lues</Label>
         </div>
       </div>
@@ -99,17 +97,16 @@ export function MaintenanceNotifications() {
       {notifications.length === 0 ? (
         <div className="text-center py-10">
           <Bell className="mx-auto h-12 w-12 text-gray-400" />
-          <h3 className="mt-2 text-sm font-medium text-gray-900">Aucune notification</h3>
+          <h3 className="mt-2 text-sm font-medium text-gray-900">
+            Aucune notification
+          </h3>
           <p className="mt-1 text-sm text-gray-500">
             Vous n'avez aucune notification de maintenance pour le moment.
           </p>
         </div>
       ) : (
-        <DataTable 
-          columns={columns} 
-          data={notifications}
-        />
+        <DataTable columns={columns} data={notifications} />
       )}
     </div>
   );
-} 
+}

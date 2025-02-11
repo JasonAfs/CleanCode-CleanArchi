@@ -45,7 +45,6 @@ export class StockNotification {
   }
 }
 
-
 export enum StockNotificationType {
   LOW_STOCK = 'LOW_STOCK',
   OUT_OF_STOCK = 'OUT_OF_STOCK',

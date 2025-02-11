@@ -29,27 +29,22 @@ export class AuthorizationService implements IAuthorizationService {
     context: AuthorizationContext,
     requiredPermission: Permission,
   ): boolean {
-
     const userPermissions = this.permissionRegistry.get(context.userRole);
     if (!userPermissions?.has(requiredPermission)) {
       return false;
     }
 
     try {
-
       const ruleType = PermissionRuleMapper.getRuleType(requiredPermission);
       const [domain] = ruleType.split('.') as [keyof OperationCheckers];
-
 
       const checker = this.operationCheckers[domain];
       if (checker) {
         return checker.verifyAccess(context, requiredPermission);
       }
 
-
       return true;
     } catch {
-
       return true;
     }
   }

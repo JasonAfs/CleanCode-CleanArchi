@@ -11,7 +11,10 @@ import {
 } from '@/components/ui/select';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { MaintenanceStatus, MaintenanceType } from '@domain/enums/MaintenanceEnums';
+import {
+  MaintenanceStatus,
+  MaintenanceType,
+} from '@domain/enums/MaintenanceEnums';
 import { ColumnDef } from '@tanstack/react-table';
 import { Loader2 } from 'lucide-react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
@@ -19,7 +22,8 @@ import type { Maintenance } from '@/store/maintenanceStore';
 import { useNavigate } from 'react-router-dom';
 
 export function MaintenanceList() {
-  const { maintenances, isLoading, error, fetchMaintenances } = useMaintenanceStore();
+  const { maintenances, isLoading, error, fetchMaintenances } =
+    useMaintenanceStore();
   const [filters, setFilters] = useState({
     startDate: '',
     endDate: '',
@@ -32,10 +36,11 @@ export function MaintenanceList() {
     {
       accessorKey: 'scheduledDate',
       header: 'Date prévue',
-      cell: ({ row }) => new Intl.DateTimeFormat('fr-FR', {
-        dateStyle: 'medium',
-        timeStyle: 'short'
-      }).format(new Date(row.getValue('scheduledDate'))),
+      cell: ({ row }) =>
+        new Intl.DateTimeFormat('fr-FR', {
+          dateStyle: 'medium',
+          timeStyle: 'short',
+        }).format(new Date(row.getValue('scheduledDate'))),
     },
     {
       accessorKey: 'type',
@@ -131,7 +136,7 @@ export function MaintenanceList() {
     <div className="container mx-auto py-10">
       <div className="mb-8">
         <h1 className="text-2xl font-bold mb-4">Maintenances</h1>
-        
+
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
           <div>
             <Label htmlFor="startDate">Date début</Label>
@@ -139,25 +144,31 @@ export function MaintenanceList() {
               type="date"
               id="startDate"
               value={filters.startDate}
-              onChange={(e) => setFilters({ ...filters, startDate: e.target.value })}
+              onChange={(e) =>
+                setFilters({ ...filters, startDate: e.target.value })
+              }
             />
           </div>
-          
+
           <div>
             <Label htmlFor="endDate">Date fin</Label>
             <Input
               type="date"
               id="endDate"
               value={filters.endDate}
-              onChange={(e) => setFilters({ ...filters, endDate: e.target.value })}
+              onChange={(e) =>
+                setFilters({ ...filters, endDate: e.target.value })
+              }
             />
           </div>
-          
+
           <div>
             <Label htmlFor="status">Statut</Label>
             <Select
               value={filters.status}
-              onValueChange={(value) => setFilters({ ...filters, status: value })}
+              onValueChange={(value) =>
+                setFilters({ ...filters, status: value })
+              }
             >
               <SelectTrigger>
                 <SelectValue placeholder="Tous les statuts" />
@@ -172,7 +183,7 @@ export function MaintenanceList() {
               </SelectContent>
             </Select>
           </div>
-          
+
           <div>
             <Label htmlFor="type">Type</Label>
             <Select
@@ -193,16 +204,11 @@ export function MaintenanceList() {
             </Select>
           </div>
         </div>
-        
-        <Button onClick={handleSearch}>
-          Rechercher
-        </Button>
+
+        <Button onClick={handleSearch}>Rechercher</Button>
       </div>
 
-      <DataTable
-        columns={columns}
-        data={maintenances}
-      />
+      <DataTable columns={columns} data={maintenances} />
     </div>
   );
-} 
+}

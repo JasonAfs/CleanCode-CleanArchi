@@ -1,5 +1,5 @@
-import * as React from "react";
-import { Link, useLocation } from "react-router-dom";
+import * as React from 'react';
+import { Link, useLocation } from 'react-router-dom';
 import {
   Sidebar,
   SidebarContent,
@@ -11,8 +11,8 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
   SidebarRail,
-} from "@/components/ui/sidebar";
-import { useAuth } from "@/hooks/useAuth";
+} from '@/components/ui/sidebar';
+import { useAuth } from '@/hooks/useAuth';
 import {
   Bike,
   LayoutDashboard,
@@ -24,9 +24,9 @@ import {
   Wrench,
   Bell,
   Drill,
-  ShoppingCart
-} from "lucide-react";
-import { appRoutes } from "@/navigation/routes";
+  ShoppingCart,
+} from 'lucide-react';
+import { appRoutes } from '@/navigation/routes';
 
 // Map des icônes en fonction des noms
 const iconMap: { [key: string]: React.ElementType } = {
@@ -50,9 +50,7 @@ export function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
   // - Et pour lesquelles l'utilisateur possède l'accès
   const filteredRoutes = appRoutes.filter(
     (route) =>
-      route.icon &&
-      user?.role &&
-      route.allowedRoles.includes(user.role)
+      route.icon && user?.role && route.allowedRoles.includes(user.role),
   );
 
   // Fonction pour obtenir le composant icône

@@ -15,7 +15,7 @@ export default defineConfig({
       '@': path.resolve(__dirname, './src'),
       '@domain': path.resolve(__dirname, '../../../domain'),
       '@application': path.resolve(__dirname, '../../../application'),
-      '@infrastructure': path.resolve(__dirname, '../../../infrastructure')
-    }
-  }
+      '@infrastructure': path.resolve(__dirname, '../../../infrastructure'),
+    },
+  },
 });

@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Button } from "@/components/ui/button";
+import { Button } from '@/components/ui/button';
 import {
   Dialog,
   DialogContent,
@@ -7,12 +7,12 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Company, CompanyDialogState } from "@/types/company";
-import { create } from "zustand";
-import { useCompanyStore } from "@/store/companyStore";
+} from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Company, CompanyDialogState } from '@/types/company';
+import { create } from 'zustand';
+import { useCompanyStore } from '@/store/companyStore';
 
 export const useCompanyDialogStore = create<CompanyDialogState>((set) => ({
   isOpen: false,
@@ -21,7 +21,9 @@ export const useCompanyDialogStore = create<CompanyDialogState>((set) => ({
   setData: (data: Company) => set(() => ({ data, isOpen: true })),
 }));
 
-type EditCompanyDialogProps = Readonly<Pick<CompanyDialogState, "isOpen" | "data" | "toggleModal">>;
+type EditCompanyDialogProps = Readonly<
+  Pick<CompanyDialogState, 'isOpen' | 'data' | 'toggleModal'>
+>;
 
 interface Employee {
   id: string;
@@ -55,17 +57,21 @@ const initialFormData: FormData = {
     street: '',
     city: '',
     postalCode: '',
-    country: ''
+    country: '',
   },
   contactInfo: {
     phone: '',
-    email: ''
+    email: '',
   },
   isActive: true,
-  employees: []
+  employees: [],
 };
 
-export function EditCompanyDialog({ isOpen, data, toggleModal }: EditCompanyDialogProps) {
+export function EditCompanyDialog({
+  isOpen,
+  data,
+  toggleModal,
+}: EditCompanyDialogProps) {
   const { addCompany, updateCompany } = useCompanyStore();
   const [formData, setFormData] = useState<FormData>(initialFormData);
 
@@ -74,18 +80,18 @@ export function EditCompanyDialog({ isOpen, data, toggleModal }: EditCompanyDial
       setFormData({
         name: data.name || '',
         registrationNumber: data.registrationNumber || '',
-        address: { 
+        address: {
           street: data.address?.street || '',
           city: data.address?.city || '',
           postalCode: data.address?.postalCode || '',
-          country: data.address?.country || ''
+          country: data.address?.country || '',
         },
         contactInfo: {
           phone: data.contactInfo?.phoneNumber || '',
-          email: data.contactInfo?.email || ''
+          email: data.contactInfo?.email || '',
         },
         isActive: data.isActive ?? true,
-        employees: [...(data.employees || [])]
+        employees: [...(data.employees || [])],
       });
     } else {
       setFormData(initialFormData);
@@ -94,35 +100,35 @@ export function EditCompanyDialog({ isOpen, data, toggleModal }: EditCompanyDial
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (data?.id) {
       await updateCompany({
         ...formData,
-        id: data.id
+        id: data.id,
       } as Company);
     } else {
       await addCompany(formData);
     }
-    
+
     toggleModal();
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    
+
     if (name.includes('.')) {
       const [section, field] = name.split('.');
-      setFormData(prev => ({
+      setFormData((prev) => ({
         ...prev,
         [section]: {
           ...(prev[section as keyof typeof prev] as Record<string, unknown>),
-          [field]: value
-        }
+          [field]: value,
+        },
       }));
     } else {
-      setFormData(prev => ({
+      setFormData((prev) => ({
         ...prev,
-        [name]: value
+        [name]: value,
       }));
     }
   };
@@ -132,10 +138,12 @@ export function EditCompanyDialog({ isOpen, data, toggleModal }: EditCompanyDial
       <DialogContent>
         <DialogHeader>
           <DialogTitle>
-            {data ? "Modifier l'entreprise" : "Créer une entreprise"}
+            {data ? "Modifier l'entreprise" : 'Créer une entreprise'}
           </DialogTitle>
           <DialogDescription>
-            {data ? "Modifiez les informations de l'entreprise." : "Ajoutez une nouvelle entreprise."}
+            {data
+              ? "Modifiez les informations de l'entreprise."
+              : 'Ajoutez une nouvelle entreprise.'}
           </DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit}>
@@ -254,9 +262,7 @@ export function EditCompanyDialog({ isOpen, data, toggleModal }: EditCompanyDial
             </div>
           </div>
           <DialogFooter>
-            <Button type="submit">
-              {data ? 'Mettre à jour' : 'Créer'}
-            </Button>
+            <Button type="submit">{data ? 'Mettre à jour' : 'Créer'}</Button>
           </DialogFooter>
         </form>
       </DialogContent>

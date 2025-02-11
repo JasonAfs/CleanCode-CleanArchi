@@ -5,26 +5,34 @@ import { Button } from '@/components/ui/button';
 import { DataTable } from '@/components/ui/data-table';
 import { ColumnDef } from '@tanstack/react-table';
 import { ArrowLeft, Plus, Loader2 } from 'lucide-react';
-import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Motorcycle } from '@/types/motorcycle';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogDescription } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+  DialogDescription,
+} from '@/components/ui/dialog';
 import { useDealershipStore } from '@/store/dealershipStore';
 import { useMotorcycleStore } from '@/store/motorcycleStore';
 
 export function CompanyMotorcycles() {
   const { id } = useParams<{ id: string }>();
-  const { 
-    currentCompany, 
-    fetchCompanyById, 
+  const {
+    currentCompany,
+    fetchCompanyById,
     companyMotorcycles,
     fetchCompanyMotorcycles,
-    isLoading, 
+    isLoading,
     isLoadingMotorcycles,
     error,
-    motorcyclesError
+    motorcyclesError,
   } = useCompanyStore();
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const { currentDealershipMotorcycles, fetchDealershipMotorcycles } = useDealershipStore();
+  const { currentDealershipMotorcycles, fetchDealershipMotorcycles } =
+    useDealershipStore();
   const { assignMotorcycleToCompany } = useMotorcycleStore();
 
   const handleAssignMotorcycle = async (motorcycleId: string) => {
@@ -43,7 +51,7 @@ export function CompanyMotorcycles() {
     if (currentCompany?.dealershipId && isModalOpen) {
       fetchDealershipMotorcycles(currentCompany.dealershipId, {
         statusFilter: 'AVAILABLE',
-        includeInactive: false
+        includeInactive: false,
       });
     }
   }, [currentCompany?.dealershipId, isModalOpen, fetchDealershipMotorcycles]);
@@ -61,7 +69,7 @@ export function CompanyMotorcycles() {
       header: 'Modèle',
       cell: ({ row }) => (
         <span>{row.original.model.type.replace('_', ' ')}</span>
-      )
+      ),
     },
     {
       accessorKey: 'vin',
@@ -70,9 +78,7 @@ export function CompanyMotorcycles() {
     {
       accessorKey: 'mileage',
       header: 'Kilométrage',
-      cell: ({ row }) => (
-        <span>{row.original.mileage} km</span>
-      )
+      cell: ({ row }) => <span>{row.original.mileage} km</span>,
     },
     {
       accessorKey: 'status',
@@ -81,37 +87,39 @@ export function CompanyMotorcycles() {
         const status = row.original.status;
         let statusConfig = {
           text: '',
-          classes: ''
+          classes: '',
         };
 
         switch (status) {
           case 'AVAILABLE':
             statusConfig = {
               text: 'Disponible',
-              classes: 'bg-green-100 text-green-800'
+              classes: 'bg-green-100 text-green-800',
             };
             break;
           case 'MAINTENANCE':
             statusConfig = {
               text: 'En maintenance',
-              classes: 'bg-yellow-100 text-yellow-800'
+              classes: 'bg-yellow-100 text-yellow-800',
             };
             break;
           case 'IN_USE':
             statusConfig = {
               text: 'En utilisation',
-              classes: 'bg-blue-100 text-blue-800'
+              classes: 'bg-blue-100 text-blue-800',
             };
             break;
           default:
             statusConfig = {
               text: status,
-              classes: 'bg-gray-100 text-gray-800'
+              classes: 'bg-gray-100 text-gray-800',
             };
         }
 
         return (
-          <span className={`px-2 py-1 rounded-full text-xs ${statusConfig.classes}`}>
+          <span
+            className={`px-2 py-1 rounded-full text-xs ${statusConfig.classes}`}
+          >
             {statusConfig.text}
           </span>
         );
@@ -132,8 +140,8 @@ export function CompanyMotorcycles() {
       <Alert variant="destructive" className="max-w-md mx-auto mt-4">
         <AlertDescription>
           {error || motorcyclesError}
-          <Button 
-            variant="outline" 
+          <Button
+            variant="outline"
             className="ml-2"
             onClick={() => {
               if (id) {
@@ -178,7 +186,8 @@ export function CompanyMotorcycles() {
             <DialogHeader>
               <DialogTitle>Sélectionner une moto à ajouter</DialogTitle>
               <DialogDescription>
-                Choisissez une moto disponible dans la concession pour l'ajouter à l'entreprise.
+                Choisissez une moto disponible dans la concession pour l'ajouter
+                à l'entreprise.
               </DialogDescription>
             </DialogHeader>
             <div className="grid gap-4 py-4">
@@ -195,7 +204,9 @@ export function CompanyMotorcycles() {
                       onClick={() => handleAssignMotorcycle(motorcycle.id)}
                     >
                       <div>
-                        <p className="font-medium">{motorcycle.model.type.replace('_', ' ')}</p>
+                        <p className="font-medium">
+                          {motorcycle.model.type.replace('_', ' ')}
+                        </p>
                         <p className="text-sm text-gray-500">
                           VIN: {motorcycle.vin}
                         </p>
@@ -224,4 +235,4 @@ export function CompanyMotorcycles() {
       <DataTable columns={columns} data={companyMotorcycles} />
     </div>
   );
-} 
+}

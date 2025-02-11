@@ -1,7 +1,7 @@
-import { DomainError } from "@domain/errors/DomainError";
+import { DomainError } from '@domain/errors/DomainError';
 
 export class InvalidRegistrationNumberError extends DomainError {
-    constructor(message: string) {
-        super(`Invalid registration number: ${message}`);
-    }
+  constructor(message: string) {
+    super(`Invalid registration number: ${message}`);
+  }
 }

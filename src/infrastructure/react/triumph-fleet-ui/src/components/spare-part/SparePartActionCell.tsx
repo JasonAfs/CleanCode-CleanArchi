@@ -28,15 +28,21 @@ export const ActionCell = ({ row }: { row: Row<SparePart> }) => {
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
-        <DropdownMenuItem onClick={() => setData(row.original)} className="cursor-pointer">
+        <DropdownMenuItem
+          onClick={() => setData(row.original)}
+          className="cursor-pointer"
+        >
           <Edit className="mr-2 h-4 w-4" />
           Modifier
         </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => deleteSparePart(row.original.reference, user.role)} className="cursor-pointer text-red-600">
+        <DropdownMenuItem
+          onClick={() => deleteSparePart(row.original.reference, user.role)}
+          className="cursor-pointer text-red-600"
+        >
           <Trash className="mr-2 h-4 w-4" />
           Supprimer
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
   );
-}; 
+};

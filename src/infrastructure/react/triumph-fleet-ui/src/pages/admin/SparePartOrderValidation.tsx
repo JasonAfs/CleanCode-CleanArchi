@@ -11,7 +11,10 @@ export const SparePartOrderValidation: React.FC = () => {
     fetchOrderHistory();
   }, [fetchOrderHistory]);
 
-  const handleValidate = async (orderId: string, action: 'CONFIRM' | 'CANCEL') => {
+  const handleValidate = async (
+    orderId: string,
+    action: 'CONFIRM' | 'CANCEL',
+  ) => {
     try {
       await validateOrder(orderId, action);
     } catch (error) {
@@ -19,9 +22,7 @@ export const SparePartOrderValidation: React.FC = () => {
     }
   };
 
-  const pendingOrders = orders.filter(
-    (order) => order.status === 'PENDING',
-  );
+  const pendingOrders = orders.filter((order) => order.status === 'PENDING');
 
   if (isLoading) return <div>Chargement...</div>;
   if (error) return <div className="text-red-500">{error}</div>;
@@ -29,7 +30,7 @@ export const SparePartOrderValidation: React.FC = () => {
   return (
     <div className="container mx-auto p-4">
       <h1 className="text-2xl font-bold mb-6">Validation des Commandes</h1>
-      
+
       {pendingOrders.length === 0 ? (
         <p>Aucune commande en attente de validation</p>
       ) : (
@@ -75,4 +76,4 @@ export const SparePartOrderValidation: React.FC = () => {
       )}
     </div>
   );
-}; 
+};

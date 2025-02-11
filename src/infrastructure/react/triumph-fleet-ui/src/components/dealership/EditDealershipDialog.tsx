@@ -1,6 +1,6 @@
 // src/components/dealership/EditDealershipDialog.tsx
 import { useState, useEffect } from 'react';
-import { Button } from "@/components/ui/button";
+import { Button } from '@/components/ui/button';
 import {
   Dialog,
   DialogContent,
@@ -8,19 +8,21 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { create } from "zustand";
-import { useDealershipStore } from "@/store/dealershipStore";
-import { Dealership, DealershipDialogState } from "@/types/dealership";
+} from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { create } from 'zustand';
+import { useDealershipStore } from '@/store/dealershipStore';
+import { Dealership, DealershipDialogState } from '@/types/dealership';
 
-export const useDealershipDialogStore = create<DealershipDialogState>((set) => ({
-  isOpen: false,
-  toggleModal: () => set((state) => ({ isOpen: !state.isOpen })),
-  data: null,
-  setData: (data: Dealership) => set(() => ({ data, isOpen: true })),
-}));
+export const useDealershipDialogStore = create<DealershipDialogState>(
+  (set) => ({
+    isOpen: false,
+    toggleModal: () => set((state) => ({ isOpen: !state.isOpen })),
+    data: null,
+    setData: (data: Dealership) => set(() => ({ data, isOpen: true })),
+  }),
+);
 
 interface EditDealershipDialogProps {
   readonly isOpen: boolean;
@@ -49,16 +51,20 @@ const initialFormData: DealershipFormData = {
     street: '',
     city: '',
     postalCode: '',
-    country: ''
+    country: '',
   },
   contactInfo: {
     phoneNumber: '',
-    email: ''
+    email: '',
   },
-  isActive: true
+  isActive: true,
 };
 
-export function EditDealershipDialog({ isOpen, data, toggleModal }: EditDealershipDialogProps) {
+export function EditDealershipDialog({
+  isOpen,
+  data,
+  toggleModal,
+}: EditDealershipDialogProps) {
   const { addDealership, updateDealership } = useDealershipStore();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -76,7 +82,7 @@ export function EditDealershipDialog({ isOpen, data, toggleModal }: EditDealersh
     e.preventDefault();
     setError(null);
     setIsSubmitting(true);
-    
+
     try {
       if (data?.id) {
         await updateDealership({
@@ -86,11 +92,15 @@ export function EditDealershipDialog({ isOpen, data, toggleModal }: EditDealersh
       } else {
         await addDealership(formData);
       }
-      
+
       toggleModal();
     } catch (error) {
       console.error('Failed to save dealership:', error);
-      setError(error instanceof Error ? error.message : 'An error occurred while saving');
+      setError(
+        error instanceof Error
+          ? error.message
+          : 'An error occurred while saving',
+      );
     } finally {
       setIsSubmitting(false);
     }
@@ -99,29 +109,29 @@ export function EditDealershipDialog({ isOpen, data, toggleModal }: EditDealersh
   const handleNestedChange = (
     section: 'address' | 'contactInfo',
     field: string,
-    value: string
+    value: string,
   ) => {
     setFormData((prev) => ({
       ...prev,
       [section]: {
         ...prev[section],
-        [field]: value
-      }
+        [field]: value,
+      },
     }));
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    
+
     if (name.includes('.')) {
       const [section, field] = name.split('.');
       if (section === 'address' || section === 'contactInfo') {
         handleNestedChange(section, field, value);
       }
     } else {
-      setFormData(prev => ({
+      setFormData((prev) => ({
         ...prev,
-        [name]: value
+        [name]: value,
       }));
     }
   };
@@ -131,10 +141,12 @@ export function EditDealershipDialog({ isOpen, data, toggleModal }: EditDealersh
       <DialogContent>
         <DialogHeader>
           <DialogTitle>
-            {data ? "Modifier la concession" : "Créer une concession"}
+            {data ? 'Modifier la concession' : 'Créer une concession'}
           </DialogTitle>
           <DialogDescription>
-            {data ? "Modifiez les informations de la concession." : "Ajoutez une nouvelle concession."}
+            {data
+              ? 'Modifiez les informations de la concession.'
+              : 'Ajoutez une nouvelle concession.'}
           </DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit}>
@@ -239,9 +251,7 @@ export function EditDealershipDialog({ isOpen, data, toggleModal }: EditDealersh
             </div>
           </div>
           <DialogFooter>
-            <Button type="submit">
-              {data ? 'Mettre à jour' : 'Créer'}
-            </Button>
+            <Button type="submit">{data ? 'Mettre à jour' : 'Créer'}</Button>
           </DialogFooter>
         </form>
       </DialogContent>

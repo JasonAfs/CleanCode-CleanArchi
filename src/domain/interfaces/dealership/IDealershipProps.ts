@@ -4,26 +4,26 @@ import { DealershipEmployees } from '@domain/aggregates/dealership/DealershipEmp
 import { DealershipMotorcycles } from '@domain/aggregates/dealership/DealershipMotorcycles';
 
 export interface DealershipProps {
-    id: string;
-    name: string;
-    address: Address;
-    contactInfo: ContactInfo;
-    employees: DealershipEmployees;
-    motorcycles: DealershipMotorcycles;
-    isActive: boolean;
-    createdAt: Date;
-    updatedAt: Date;
+  id: string;
+  name: string;
+  address: Address;
+  contactInfo: ContactInfo;
+  employees: DealershipEmployees;
+  motorcycles: DealershipMotorcycles;
+  isActive: boolean;
+  createdAt: Date;
+  updatedAt: Date;
 }
 
 export interface CreateDealershipProps {
-    name: string;
-    address: Address;
-    contactInfo: ContactInfo;
+  name: string;
+  address: Address;
+  contactInfo: ContactInfo;
 }
 
 export interface ReconstituteDealershipProps extends CreateDealershipProps {
-    id: string;
-    isActive: boolean;
-    createdAt: Date;
-    updatedAt: Date;
+  id: string;
+  isActive: boolean;
+  createdAt: Date;
+  updatedAt: Date;
 }

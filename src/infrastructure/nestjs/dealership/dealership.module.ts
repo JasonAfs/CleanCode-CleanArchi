@@ -29,12 +29,14 @@ import { PrismaMotorcycleRepository } from '@infrastructure/repositories/prisma/
     // Repository Providers
     {
       provide: 'IDealershipRepository',
-      useFactory: (prisma: PrismaService) => new PrismaDealershipRepository(prisma),
+      useFactory: (prisma: PrismaService) =>
+        new PrismaDealershipRepository(prisma),
       inject: [PrismaService],
     },
     {
       provide: 'IMotorcycleRepository',
-      useFactory: (prisma: PrismaService) => new PrismaMotorcycleRepository(prisma),
+      useFactory: (prisma: PrismaService) =>
+        new PrismaMotorcycleRepository(prisma),
       inject: [PrismaService],
     },
     {
@@ -42,59 +44,65 @@ import { PrismaMotorcycleRepository } from '@infrastructure/repositories/prisma/
       useFactory: (prisma: PrismaService) => new PrismaUserRepository(prisma),
       inject: [PrismaService],
     },
-    
+
     // Use Case Providers
     {
       provide: CreateDealershipUseCase,
-      useFactory: (dealershipRepo: IDealershipRepository) => 
+      useFactory: (dealershipRepo: IDealershipRepository) =>
         new CreateDealershipUseCase(dealershipRepo),
       inject: ['IDealershipRepository'],
     },
     {
       provide: GetDealershipsUseCase,
-      useFactory: (dealershipRepo: IDealershipRepository) => 
+      useFactory: (dealershipRepo: IDealershipRepository) =>
         new GetDealershipsUseCase(dealershipRepo),
       inject: ['IDealershipRepository'],
     },
     {
       provide: GetDealershipByIdUseCase,
-      useFactory: (dealershipRepo: IDealershipRepository,userRepo : IUserRepository) => 
-        new GetDealershipByIdUseCase(dealershipRepo,userRepo),
-      inject: ['IDealershipRepository','IUserRepository'],
+      useFactory: (
+        dealershipRepo: IDealershipRepository,
+        userRepo: IUserRepository,
+      ) => new GetDealershipByIdUseCase(dealershipRepo, userRepo),
+      inject: ['IDealershipRepository', 'IUserRepository'],
     },
     {
       provide: UpdateDealershipInfoUseCase,
-      useFactory: (dealershipRepo: IDealershipRepository) => 
+      useFactory: (dealershipRepo: IDealershipRepository) =>
         new UpdateDealershipInfoUseCase(dealershipRepo),
       inject: ['IDealershipRepository'],
     },
     {
       provide: DeactivateDealershipUseCase,
-      useFactory: (dealershipRepo: IDealershipRepository) => 
+      useFactory: (dealershipRepo: IDealershipRepository) =>
         new DeactivateDealershipUseCase(dealershipRepo),
       inject: ['IDealershipRepository'],
     },
     {
       provide: AddDealershipEmployeeUseCase,
-      useFactory: (dealershipRepo: IDealershipRepository, userRepo: IUserRepository) => 
-        new AddDealershipEmployeeUseCase(dealershipRepo, userRepo),
+      useFactory: (
+        dealershipRepo: IDealershipRepository,
+        userRepo: IUserRepository,
+      ) => new AddDealershipEmployeeUseCase(dealershipRepo, userRepo),
       inject: ['IDealershipRepository', 'IUserRepository'],
     },
     {
       provide: RemoveDealershipEmployeeUseCase,
-      useFactory: (dealershipRepo: IDealershipRepository, userRepo: IUserRepository) => 
-        new RemoveDealershipEmployeeUseCase(dealershipRepo, userRepo),
+      useFactory: (
+        dealershipRepo: IDealershipRepository,
+        userRepo: IUserRepository,
+      ) => new RemoveDealershipEmployeeUseCase(dealershipRepo, userRepo),
       inject: ['IDealershipRepository', 'IUserRepository'],
     },
     {
       provide: GetDealershipMotorcyclesUseCase,
-      useFactory: (motorcycleRepo: IMotorcycleRepository) => 
+      useFactory: (motorcycleRepo: IMotorcycleRepository) =>
         new GetDealershipMotorcyclesUseCase(motorcycleRepo),
       inject: ['IMotorcycleRepository'],
     },
     {
       provide: GetDealershipEmployeesUseCase,
-      useFactory: (dealershipRepo: IDealershipRepository) => 
+      useFactory: (dealershipRepo: IDealershipRepository) =>
         new GetDealershipEmployeesUseCase(dealershipRepo),
       inject: ['IDealershipRepository'],
     },
@@ -108,7 +116,7 @@ import { PrismaMotorcycleRepository } from '@infrastructure/repositories/prisma/
     AddDealershipEmployeeUseCase,
     RemoveDealershipEmployeeUseCase,
     GetDealershipMotorcyclesUseCase,
-    GetDealershipEmployeesUseCase,  
+    GetDealershipEmployeesUseCase,
   ],
 })
 export class DealershipModule {}

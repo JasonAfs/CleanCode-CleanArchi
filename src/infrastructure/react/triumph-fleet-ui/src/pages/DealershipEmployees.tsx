@@ -4,7 +4,12 @@ import { useDealershipStore } from '@/store/dealershipStore';
 
 export function DealershipEmployees() {
   const { id } = useParams<{ id: string }>();
-  const { currentDealershipEmployees, fetchDealershipEmployees, isLoading, error } = useDealershipStore();
+  const {
+    currentDealershipEmployees,
+    fetchDealershipEmployees,
+    isLoading,
+    error,
+  } = useDealershipStore();
 
   useEffect(() => {
     if (id) {
@@ -31,7 +36,9 @@ export function DealershipEmployees() {
           >
             <div className="flex justify-between items-center">
               <div>
-                <h3 className="font-semibold">{employee.firstName} {employee.lastName}</h3>
+                <h3 className="font-semibold">
+                  {employee.firstName} {employee.lastName}
+                </h3>
                 <p className="text-sm text-gray-500">{employee.role}</p>
               </div>
               <div className="text-sm text-gray-500">{employee.email}</div>
@@ -41,4 +48,4 @@ export function DealershipEmployees() {
       </div>
     </div>
   );
-} 
+}

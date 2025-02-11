@@ -6,25 +6,28 @@ import { Button } from '@/components/ui/button';
 
 export function DealershipMotorcycles() {
   const { id } = useParams<{ id: string }>();
-  const [selectedMotorcycleId, setSelectedMotorcycleId] = useState<string | null>(null);
+  const [selectedMotorcycleId, setSelectedMotorcycleId] = useState<
+    string | null
+  >(null);
   const [isTransferModalOpen, setIsTransferModalOpen] = useState(false);
   const [transferError, setTransferError] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
-  
-  const { 
-    currentDealershipMotorcycles, 
-    fetchDealershipMotorcycles, 
-    isLoading: isLoadingMotorcycles, 
-    error: motorcyclesError 
+
+  const {
+    currentDealershipMotorcycles,
+    fetchDealershipMotorcycles,
+    isLoading: isLoadingMotorcycles,
+    error: motorcyclesError,
   } = useDealershipStore();
-  
-  const { 
-    dealerships, 
-    fetchDealerships, 
-    isLoading: isLoadingDealerships 
+
+  const {
+    dealerships,
+    fetchDealerships,
+    isLoading: isLoadingDealerships,
   } = useDealershipStore();
-  
-  const { transferMotorcycle, releaseMotorcycleFromCompany } = useMotorcycleStore();
+
+  const { transferMotorcycle, releaseMotorcycleFromCompany } =
+    useMotorcycleStore();
 
   useEffect(() => {
     if (!id) return;
@@ -34,20 +37,24 @@ export function DealershipMotorcycles() {
 
   const handleTransferClick = (motorcycleId: string) => {
     // Trouver la moto sélectionnée
-    const motorcycle = currentDealershipMotorcycles.find(m => m.id === motorcycleId);
-    
+    const motorcycle = currentDealershipMotorcycles.find(
+      (m) => m.id === motorcycleId,
+    );
+
     if (motorcycle?.holder?.companyId) {
       // Si la moto est assignée à une entreprise, afficher un message de confirmation
-      if (window.confirm(
-        "Cette moto est actuellement assignée à une entreprise. Voulez-vous la libérer avant de la transférer ?"
-      )) {
+      if (
+        window.confirm(
+          'Cette moto est actuellement assignée à une entreprise. Voulez-vous la libérer avant de la transférer ?',
+        )
+      ) {
         // Appeler l'API pour libérer la moto de l'entreprise
         releaseMotorcycleFromCompany(motorcycleId)
           .then(async () => {
             // D'abord rafraîchir les données
             await fetchDealerships();
             await fetchDealershipMotorcycles(id!);
-            
+
             // Attendre un court instant pour s'assurer que le store est mis à jour
             setTimeout(() => {
               setSelectedMotorcycleId(motorcycleId);
@@ -55,11 +62,11 @@ export function DealershipMotorcycles() {
             }, 100);
           })
           .catch((error) => {
-            console.error("Erreur lors de la libération de la moto:", error);
+            console.error('Erreur lors de la libération de la moto:', error);
             setTransferError(
-              error instanceof Error 
-                ? error.message 
-                : "Une erreur est survenue lors de la libération de la moto"
+              error instanceof Error
+                ? error.message
+                : 'Une erreur est survenue lors de la libération de la moto',
             );
           });
       }
@@ -75,11 +82,14 @@ export function DealershipMotorcycles() {
 
   const handleTransferConfirm = async (targetDealershipId: string) => {
     if (!selectedMotorcycleId || !id) return;
-    
+
     try {
       setTransferError(null);
-      const response = await transferMotorcycle(selectedMotorcycleId, targetDealershipId);
-      
+      const response = await transferMotorcycle(
+        selectedMotorcycleId,
+        targetDealershipId,
+      );
+
       // Utiliser le message de succès retourné par l'API
       setSuccessMessage(response.message);
       setIsTransferModalOpen(false);
@@ -91,11 +101,11 @@ export function DealershipMotorcycles() {
         setSuccessMessage(null);
       }, 5000);
     } catch (error) {
-      console.error("Erreur lors du transfert:", error);
+      console.error('Erreur lors du transfert:', error);
       setTransferError(
-        error instanceof Error 
-          ? error.message 
-          : "Une erreur est survenue lors du transfert"
+        error instanceof Error
+          ? error.message
+          : 'Une erreur est survenue lors du transfert',
       );
     }
   };
@@ -122,8 +132,12 @@ export function DealershipMotorcycles() {
         <div className="fixed top-4 right-4 bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded z-50 shadow-lg">
           <div className="flex items-center">
             <div className="py-1">
-              <svg className="fill-current h-6 w-6 text-green-500 mr-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
-                <path d="M2.93 17.07A10 10 0 1 1 17.07 2.93 10 10 0 0 1 2.93 17.07zm12.73-1.41A8 8 0 1 0 4.34 4.34a8 8 0 0 0 11.32 11.32zM6.7 9.29L9 11.6l4.3-4.3 1.4 1.42L9 14.4l-3.7-3.7 1.4-1.42z"/>
+              <svg
+                className="fill-current h-6 w-6 text-green-500 mr-4"
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 20 20"
+              >
+                <path d="M2.93 17.07A10 10 0 1 1 17.07 2.93 10 10 0 0 1 2.93 17.07zm12.73-1.41A8 8 0 1 0 4.34 4.34a8 8 0 0 0 11.32 11.32zM6.7 9.29L9 11.6l4.3-4.3 1.4 1.42L9 14.4l-3.7-3.7 1.4-1.42z" />
               </svg>
             </div>
             <p>{successMessage}</p>
@@ -166,7 +180,7 @@ export function DealershipMotorcycles() {
             <h2 className="text-xl font-bold mb-4">
               Sélectionner la concession de destination
             </h2>
-            
+
             {transferError && (
               <div className="mb-4 p-2 bg-red-100 text-red-700 rounded">
                 {transferError}
@@ -180,8 +194,8 @@ export function DealershipMotorcycles() {
                 </div>
               ) : (
                 dealerships
-                  .filter(dealership => dealership.id !== id)
-                  .map(dealership => (
+                  .filter((dealership) => dealership.id !== id)
+                  .map((dealership) => (
                     <button
                       key={dealership.id}
                       onClick={() => handleTransferConfirm(dealership.id)}
@@ -192,7 +206,7 @@ export function DealershipMotorcycles() {
                   ))
               )}
             </div>
-            
+
             <div className="mt-4 flex justify-end gap-2">
               <button
                 onClick={() => setIsTransferModalOpen(false)}
@@ -206,4 +220,4 @@ export function DealershipMotorcycles() {
       )}
     </div>
   );
-} 
+}

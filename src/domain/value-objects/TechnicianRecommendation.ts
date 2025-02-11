@@ -3,7 +3,6 @@ import { ITechnicianRecommendationProps } from '@domain/interfaces/maintenance/I
 import { RecommendationPriority } from '@domain/enums/MaintenanceEnums';
 import { randomUUID } from 'crypto';
 
-
 export class TechnicianRecommendation {
   private readonly props: ITechnicianRecommendationProps;
 

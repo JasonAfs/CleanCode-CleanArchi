@@ -6,18 +6,15 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ColumnDef } from '@tanstack/react-table';
 import { Loader2, History } from 'lucide-react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { SparePartStock, SparePartOrder } from '@/services/sparePart/HttpSparePartOrderService';
+import {
+  SparePartStock,
+  SparePartOrder,
+} from '@/services/sparePart/HttpSparePartOrderService';
 import { NewOrderDialog } from '@/components/spare-part/NewOrderDialog';
 
 export function DealershipSparePartStock() {
-  const { 
-    stock, 
-    orders, 
-    isLoading, 
-    error, 
-    fetchStock, 
-    fetchOrderHistory,
-  } = useSparePartOrderStore();
+  const { stock, orders, isLoading, error, fetchStock, fetchOrderHistory } =
+    useSparePartOrderStore();
   const [activeTab, setActiveTab] = useState('stock');
 
   const stockColumns: ColumnDef<SparePartStock>[] = [
@@ -33,7 +30,9 @@ export function DealershipSparePartStock() {
       accessorKey: 'currentQuantity',
       header: 'Quantité',
       cell: ({ row }) => (
-        <span className={`${row.original.isLowStock ? 'text-red-500 font-bold' : ''}`}>
+        <span
+          className={`${row.original.isLowStock ? 'text-red-500 font-bold' : ''}`}
+        >
           {row.original.currentQuantity}
         </span>
       ),
@@ -54,8 +53,8 @@ export function DealershipSparePartStock() {
     {
       id: 'actions',
       cell: ({ row }) => (
-        <Button 
-          variant="outline" 
+        <Button
+          variant="outline"
           size="sm"
           onClick={() => handleOrder(row.original)}
           disabled={!row.original.isLowStock}
@@ -70,7 +69,8 @@ export function DealershipSparePartStock() {
     {
       accessorKey: 'orderDate',
       header: 'Date de commande',
-      cell: ({ row }) => new Date(row.original.orderDate).toLocaleDateString('fr-FR'),
+      cell: ({ row }) =>
+        new Date(row.original.orderDate).toLocaleDateString('fr-FR'),
     },
     {
       accessorKey: 'status',
@@ -89,9 +89,12 @@ export function DealershipSparePartStock() {
     {
       accessorKey: 'estimatedDeliveryDate',
       header: 'Livraison estimée',
-      cell: ({ row }) => row.original.estimatedDeliveryDate 
-        ? new Date(row.original.estimatedDeliveryDate).toLocaleDateString('fr-FR')
-        : 'Non définie',
+      cell: ({ row }) =>
+        row.original.estimatedDeliveryDate
+          ? new Date(row.original.estimatedDeliveryDate).toLocaleDateString(
+              'fr-FR',
+            )
+          : 'Non définie',
     },
   ];
 
@@ -139,8 +142,8 @@ export function DealershipSparePartStock() {
       <Alert variant="destructive" className="max-w-md mx-auto mt-4">
         <AlertDescription>
           {error}
-          <Button 
-            variant="outline" 
+          <Button
+            variant="outline"
             className="ml-2"
             onClick={() => fetchStock()}
           >
@@ -168,19 +171,13 @@ export function DealershipSparePartStock() {
         </TabsList>
 
         <TabsContent value="stock">
-          <DataTable 
-            columns={stockColumns} 
-            data={stock}
-          />
+          <DataTable columns={stockColumns} data={stock} />
         </TabsContent>
 
         <TabsContent value="orders">
-          <DataTable 
-            columns={orderColumns} 
-            data={orders}
-          />
+          <DataTable columns={orderColumns} data={orders} />
         </TabsContent>
       </Tabs>
     </div>
   );
-} 
+}

@@ -1,7 +1,7 @@
-import { DomainError } from "@domain/errors/DomainError";
+import { DomainError } from '@domain/errors/DomainError';
 
 export class AuthValidationError extends DomainError {
-    constructor(message: string) {
-        super(message);
-    }
+  constructor(message: string) {
+    super(message);
+  }
 }

@@ -1,11 +1,11 @@
-import { Routes, Route, Navigate } from "react-router-dom";
-import { AuthProvider } from "./providers/AuthProvider";
-import { LoginForm } from "./components/auth/LoginForm";
-import { RegisterForm } from "./components/auth/RegisterForm";
-import { DashboardLayout } from "./components/layouts/DashboardLayout";
-import { useAuth } from "./hooks/useAuth";
-import { appRoutes } from "@/navigation/routes";
-import { UserRole } from "@domain/enums/UserRole";
+import { Routes, Route, Navigate } from 'react-router-dom';
+import { AuthProvider } from './providers/AuthProvider';
+import { LoginForm } from './components/auth/LoginForm';
+import { RegisterForm } from './components/auth/RegisterForm';
+import { DashboardLayout } from './components/layouts/DashboardLayout';
+import { useAuth } from './hooks/useAuth';
+import { appRoutes } from '@/navigation/routes';
+import { UserRole } from '@domain/enums/UserRole';
 import { CompanyDetails } from '@/components/company/CompanyDetails';
 import { CompanyEmployees } from '@/components/company/CompanyEmployees';
 import { CompanyMotorcycles } from '@/components/company/CompanyMotorcycles';
@@ -65,7 +65,10 @@ const AppRoutes = () => {
       {/* Nouvelles routes */}
       <Route path="/companies/:id" element={<CompanyDetails />} />
       <Route path="/companies/:id/employees" element={<CompanyEmployees />} />
-      <Route path="/companies/:id/motorcycles" element={<CompanyMotorcycles />} />
+      <Route
+        path="/companies/:id/motorcycles"
+        element={<CompanyMotorcycles />}
+      />
       <Route path="/companies" element={<Company />} />
     </Routes>
   );

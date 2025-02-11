@@ -1,53 +1,58 @@
-import { InvalidAddressError } from "@domain/errors/value-objects/address/InvalidAddressError";
+import { InvalidAddressError } from '@domain/errors/value-objects/address/InvalidAddressError';
 
 export class Address {
-    private constructor(
-        private readonly _street: string,
-        private readonly _city: string,
-        private readonly _postalCode: string,
-        private readonly _country: string
-    ) {}
+  private constructor(
+    private readonly _street: string,
+    private readonly _city: string,
+    private readonly _postalCode: string,
+    private readonly _country: string,
+  ) {}
 
-    public static create(street: string, city: string, postalCode: string, country: string): Address {
-        if (!street.trim()) {
-            throw new InvalidAddressError("Street is required");
-        }
-        if (!city.trim()) {
-            throw new InvalidAddressError("City is required");
-        }
-        if (!postalCode.trim()) {
-            throw new InvalidAddressError("Postal code is required");
-        }
-        if (!country.trim()) {
-            throw new InvalidAddressError("Country is required");
-        }
-
-        return new Address(
-            street.trim(),
-            city.trim(),
-            postalCode.trim(),
-            country.trim()
-        );
+  public static create(
+    street: string,
+    city: string,
+    postalCode: string,
+    country: string,
+  ): Address {
+    if (!street.trim()) {
+      throw new InvalidAddressError('Street is required');
+    }
+    if (!city.trim()) {
+      throw new InvalidAddressError('City is required');
+    }
+    if (!postalCode.trim()) {
+      throw new InvalidAddressError('Postal code is required');
+    }
+    if (!country.trim()) {
+      throw new InvalidAddressError('Country is required');
     }
 
-    // Ajout des getters
-    get street(): string {
-        return this._street;
-    }
+    return new Address(
+      street.trim(),
+      city.trim(),
+      postalCode.trim(),
+      country.trim(),
+    );
+  }
 
-    get city(): string {
-        return this._city;
-    }
+  // Ajout des getters
+  get street(): string {
+    return this._street;
+  }
 
-    get postalCode(): string {
-        return this._postalCode;
-    }
+  get city(): string {
+    return this._city;
+  }
 
-    get country(): string {
-        return this._country;
-    }
+  get postalCode(): string {
+    return this._postalCode;
+  }
 
-    public toString(): string {
-        return `${this._street}, ${this._city}, ${this._postalCode}, ${this._country}`;
-    }
+  get country(): string {
+    return this._country;
+  }
+
+  public toString(): string {
+    return `${this._street}, ${this._city}, ${this._postalCode}, ${this._country}`;
+  }
 }

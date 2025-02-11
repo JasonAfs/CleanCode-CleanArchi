@@ -183,12 +183,6 @@ export class Company {
     return this.props.employees.getCompanyEmployees();
   }
 
-  
-  
-
-  
-
-
   public belongsToDealership(dealershipId: string | undefined): boolean {
     if (!dealershipId || !this.props.createdByDealershipId) {
       return false;

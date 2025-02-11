@@ -4,98 +4,110 @@ import { UserRole } from '@domain/enums/UserRole';
 import { DealershipMotorcyclesError } from '@domain/errors/motorcycle/DealershipMotorcyclesError';
 
 export class DealershipMotorcycles {
-    private constructor(private readonly motorcycles: Motorcycle[]) {}
+  private constructor(private readonly motorcycles: Motorcycle[]) {}
 
-    public static create(): DealershipMotorcycles {
-        return new DealershipMotorcycles([]);
+  public static create(): DealershipMotorcycles {
+    return new DealershipMotorcycles([]);
+  }
+
+  public addMotorcycle(
+    motorcycle: Motorcycle,
+    userRole: UserRole,
+  ): DealershipMotorcycles {
+    if (userRole !== UserRole.TRIUMPH_ADMIN) {
+      throw new DealershipMotorcyclesError(
+        'Only TRIUMPH_ADMIN can add motorcycles to dealership fleet',
+      );
     }
 
-    public addMotorcycle(motorcycle: Motorcycle, userRole: UserRole): DealershipMotorcycles {
-        if (userRole !== UserRole.TRIUMPH_ADMIN) {
-            throw new DealershipMotorcyclesError(
-                'Only TRIUMPH_ADMIN can add motorcycles to dealership fleet'
-            );
-        }
-
-        if (motorcycle.dealershipId) {
-            throw new DealershipMotorcyclesError(
-                'Motorcycle is already assigned to a dealership'
-            );
-        }
-
-        if (this.hasMotorcycle(motorcycle.id)) {
-            throw new DealershipMotorcyclesError(
-                'Motorcycle already exists in this dealership'
-            );
-        }
-
-        return new DealershipMotorcycles([...this.motorcycles, motorcycle]);
+    if (motorcycle.dealershipId) {
+      throw new DealershipMotorcyclesError(
+        'Motorcycle is already assigned to a dealership',
+      );
     }
 
-    public removeMotorcycle(motorcycleId: string, userRole: UserRole): DealershipMotorcycles {
-        if (userRole !== UserRole.TRIUMPH_ADMIN) {
-            throw new DealershipMotorcyclesError(
-                'Only TRIUMPH_ADMIN can remove motorcycles from dealership fleet'
-            );
-        }
-
-        const motorcycle = this.getMotorcycleById(motorcycleId);
-        if (!motorcycle) {
-            throw new DealershipMotorcyclesError('Motorcycle not found in this dealership');
-        }
-
-        if (motorcycle.status === MotorcycleStatus.IN_USE) {
-            throw new DealershipMotorcyclesError(
-                'Cannot remove motorcycle while it is in use'
-            );
-        }
-
-        if (motorcycle.status === MotorcycleStatus.MAINTENANCE) {
-            throw new DealershipMotorcyclesError(
-                'Cannot remove motorcycle while it is in maintenance'
-            );
-        }
-
-        const newMotorcycles = this.motorcycles.filter(
-            (moto) => moto.id !== motorcycleId
-        );
-
-        return new DealershipMotorcycles(newMotorcycles);
+    if (this.hasMotorcycle(motorcycle.id)) {
+      throw new DealershipMotorcyclesError(
+        'Motorcycle already exists in this dealership',
+      );
     }
 
-    // Méthodes de consultation
-    public hasMotorcycle(motorcycleId: string): boolean {
-        return this.motorcycles.some((motorcycle) => motorcycle.id === motorcycleId);
+    return new DealershipMotorcycles([...this.motorcycles, motorcycle]);
+  }
+
+  public removeMotorcycle(
+    motorcycleId: string,
+    userRole: UserRole,
+  ): DealershipMotorcycles {
+    if (userRole !== UserRole.TRIUMPH_ADMIN) {
+      throw new DealershipMotorcyclesError(
+        'Only TRIUMPH_ADMIN can remove motorcycles from dealership fleet',
+      );
     }
 
-    public getMotorcycleById(motorcycleId: string): Motorcycle | undefined {
-        return this.motorcycles.find((motorcycle) => motorcycle.id === motorcycleId);
+    const motorcycle = this.getMotorcycleById(motorcycleId);
+    if (!motorcycle) {
+      throw new DealershipMotorcyclesError(
+        'Motorcycle not found in this dealership',
+      );
     }
 
-    public getAll(): Motorcycle[] {
-        return [...this.motorcycles];
+    if (motorcycle.status === MotorcycleStatus.IN_USE) {
+      throw new DealershipMotorcyclesError(
+        'Cannot remove motorcycle while it is in use',
+      );
     }
 
-    public getByStatus(status: MotorcycleStatus): Motorcycle[] {
-        return this.motorcycles.filter(
-            (motorcycle) => motorcycle.status === status
-        );
+    if (motorcycle.status === MotorcycleStatus.MAINTENANCE) {
+      throw new DealershipMotorcyclesError(
+        'Cannot remove motorcycle while it is in maintenance',
+      );
     }
 
-    public getAvailableMotorcycles(): Motorcycle[] {
-        return this.getByStatus(MotorcycleStatus.AVAILABLE);
-    }
+    const newMotorcycles = this.motorcycles.filter(
+      (moto) => moto.id !== motorcycleId,
+    );
 
-    public getInMaintenanceMotorcycles(): Motorcycle[] {
-        return this.getByStatus(MotorcycleStatus.MAINTENANCE);
-    }
+    return new DealershipMotorcycles(newMotorcycles);
+  }
 
-    public getInUseMotorcycles(): Motorcycle[] {
-        return this.getByStatus(MotorcycleStatus.IN_USE);
-    }
+  // Méthodes de consultation
+  public hasMotorcycle(motorcycleId: string): boolean {
+    return this.motorcycles.some(
+      (motorcycle) => motorcycle.id === motorcycleId,
+    );
+  }
 
-    // Getter
-    get totalMotorcycles(): number {
-        return this.motorcycles.length;
-    }
+  public getMotorcycleById(motorcycleId: string): Motorcycle | undefined {
+    return this.motorcycles.find(
+      (motorcycle) => motorcycle.id === motorcycleId,
+    );
+  }
+
+  public getAll(): Motorcycle[] {
+    return [...this.motorcycles];
+  }
+
+  public getByStatus(status: MotorcycleStatus): Motorcycle[] {
+    return this.motorcycles.filter(
+      (motorcycle) => motorcycle.status === status,
+    );
+  }
+
+  public getAvailableMotorcycles(): Motorcycle[] {
+    return this.getByStatus(MotorcycleStatus.AVAILABLE);
+  }
+
+  public getInMaintenanceMotorcycles(): Motorcycle[] {
+    return this.getByStatus(MotorcycleStatus.MAINTENANCE);
+  }
+
+  public getInUseMotorcycles(): Motorcycle[] {
+    return this.getByStatus(MotorcycleStatus.IN_USE);
+  }
+
+  // Getter
+  get totalMotorcycles(): number {
+    return this.motorcycles.length;
+  }
 }

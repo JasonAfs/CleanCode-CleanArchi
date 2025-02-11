@@ -97,7 +97,10 @@ export class Dealership {
         'Cannot add motorcycle to an inactive dealership',
       );
     }
-    this.props.motorcycles = this.props.motorcycles.addMotorcycle(motorcycle, userRole);
+    this.props.motorcycles = this.props.motorcycles.addMotorcycle(
+      motorcycle,
+      userRole,
+    );
     this.updateLastModified();
   }
 
@@ -107,7 +110,10 @@ export class Dealership {
         'Cannot remove motorcycle from an inactive dealership',
       );
     }
-    this.props.motorcycles = this.props.motorcycles.removeMotorcycle(motorcycleId, userRole);
+    this.props.motorcycles = this.props.motorcycles.removeMotorcycle(
+      motorcycleId,
+      userRole,
+    );
     this.updateLastModified();
   }
 

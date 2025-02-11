@@ -19,7 +19,8 @@ export class JwtAuthenticationService implements IAuthenticationService {
     private readonly refreshTokenRepository: IRefreshTokenRepository,
     private readonly dealershipRepository: IDealershipRepository,
     private readonly companyRepository: ICompanyRepository,
-    private readonly jwtSecret: string = process.env.JWT_SECRET ?? 'your-secret-key', 
+    private readonly jwtSecret: string = process.env.JWT_SECRET ??
+      'your-secret-key',
     private readonly accessTokenExpiration: string = '1d',
     private readonly refreshTokenExpiration: string = '7d',
   ) {}
@@ -33,7 +34,7 @@ export class JwtAuthenticationService implements IAuthenticationService {
     let userCompanyId: string | undefined;
 
     if (this.isDealershipRole(role)) {
-      const dealership = await this.dealershipRepository.findByEmployee(userId); 
+      const dealership = await this.dealershipRepository.findByEmployee(userId);
       userDealershipId = dealership?.id;
     } else if (this.isCompanyRole(role)) {
       const company = await this.companyRepository.findByEmployeeId(userId);
@@ -44,7 +45,7 @@ export class JwtAuthenticationService implements IAuthenticationService {
       userId,
       role,
       ...(userDealershipId && { userDealershipId }),
-      ...(userCompanyId && { userCompanyId })
+      ...(userCompanyId && { userCompanyId }),
     };
 
     const accessToken = jwt.sign(tokenPayload, this.jwtSecret, {
@@ -57,7 +58,11 @@ export class JwtAuthenticationService implements IAuthenticationService {
 
     const refreshExpiration = new Date();
     refreshExpiration.setDate(refreshExpiration.getDate() + 7);
-    await this.refreshTokenRepository.save(refreshToken, userId, refreshExpiration);
+    await this.refreshTokenRepository.save(
+      refreshToken,
+      userId,
+      refreshExpiration,
+    );
 
     return {
       accessToken,
@@ -77,7 +82,7 @@ export class JwtAuthenticationService implements IAuthenticationService {
   public async verifyRefreshToken(token: string): Promise<ExtendedAuthPayload> {
     try {
       const decoded = jwt.verify(token, this.jwtSecret) as ExtendedAuthPayload;
-      
+
       const userId = await this.refreshTokenRepository.verify(token);
       if (!userId) {
         throw new Error('Refresh token has been revoked');
@@ -98,14 +103,11 @@ export class JwtAuthenticationService implements IAuthenticationService {
       UserRole.DEALERSHIP_MANAGER,
       UserRole.DEALERSHIP_EMPLOYEE,
       UserRole.DEALERSHIP_TECHNICIAN,
-      UserRole.DEALERSHIP_STOCK_MANAGER
+      UserRole.DEALERSHIP_STOCK_MANAGER,
     ].includes(role);
   }
 
   private isCompanyRole(role: UserRole): boolean {
-    return [
-      UserRole.COMPANY_MANAGER,
-      UserRole.COMPANY_DRIVER
-    ].includes(role);
+    return [UserRole.COMPANY_MANAGER, UserRole.COMPANY_DRIVER].includes(role);
   }
 }
