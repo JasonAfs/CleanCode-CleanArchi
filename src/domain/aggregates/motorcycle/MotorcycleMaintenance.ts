@@ -3,14 +3,8 @@ import {
   MaintenanceType,
   MaintenanceStatus,
 } from '@domain/enums/MaintenanceEnums';
-import { DomainError } from '@domain/errors/DomainError';
 import { MaintenanceInterval } from '@domain/value-objects/MaintenanceInterval';
-
-export class MotorcycleMaintenanceError extends DomainError {
-  constructor(message: string) {
-    super(message);
-  }
-}
+import { MotorcycleMaintenanceError } from '@domain/errors/motorcycle/MotorcycleMaintenanceError';
 
 export class MotorcycleMaintenance {
   private constructor(

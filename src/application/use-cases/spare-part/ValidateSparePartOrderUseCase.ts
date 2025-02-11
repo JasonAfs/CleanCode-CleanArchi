@@ -5,22 +5,6 @@ import { UnauthorizedError } from '@domain/errors/authorization/UnauthorizedErro
 import { UserRole } from '@domain/enums/UserRole';
 import { BaseAuthenticatedDTO } from '@application/dtos/shared/BaseAuthenticatedDTO';
 
-export interface ValidateSparePartOrderDTO extends BaseAuthenticatedDTO {
-  orderId: string;
-  action: 'CONFIRM' | 'CANCEL';
-}
-
-export interface ValidateSparePartOrderResponseDTO {
-  success: boolean;
-  message: string;
-  orderId: string;
-  newStatus: OrderStatus;
-  updatedStock?: {
-    sparePartReference: string;
-    newQuantity: number;
-  }[];
-}
-
 export class ValidateSparePartOrderUseCase {
   constructor(
     private readonly sparePartOrderRepository: ISparePartOrderRepository,
@@ -93,3 +77,20 @@ export class ValidateSparePartOrderUseCase {
     }
   }
 }
+
+
+export interface ValidateSparePartOrderDTO extends BaseAuthenticatedDTO {
+    orderId: string;
+    action: 'CONFIRM' | 'CANCEL';
+  }
+  
+  export interface ValidateSparePartOrderResponseDTO {
+    success: boolean;
+    message: string;
+    orderId: string;
+    newStatus: OrderStatus;
+    updatedStock?: {
+      sparePartReference: string;
+      newQuantity: number;
+    }[];
+  }

@@ -1,12 +1,6 @@
 import { SparePart } from '@domain/value-objects/SparePart';
-import { DomainError } from '@domain/errors/DomainError';
 import { SparePartOrder } from '@domain/entities/SparePartOrderEntity';
-
-export class DealershipSparePartsStockError extends DomainError {
-  constructor(message: string) {
-    super(message);
-  }
-}
+import { DealershipSparePartsStockError } from '@domain/errors/spare-part/DealershipSparePartsStockError';
 
 export class DealershipSparePartsStock {
   private constructor(

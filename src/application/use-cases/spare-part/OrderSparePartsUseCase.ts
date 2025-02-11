@@ -5,17 +5,7 @@ import { SparePartOrder } from '@domain/entities/SparePartOrderEntity';
 import { SparePart } from '@domain/value-objects/SparePart';
 import { UnauthorizedError } from '@domain/errors/authorization/UnauthorizedError';
 import { UserRole } from '@domain/enums/UserRole';
-
-interface OrderSparePartsDTO {
-  dealershipId: string;
-  userId: string;
-  userRole: UserRole;
-  items: Array<{
-    sparePartReference: string;
-    quantity: number;
-  }>;
-  estimatedDeliveryDate?: Date;
-}
+import { OrderSparePartsDTO } from '@application/dtos/spare-part/request/OrderSparePartsDTO';
 
 export class OrderSparePartsUseCase {
   constructor(

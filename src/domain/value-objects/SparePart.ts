@@ -3,36 +3,6 @@ import { ISparePartProps } from '@domain/interfaces/maintenance/ISparePartProps'
 import { Model } from '@domain/value-objects/Model';
 import { MotorcycleModel } from '@domain/enums/MotorcycleEnums';
 
-export enum SparePartCategory {
-  FILTER = 'FILTER',
-  TIRE = 'TIRE',
-  BRAKE = 'BRAKE',
-  ENGINE = 'ENGINE',
-  TRANSMISSION = 'TRANSMISSION',
-  ELECTRICAL = 'ELECTRICAL',
-  OTHER = 'OTHER',
-}
-
-export class SparePartError extends DomainError {
-  constructor(message: string) {
-    super(message);
-  }
-}
-
-export interface SparePartProps {
-  reference: string;
-  name: string;
-  category: SparePartCategory;
-  description: string;
-  manufacturer: string;
-  compatibleModels: MotorcycleModel[];
-  minimumStockThreshold: number;
-  unitPrice: number;
-  isActive: boolean;
-  createdAt: Date;
-  updatedAt: Date;
-}
-
 export class SparePart {
   private readonly props: SparePartProps;
 
@@ -130,4 +100,34 @@ export class SparePart {
       'Price is not provided in the constructor or create method',
     );
   }
+}
+
+export enum SparePartCategory {
+  FILTER = 'FILTER',
+  TIRE = 'TIRE',
+  BRAKE = 'BRAKE',
+  ENGINE = 'ENGINE',
+  TRANSMISSION = 'TRANSMISSION',
+  ELECTRICAL = 'ELECTRICAL',
+  OTHER = 'OTHER',
+}
+
+export class SparePartError extends DomainError {
+  constructor(message: string) {
+    super(message);
+  }
+}
+
+export interface SparePartProps {
+  reference: string;
+  name: string;
+  category: SparePartCategory;
+  description: string;
+  manufacturer: string;
+  compatibleModels: MotorcycleModel[];
+  minimumStockThreshold: number;
+  unitPrice: number;
+  isActive: boolean;
+  createdAt: Date;
+  updatedAt: Date;
 }

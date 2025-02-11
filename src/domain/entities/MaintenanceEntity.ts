@@ -8,26 +8,13 @@ import {
   MaintenanceType,
   RecommendationPriority,
 } from '@domain/enums/MaintenanceEnums';
-import { DomainError } from '@domain/errors/DomainError';
 import { randomUUID } from 'crypto';
 import { SparePart } from '@domain/value-objects/SparePart';
 import { MaintenanceCost } from '@domain/value-objects/MaintenanceCost';
 import { TechnicianRecommendation } from '@domain/value-objects/TechnicianRecommendation';
 import { Warranty } from '@domain/value-objects/Warranty';
-
-export class MaintenanceValidationError extends DomainError {
-  constructor(message: string) {
-    super(message);
-  }
-}
-
-interface UsedSparePart {
-  sparePart: SparePart;
-  quantity: number;
-  unitPrice: number;
-  totalPrice: number;
-  usedAt: Date;
-}
+import { MaintenanceValidationError } from '@domain/errors/maintenance/MaintenanceValidationError';
+import { UsedSparePart } from '@domain/interfaces/maintenance/UsedSparePart';
 
 export class Maintenance {
   private readonly props: IMaintenanceProps;

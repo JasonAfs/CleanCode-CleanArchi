@@ -1,10 +1,6 @@
 import { IMotorcycleRepository } from '@application/ports/repositories/IMotorcycleRepository';
 import { ICompanyRepository } from '@application/ports/repositories/ICompanyRepository';
 import { AssignMotorcycleToCompanyDTO } from '@application/dtos/motorcycle/request/AssignMotorcycleToCompanyDTO';
-import { Authorize } from '@application/decorators/Authorize';
-import { IAuthorizationAware } from '@domain/services/authorization/ports/IAuthorizationAware';
-import { AuthorizationContext } from '@domain/services/authorization/types/AuthorizationContext';
-import { Permission } from '@domain/services/authorization/Permission';
 import { Result } from '@domain/shared/Result';
 import { CompanyValidationError } from '@domain/errors/company/CompanyValidationError';
 import { MotorcycleNotFoundError } from '@domain/errors/motorcycle/MotorcycleValidationError';

@@ -3,12 +3,6 @@ import { IWarrantyProps } from '@domain/interfaces/maintenance/IWarrantyProps';
 import { WarrantyType } from '@domain/enums/MaintenanceEnums';
 import { randomUUID } from 'crypto';
 
-export class WarrantyError extends DomainError {
-  constructor(message: string) {
-    super(message);
-  }
-}
-
 export class Warranty {
   private readonly props: IWarrantyProps;
 
@@ -89,5 +83,11 @@ export class Warranty {
   public deactivate(): void {
     this.props.isActive = false;
     this.props.updatedAt = new Date();
+  }
+}
+
+export class WarrantyError extends DomainError {
+  constructor(message: string) {
+    super(message);
   }
 }

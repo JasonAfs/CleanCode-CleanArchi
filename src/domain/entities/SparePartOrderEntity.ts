@@ -2,36 +2,6 @@ import { DomainError } from '@domain/errors/DomainError';
 import { SparePart } from '@domain/value-objects/SparePart';
 import { randomUUID } from 'crypto';
 
-export enum OrderStatus {
-  PENDING = 'PENDING',
-  CONFIRMED = 'CONFIRMED',
-  SHIPPED = 'SHIPPED',
-  DELIVERED = 'DELIVERED',
-  CANCELLED = 'CANCELLED',
-}
-
-export class SparePartOrderError extends DomainError {
-  constructor(message: string) {
-    super(message);
-  }
-}
-
-interface OrderItem {
-  sparePart: SparePart;
-  quantity: number;
-  unitPrice: number;
-}
-
-interface ReconstituteProps {
-  id: string;
-  dealershipId: string;
-  items: OrderItem[];
-  status: OrderStatus;
-  orderedAt: Date;
-  estimatedDeliveryDate?: Date;
-  deliveredAt?: Date;
-}
-
 export class SparePartOrder {
   private constructor(
     private readonly _id: string,
@@ -147,4 +117,34 @@ export class SparePartOrder {
   public getTotalQuantity(): number {
     return this.orderItems.reduce((total, item) => total + item.quantity, 0);
   }
+}
+
+export enum OrderStatus {
+  PENDING = 'PENDING',
+  CONFIRMED = 'CONFIRMED',
+  SHIPPED = 'SHIPPED',
+  DELIVERED = 'DELIVERED',
+  CANCELLED = 'CANCELLED',
+}
+
+export class SparePartOrderError extends DomainError {
+  constructor(message: string) {
+    super(message);
+  }
+}
+
+interface OrderItem {
+  sparePart: SparePart;
+  quantity: number;
+  unitPrice: number;
+}
+
+interface ReconstituteProps {
+  id: string;
+  dealershipId: string;
+  items: OrderItem[];
+  status: OrderStatus;
+  orderedAt: Date;
+  estimatedDeliveryDate?: Date;
+  deliveredAt?: Date;
 }

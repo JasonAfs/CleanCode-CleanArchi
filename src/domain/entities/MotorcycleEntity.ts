@@ -20,7 +20,6 @@ import { MaintenanceInterval } from '@domain/value-objects/MaintenanceInterval';
 import { MotorcycleMaintenance } from '@domain/aggregates/motorcycle/MotorcycleMaintenance';
 import { Maintenance } from '@domain/entities/MaintenanceEntity';
 import { MaintenanceType } from '@domain/enums/MaintenanceEnums';
-import { MaintenanceNotification } from '@domain/entities/MaintenanceNotificationEntity';
 
 export class Motorcycle {
   private readonly props: MotorcycleProps;

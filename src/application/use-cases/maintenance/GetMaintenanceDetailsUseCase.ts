@@ -5,50 +5,6 @@ import { Maintenance } from '@domain/entities/MaintenanceEntity';
 import { UserRole } from '@domain/enums/UserRole';
 import { UnauthorizedError } from '@domain/errors/authorization/UnauthorizedError';
 
-export interface GetMaintenanceDetailsDTO {
-  maintenanceId: string;
-  userId: string;
-  userRole: UserRole;
-  userDealershipId?: string;
-  userCompanyId?: string;
-}
-
-export interface MaintenanceDetailsResponseDTO {
-  id: string;
-  motorcycleId: string;
-  dealershipId: string;
-  type: string;
-  status: string;
-  description: string;
-  mileage: number;
-  scheduledDate: Date;
-  startDate?: Date;
-  completedDate?: Date;
-  spareParts: {
-    reference: string;
-    name: string;
-    quantity: number;
-    unitPrice: number;
-    totalPrice: number;
-  }[];
-  costs?: {
-    laborCost: number;
-    partsCost: number;
-    total: number;
-  };
-  recommendations: {
-    description: string;
-    priority: string;
-  }[];
-  warranty?: {
-    type: string;
-    startDate: Date;
-    endDate: Date;
-  };
-  createdAt: Date;
-  updatedAt: Date;
-}
-
 export class GetMaintenanceDetailsUseCase {
   constructor(
     private readonly maintenanceRepository: IMaintenanceRepository,
@@ -165,4 +121,48 @@ export class GetMaintenanceDetailsUseCase {
       updatedAt: maintenance.updatedAt,
     };
   }
+}
+
+export interface GetMaintenanceDetailsDTO {
+  maintenanceId: string;
+  userId: string;
+  userRole: UserRole;
+  userDealershipId?: string;
+  userCompanyId?: string;
+}
+
+export interface MaintenanceDetailsResponseDTO {
+  id: string;
+  motorcycleId: string;
+  dealershipId: string;
+  type: string;
+  status: string;
+  description: string;
+  mileage: number;
+  scheduledDate: Date;
+  startDate?: Date;
+  completedDate?: Date;
+  spareParts: {
+    reference: string;
+    name: string;
+    quantity: number;
+    unitPrice: number;
+    totalPrice: number;
+  }[];
+  costs?: {
+    laborCost: number;
+    partsCost: number;
+    total: number;
+  };
+  recommendations: {
+    description: string;
+    priority: string;
+  }[];
+  warranty?: {
+    type: string;
+    startDate: Date;
+    endDate: Date;
+  };
+  createdAt: Date;
+  updatedAt: Date;
 }

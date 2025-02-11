@@ -2,11 +2,7 @@ import { DomainError } from '@domain/errors/DomainError';
 import { randomUUID } from 'crypto';
 import { MaintenanceNotificationProps } from '@domain/interfaces/Notification/MaintenanceNotificationProps';
 
-export class MaintenanceNotificationError extends DomainError {
-  constructor(message: string) {
-    super(message);
-  }
-}
+
 
 export class MaintenanceNotification {
   private readonly props: MaintenanceNotificationProps;
@@ -81,5 +77,11 @@ export class MaintenanceNotification {
   public markAsRead(): void {
     this.props.isRead = true;
     this.props.updatedAt = new Date();
+  }
+}
+
+export class MaintenanceNotificationError extends DomainError {
+  constructor(message: string) {
+    super(message);
   }
 }

@@ -1,11 +1,5 @@
 import { randomUUID } from 'crypto';
 
-export enum StockNotificationType {
-  LOW_STOCK = 'LOW_STOCK',
-  OUT_OF_STOCK = 'OUT_OF_STOCK',
-  REORDER_SUGGESTED = 'REORDER_SUGGESTED',
-}
-
 export class StockNotification {
   private constructor(
     private readonly id: string,
@@ -49,4 +43,11 @@ export class StockNotification {
   get notificationType(): StockNotificationType {
     return this.type;
   }
+}
+
+
+export enum StockNotificationType {
+  LOW_STOCK = 'LOW_STOCK',
+  OUT_OF_STOCK = 'OUT_OF_STOCK',
+  REORDER_SUGGESTED = 'REORDER_SUGGESTED',
 }

@@ -3,11 +3,6 @@ import { ITechnicianRecommendationProps } from '@domain/interfaces/maintenance/I
 import { RecommendationPriority } from '@domain/enums/MaintenanceEnums';
 import { randomUUID } from 'crypto';
 
-export class TechnicianRecommendationError extends DomainError {
-  constructor(message: string) {
-    super(message);
-  }
-}
 
 export class TechnicianRecommendation {
   private readonly props: ITechnicianRecommendationProps;
@@ -62,5 +57,11 @@ export class TechnicianRecommendation {
 
   get updatedAt(): Date {
     return this.props.updatedAt;
+  }
+}
+
+export class TechnicianRecommendationError extends DomainError {
+  constructor(message: string) {
+    super(message);
   }
 }

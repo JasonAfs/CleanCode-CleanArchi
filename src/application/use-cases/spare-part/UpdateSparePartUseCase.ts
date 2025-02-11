@@ -5,7 +5,6 @@ import { SparePart } from '@domain/value-objects/SparePart';
 import { UserRole } from '@domain/enums/UserRole';
 import { UnauthorizedError } from '@domain/errors/authorization/UnauthorizedError';
 import { SparePartMapper } from '@application/mappers/SparePartMapper';
-import { Result } from '@domain/shared/Result';
 import { SparePartNotFoundError } from '@domain/errors/spare-part/SparePartNotFoundError';
 
 export class UpdateSparePartUseCase {
