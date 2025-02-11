@@ -15,7 +15,6 @@ export class ValidateSparePartOrderUseCase {
     dto: ValidateSparePartOrderDTO,
   ): Promise<ValidateSparePartOrderResponseDTO> {
     // Vérification du rôle
-    console.log('laaaaaaa' + dto.userRole);
     if (dto.userRole !== UserRole.TRIUMPH_ADMIN) {
       throw new UnauthorizedError(
         'Only TRIUMPH_ADMIN can validate spare part orders',

@@ -66,12 +66,14 @@ export class MotorcycleController {
     @Body() dto: CreateMotorcycleRequestDTO,
   ) {
     try {
+      console.log(dto);
       const result = await this.createMotorcycleUseCase.execute({
         ...dto,
         userId: req.user.userId,
         userRole: req.user.role,
         dealershipId: dto.dealershipId,
       });
+      console.log(result);
 
       if (result instanceof Error) {
         if (result instanceof UnauthorizedError) {

@@ -88,8 +88,7 @@ export class SparePartOrderController {
       );
     }
 
-    console.log('Controller - Raw body:', dto);
-    console.log('Controller - Items from body:', dto.items);
+    
 
     const orderData = {
       ...dto,
@@ -98,7 +97,7 @@ export class SparePartOrderController {
       userRole: req.user.role,
     };
 
-    console.log('Controller - Final data:', orderData);
+
 
     try {
       const result = await this.orderSparePartsUseCase.execute(orderData);
@@ -162,7 +161,7 @@ export class SparePartOrderController {
     @Request() req: AuthenticatedRequest,
     @Body() dto: ValidateSparePartOrderDTO,
   ): Promise<ValidateSparePartOrderResponseDTO> {
-    console.log('laaaaaaa' + JSON.stringify(dto));
+
     return this.validateSparePartOrderUseCase.execute({
       ...dto,
       userId: req.user.userId,

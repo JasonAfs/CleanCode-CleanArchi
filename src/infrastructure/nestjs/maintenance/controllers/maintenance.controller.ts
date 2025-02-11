@@ -41,7 +41,7 @@ export class MaintenanceController {
       companyId: req.user.userCompanyId,
       ...query,
     });
-    console.log(result);
+
 
     if (result instanceof Error) {
       throw new BadRequestException(result.message);

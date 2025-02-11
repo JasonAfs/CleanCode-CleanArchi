@@ -36,7 +36,6 @@ export function NewOrderDialog() {
       ],
     };
 
-    console.log('Frontend - Submitting order:', orderData);
 
     try {
       await createOrder(orderData);

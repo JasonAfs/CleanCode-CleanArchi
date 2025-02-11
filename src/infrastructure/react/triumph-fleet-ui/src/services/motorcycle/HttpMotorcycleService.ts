@@ -33,6 +33,7 @@ export class HttpMotorcycleService extends AxiosAuthenticationGateway {
       dealershipId: string;
     };
   }) {
+    console.log(motorcycle);
     return this.httpClient.post<Motorcycle>('/motorcycles', motorcycle);
   }
 

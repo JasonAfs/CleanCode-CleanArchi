@@ -15,9 +15,6 @@ export class OrderSparePartsUseCase {
   ) {}
 
   async execute(dto: OrderSparePartsDTO): Promise<{ orderId: string }> {
-    console.log('UseCase - Raw DTO:', dto);
-    console.log('UseCase - Items:', dto.items);
-    console.log('UseCase - First item:', dto.items[0]);
 
     if (
       ![
@@ -49,10 +46,6 @@ export class OrderSparePartsUseCase {
         throw new Error('La référence de la pièce est requise');
       }
 
-      console.log('UseCase - Processing item:', {
-        reference: item.sparePartReference,
-        quantity: item.quantity,
-      });
 
       const part = await this.sparePartRepository.findByReference(
         item.sparePartReference,

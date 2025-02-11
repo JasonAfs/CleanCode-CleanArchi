@@ -176,7 +176,6 @@ export class CompanyController {
         userDealershipId: req.user.userDealershipId,
         includeInactive: query.includeInactive,
       });
-      console.log(result);
 
       if (result instanceof Error) {
         if (result instanceof UnauthorizedError) {

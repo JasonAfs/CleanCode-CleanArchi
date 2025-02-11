@@ -3,21 +3,15 @@ import { HttpMotorcycleService } from '@/services/motorcycle/HttpMotorcycleServi
 import { TransferMotorcycleResponse } from '@/types/responses';
 import { MotorcycleStatus } from '@domain/enums/MotorcycleEnums';
 import { Motorcycle } from '@/types/motorcycle';
+import { MotorcycleModel } from '@/types/motorcycleModel';
 
 interface CreateMotorcycleData {
-  model: {
-    type: string;
-    year: number;
-    displacement: number;
-    category: string;
-    maintenanceInterval: number;
-  };
   vin: string;
+  modelType: MotorcycleModel;
+  year: number;
+  color: string;
   mileage: number;
-  status: 'AVAILABLE' | 'MAINTENANCE';
-  holder: {
-    dealershipId: string;
-  };
+  dealershipId: string;
 }
 
 interface UpdateMotorcycleData {

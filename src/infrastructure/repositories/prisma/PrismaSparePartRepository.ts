@@ -41,8 +41,7 @@ export class PrismaSparePartRepository implements ISparePartRepository {
   }
 
   async findByReference(reference: string): Promise<SparePart | null> {
-    console.log('Repository - findByReference input:', reference);
-    console.log('Repository - findByReference type:', typeof reference);
+
 
     if (!reference) {
       console.error('Repository - Reference is undefined or empty');
@@ -55,7 +54,6 @@ export class PrismaSparePartRepository implements ISparePartRepository {
       },
     });
 
-    console.log('Repository - Found sparePart:', sparePart);
 
     if (!sparePart) return null;
 
